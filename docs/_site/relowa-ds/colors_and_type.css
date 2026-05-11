@@ -26,8 +26,8 @@
   --green-500: #00E676;   /* Primary accent — buttons, active states */
   --green-600: #00C561;
   --green-700: #009B46;
-  --green-800: #0A2E1C;   /* Sidebar, dark cards */
-  --green-900: #022117;   /* Deeper variant for darkest surfaces */
+  --green-800: #0A2E1C;   /* Sidebar top */
+  --green-900: #051C14;   /* Sidebar bottom / darkest surfaces */
 
   /* Neutrals — slightly warm grayscale */
   --neutral-0:   #FFFFFF;
@@ -97,7 +97,7 @@
   --sidebar-bg:        var(--green-800);         /* #0A2E1C */
   --sidebar-text:      #8CA699;
   --sidebar-text-hover: #C5D4CC;
-  --sidebar-active-bg: rgba(0, 230, 118, 0.12);
+  --sidebar-active-bg: linear-gradient(90deg, rgba(0, 230, 118, 0) 0%, rgba(0, 230, 118, 0.15) 100%);
   --sidebar-active-text: var(--green-500);
 
   /* Borders */
