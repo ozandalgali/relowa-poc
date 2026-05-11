@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spacing Scale — Relowa DS</title>
+  <link rel="stylesheet" href="../colors_and_type.css">
+  <style>
+    body {
+      padding: 24px;
+      background: var(--surface);
+      font-family: var(--font-sans);
+      color: var(--foreground);
+    }
+    h2 {
+      font-size: var(--text-h3);
+      font-weight: var(--weight-semibold);
+      margin: 0 0 8px;
+    }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+      font-weight: var(--weight-medium);
+      color: var(--foreground-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 32px;
+    }
+    .scale {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 480px;
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+    }
+    .bar {
+      background: var(--green-500);
+      border-radius: var(--radius-xs);
+      transition: width var(--transition-base);
+      min-width: 4px;
+      flex-shrink: 0;
+    }
+    .label {
+      font-family: var(--font-mono);
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-medium);
+      color: var(--foreground-muted);
+      white-space: nowrap;
+    }
+    .label .token {
+      color: var(--foreground);
+      font-weight: var(--weight-semibold);
+    }
+    .label .px {
+      color: var(--foreground-subtle);
+    }
+  </style>
+</head>
+<body>
+
+<h2>Spacing Scale</h2>
+<p class="eyebrow">4px base &middot; space-1 &ndash; space-20</p>
+
+<div class="scale">
+  <div class="step">
+    <div class="bar" style="width: var(--space-1); height: var(--space-1)"></div>
+    <div class="label"><span class="token">space-1</span> <span class="px">4px</span></div>
+  </div>
+  <div class="step">
+    <div class="bar" style="width: var(--space-2); height: var(--space-2)"></div>
+    <div class="label"><span class="token">space-2</span> <span class="px">8px</span></div>
+  </div>
+  <div class="step">
+    <div class="bar" style="width: var(--space-3); height: var(--space-3)"></div>
+    <div class="label"><span class="token">space-3</span> <span class="px">12px</span></div>
+  </div>
+  <div class="step">
+    <div class="bar" style="width: var(--space-4); height: var(--space-4)"></div>
+    <div class="label"><span class="token">space-4</span> <span class="px">16px</span></div>
+  </div>
+  <div class="step">
+    <div class="bar" style="width: var(--space-5); height: var(--space-5)"></div>
+    <div class="label"><span class="token">space-5</span> <span class="px">20px</span></div>
+  </div>
+  <div class="step">
+    <div class="bar" style="width: var(--space-6); height: var(--space-6)"></div>
+    <div class="label"><span class="token">space-6</span> <span class="px">24px</span></div>
+  </div>
+  <div class="step">
+    <div class="bar" style="width: var(--space-8); height: var(--space-8)"></div>
+    <div class="label"><span class="token">space-8</span> <span class="px">32px</span></div>
+  </div>
+  <div class="step">
+    <div class="bar" style="width: var(--space-10); height: var(--space-10)"></div>
+    <div class="label"><span class="token">space-10</span> <span class="px">40px</span></div>
+  </div>
+  <div class="step">
+    <div class="bar" style="width: var(--space-12); height: var(--space-12)"></div>
+    <div class="label"><span class="token">space-12</span> <span class="px">48px</span></div>
+  </div>
+  <div class="step">
+    <div class="bar" style="width: var(--space-16); height: var(--space-16)"></div>
+    <div class="label"><span class="token">space-16</span> <span class="px">64px</span></div>
+  </div>
+  <div class="step">
+    <div class="bar" style="width: var(--space-20); height: var(--space-20)"></div>
+    <div class="label"><span class="token">space-20</span> <span class="px">80px</span></div>
+  </div>
+</div>
+
+</body>
+</html>

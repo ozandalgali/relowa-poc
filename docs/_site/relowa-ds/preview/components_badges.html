@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Badges — Relowa DS</title>
+  <link rel="stylesheet" href="../colors_and_type.css">
+  <style>
+    body {
+      padding: 40px;
+      background: var(--background);
+      font-family: var(--font-sans);
+      color: var(--foreground);
+    }
+    h2 {
+      font-size: var(--text-h2);
+      font-weight: var(--weight-bold);
+      margin: 0 0 4px;
+    }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: var(--weight-medium);
+      color: var(--foreground-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 32px;
+    }
+    .section {
+      margin-bottom: 36px;
+    }
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: var(--weight-semibold);
+      color: var(--foreground-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      padding: 4px 10px;
+      font-size: 12px;
+      line-height: 1;
+    }
+    .badge-success    { background: var(--success-bg);   color: var(--success); }
+    .badge-success-dk { background: var(--success);      color: #FFFFFF; }
+    .badge-warning    { background: var(--warning-bg);   color: var(--warning); }
+    .badge-warning-dk { background: var(--warning);      color: #FFFFFF; }
+    .badge-danger     { background: var(--danger-bg);    color: var(--danger); }
+    .badge-info       { background: var(--info-bg);      color: var(--info); }
+    .badge-neutral    { background: var(--surface-muted); color: var(--foreground-muted); }
+    .badge-primary-dk { background: var(--primary);      color: #FFFFFF; }
+    .badge-primary-lt { background: var(--primary-subtle); color: var(--primary); }
+
+    .badge-sm {
+      font-size: 11px;
+      padding: 2px 8px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Status Badges</h2>
+<p class="eyebrow">Status &middot; Role &middot; Sizes</p>
+
+<!-- Row 1: Status badges -->
+<div class="section">
+  <div class="section-label">Status Badges</div>
+  <div class="row">
+    <span class="badge badge-success">AKTİF</span>
+    <span class="badge badge-success-dk">TAMAMLANDI</span>
+    <span class="badge badge-warning">BEKLEMEDE</span>
+    <span class="badge badge-warning-dk">ESCROWDA</span>
+    <span class="badge badge-danger">GECİKME</span>
+    <span class="badge badge-info">TRANSİT</span>
+    <span class="badge badge-neutral">TASLAK</span>
+  </div>
+</div>
+
+<!-- Row 2: Role badges -->
+<div class="section">
+  <div class="section-label">Role Badges</div>
+  <div class="row">
+    <span class="badge badge-primary-dk">FULL ADMIN</span>
+    <span class="badge badge-primary-lt">OPERATÖR</span>
+    <span class="badge badge-neutral">MUHASEBE</span>
+  </div>
+</div>
+
+<!-- Row 3: Sizes -->
+<div class="section">
+  <div class="section-label">Sizes: Small &middot; Default</div>
+  <div class="row">
+    <span class="badge badge-success badge-sm">AKTİF</span>
+    <span class="badge badge-success">AKTİF</span>
+    <span class="badge badge-warning badge-sm">BEKLEMEDE</span>
+    <span class="badge badge-warning">BEKLEMEDE</span>
+    <span class="badge badge-danger badge-sm">GECİKME</span>
+    <span class="badge badge-danger">GECİKME</span>
+  </div>
+</div>
+
+</body>
+</html>

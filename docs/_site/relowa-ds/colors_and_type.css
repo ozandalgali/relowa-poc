@@ -1,0 +1,225 @@
+/* =========================================================================
+   Relowa Design System — Tokens
+   shadcn-compatible CSS variables + semantic type scale.
+   Philosophy: Dark green trust, neon green action. Industrial B2B.
+   Neutral-first UI. Green is the action signal, not the wallpaper.
+   ========================================================================= */
+
+/* ---------- Fonts ---------------------------------------------------------
+   Body & Display: Inter (best cross-platform for data-dense Turkish UI).
+   Mono: JetBrains Mono for codes, IDs, numerics, contract amounts.
+   Both load from Google Fonts.
+   ------------------------------------------------------------------------ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* =========================================================================
+     COLOR — Raw palette (brand greens + neutrals).
+     ======================================================================= */
+
+  /* Brand — Green (neon action, deep trust) */
+  --green-50:  #E8FBF0;
+  --green-100: #D1FAE5;
+  --green-200: #A7F5CE;
+  --green-300: #6EE0A8;
+  --green-400: #3CC97D;
+  --green-500: #00E676;   /* Primary accent — buttons, active states */
+  --green-600: #00C561;
+  --green-700: #009B46;
+  --green-800: #0A2E1C;   /* Sidebar, dark cards */
+  --green-900: #022117;   /* Deeper variant for darkest surfaces */
+
+  /* Neutrals — slightly warm grayscale */
+  --neutral-0:   #FFFFFF;
+  --neutral-50:  #F9FAFB;
+  --neutral-100: #F4F7F6;
+  --neutral-150: #EDF0EF;
+  --neutral-200: #E5E7EB;
+  --neutral-300: #D1D5DB;
+  --neutral-400: #9CA3AF;
+  --neutral-500: #6B7280;
+  --neutral-600: #4B5563;
+  --neutral-700: #374151;
+  --neutral-800: #1F2937;
+  --neutral-900: #111827;
+  --neutral-950: #0A0D0C;
+
+  /* Semantic */
+  --success-50:  #ECFDF5;
+  --success-100: #D1FAE5;
+  --success-500: #10B981;
+  --success-700: #047857;
+
+  --warning-50:  #FFFBEB;
+  --warning-100: #FEF3C7;
+  --warning-500: #F59E0B;
+  --warning-700: #B45309;
+
+  --danger-50:   #FEF2F2;
+  --danger-100:  #FEE2E2;
+  --danger-500:  #EF4444;
+  --danger-700:  #B91C1C;
+
+  --info-50:     #EFF6FF;
+  --info-100:    #DBEAFE;
+  --info-500:    #3B82F6;
+  --info-700:    #1D4ED8;
+}
+
+[data-theme="light"], :root {
+  /* =========================================================================
+     Light theme — Semantic tokens
+     ======================================================================= */
+
+  /* Surfaces */
+  --background:        var(--neutral-100);       /* #F4F7F6 page bg */
+  --surface:           var(--neutral-0);         /* #FFFFFF cards */
+  --surface-muted:     var(--neutral-50);        /* #F9FAFB subtle fills */
+  --surface-elevated:  var(--neutral-0);
+
+  /* Foreground */
+  --foreground:        var(--neutral-900);       /* #111827 primary text */
+  --foreground-muted:  var(--neutral-500);       /* #6B7280 secondary */
+  --foreground-subtle: var(--neutral-400);       /* #9CA3AF tertiary */
+
+  /* Brand application */
+  --primary:           var(--green-800);         /* Deep green — sidebar, dark cards */
+  --primary-hover:     var(--green-700);
+  --primary-foreground: var(--neutral-0);        /* White text on dark green */
+  --primary-subtle:    var(--green-50);          /* #E8FBF0 — nav active bg */
+  --primary-subtle-foreground: var(--green-800);
+
+  --accent:            var(--green-500);         /* #00E676 — buttons, links */
+  --accent-hover:      var(--green-600);         /* #00C561 — button hover */
+  --accent-foreground:  var(--green-900);        /* #022117 — text on green btn */
+
+  /* Sidebar */
+  --sidebar-bg:        var(--green-800);         /* #0A2E1C */
+  --sidebar-text:      #8CA699;
+  --sidebar-text-hover: #C5D4CC;
+  --sidebar-active-bg: rgba(0, 230, 118, 0.12);
+  --sidebar-active-text: var(--green-500);
+
+  /* Borders */
+  --border:            var(--neutral-200);       /* #E5E7EB */
+  --border-strong:     var(--neutral-300);       /* #D1D5DB */
+  --border-subtle:     var(--neutral-150);
+
+  /* Inputs */
+  --input-bg:          var(--neutral-100);       /* #F4F7F6 */
+  --input-border:      var(--neutral-200);
+  --input-focus:       var(--green-500);         /* #00E676 focus ring */
+  --input-focus-ring:  rgba(0, 230, 118, 0.18);
+
+  /* Semantic application */
+  --success:           var(--success-500);
+  --success-bg:        var(--success-50);
+  --warning:           var(--warning-500);
+  --warning-bg:        var(--warning-50);
+  --danger:            var(--danger-500);
+  --danger-bg:         var(--danger-50);
+  --info:              var(--info-500);
+  --info-bg:           var(--info-50);
+
+  /* Overlay */
+  --overlay:           rgba(0, 0, 0, 0.4);
+
+  /* =======================================================================
+     TYPOGRAPHY — Semantic type scale (Inter)
+     ======================================================================= */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+
+  --text-display:      2.5rem;     /* 40px — hero/marketing */
+  --text-h1:           1.75rem;    /* 28px — page titles */
+  --text-h2:           1.375rem;   /* 22px — section headers */
+  --text-h3:           1.125rem;   /* 18px — card titles */
+  --text-h4:           1rem;       /* 16px — subsection */
+  --text-body-lg:      1rem;       /* 16px — large body, KPIs */
+  --text-body:         0.875rem;   /* 14px — default body */
+  --text-body-sm:      0.75rem;    /* 12px — metadata */
+  --text-caption:      0.6875rem;  /* 11px — labels, badges */
+  --text-overline:     0.6875rem;  /* 11px — uppercase labels */
+
+  --leading-relaxed:   1.6;
+  --leading-normal:    1.5;
+  --leading-tight:     1.25;
+
+  --weight-black:      800;
+  --weight-bold:       700;
+  --weight-semibold:   600;
+  --weight-medium:     500;
+  --weight-regular:    400;
+  --weight-light:      300;
+
+  /* =======================================================================
+     SPACING — 4px base grid
+     ======================================================================= */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  --content-max:    1440px;
+  --content-reading: 720px;
+  --sidebar-width:   260px;
+  --topbar-height:   64px;
+
+  /* =======================================================================
+     CORNER RADII
+     ======================================================================= */
+  --radius-xs:   4px;    /* Tags, inline chips */
+  --radius-sm:   6px;    /* Small buttons, checkboxes */
+  --radius-md:   8px;    /* Default controls: inputs, buttons */
+  --radius-lg:   12px;   /* Cards, panels, tables */
+  --radius-xl:   16px;   /* Large surfaces, modals, role cards */
+  --radius-2xl:  24px;   /* Hero / marketing cards */
+  --radius-full: 999px;  /* Pills: status chips, avatars, toggles */
+
+  /* =======================================================================
+     SHADOWS
+     ======================================================================= */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
+
+  /* Focus ring */
+  --focus-ring: 0 0 0 4px var(--input-focus-ring);
+
+  /* =======================================================================
+     MOTION
+     ======================================================================= */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-fast: 120ms var(--ease-out);
+  --transition-base: 200ms var(--ease-out);
+  --transition-slow: 300ms var(--ease-out);
+
+  /* =======================================================================
+     Z-INDEX
+     ======================================================================= */
+  --z-sidebar:  100;
+  --z-topbar:   200;
+  --z-modal:    500;
+  --z-tooltip:  600;
+  --z-toast:    700;
+
+  /* ---- Defaults -------------------------------------------------------- */
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---- Reset ------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--background); }

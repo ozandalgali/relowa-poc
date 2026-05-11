@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shadows — Relowa DS</title>
+  <link rel="stylesheet" href="../colors_and_type.css">
+  <style>
+    body {
+      padding: 24px;
+      background: var(--neutral-100);
+      font-family: var(--font-sans);
+      color: var(--foreground);
+    }
+    h2 {
+      font-size: var(--text-h3);
+      font-weight: var(--weight-semibold);
+      margin: 0 0 8px;
+      color: var(--foreground);
+    }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+      font-weight: var(--weight-medium);
+      color: var(--foreground-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 32px;
+    }
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 480px;
+    }
+    .card {
+      background: var(--surface);
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      transition: transform var(--transition-base);
+    }
+    .card:hover { transform: translateY(-2px); }
+    .card-label {
+      font-family: var(--font-mono);
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-semibold);
+      color: var(--foreground);
+      margin-bottom: 4px;
+    }
+    .card-desc {
+      font-family: var(--font-sans);
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-regular);
+      color: var(--foreground-muted);
+      line-height: var(--leading-normal);
+    }
+    .card-value {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+      font-weight: var(--weight-medium);
+      color: var(--foreground-subtle);
+      margin-top: 6px;
+      word-break: break-all;
+    }
+    .s-xs  { box-shadow: var(--shadow-xs); }
+    .s-sm  { box-shadow: var(--shadow-sm); }
+    .s-md  { box-shadow: var(--shadow-md); }
+    .s-lg  { box-shadow: var(--shadow-lg); }
+    .s-xl  { box-shadow: var(--shadow-xl); }
+    .focus {
+      border: 2px solid var(--green-500);
+      box-shadow: var(--focus-ring);
+    }
+  </style>
+</head>
+<body>
+
+<h2>Shadows &amp; Elevation</h2>
+<p class="eyebrow">5 levels &middot; xs &ndash; xl &middot; + focus ring</p>
+
+<div class="stack">
+  <div class="card s-xs">
+    <div class="card-label">shadow-xs</div>
+    <div class="card-desc">Satır içi, rozetler, giriş alanları</div>
+    <div class="card-value">0 1px 2px rgba(0, 0, 0, 0.04)</div>
+  </div>
+
+  <div class="card s-sm">
+    <div class="card-label">shadow-sm</div>
+    <div class="card-desc">Düğmeler, açılır menüler</div>
+    <div class="card-value">0 1px 3px rgba(0, 0, 0, 0.08)</div>
+  </div>
+
+  <div class="card s-md">
+    <div class="card-label">shadow-md</div>
+    <div class="card-desc">Kartlar, tablo satırları hover</div>
+    <div class="card-value">0 4px 12px rgba(0, 0, 0, 0.1)</div>
+  </div>
+
+  <div class="card s-lg">
+    <div class="card-label">shadow-lg</div>
+    <div class="card-desc">Modaller, yan paneller</div>
+    <div class="card-value">0 8px 24px rgba(0, 0, 0, 0.12)</div>
+  </div>
+
+  <div class="card s-xl">
+    <div class="card-label">shadow-xl</div>
+    <div class="card-desc">Toast bildirimleri, yüzen eylem düğmeleri</div>
+    <div class="card-value">0 16px 48px rgba(0, 0, 0, 0.16)</div>
+  </div>
+
+  <div class="card focus">
+    <div class="card-label" style="color: var(--green-700)">--focus-ring</div>
+    <div class="card-desc">Klavye odağı, seçili giriş alanları</div>
+    <div class="card-value">0 0 0 4px rgba(0, 230, 118, 0.18)</div>
+  </div>
+</div>
+
+</body>
+</html>

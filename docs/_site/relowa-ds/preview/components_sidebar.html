@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sidebar — Relowa DS</title>
+  <link rel="stylesheet" href="../colors_and_type.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      margin: 0;
+      background: var(--background);
+      font-family: var(--font-sans);
+      display: flex;
+      align-items: flex-start;
+    }
+    .sidebar {
+      width: 260px;
+      min-height: 100vh;
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+    }
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px;
+      font-size: 20px;
+      font-weight: var(--weight-bold);
+      color: #FFFFFF;
+      letter-spacing: -0.02em;
+    }
+    .sidebar-logo {
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      border-radius: var(--radius-md);
+      flex-shrink: 0;
+    }
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 0;
+    }
+    .nav-section {
+      margin-bottom: 8px;
+    }
+    .nav-section-title {
+      font-size: 10px;
+      font-weight: var(--weight-semibold);
+      color: var(--sidebar-text);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 16px 20px 8px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 48px;
+      padding-left: 20px;
+      padding-right: 20px;
+      font-size: 14px;
+      color: var(--sidebar-text);
+      text-decoration: none;
+      transition: all var(--transition-fast);
+      cursor: default;
+    }
+    .nav-item:hover {
+      color: var(--sidebar-text-hover);
+      background: rgba(255,255,255,0.04);
+    }
+    .nav-item.active {
+      color: var(--sidebar-active-text);
+      background: var(--sidebar-active-bg);
+    }
+    .nav-icon {
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+    .nav-item.active .nav-icon { opacity: 1; }
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--neutral-500);
+      flex-shrink: 0;
+    }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name {
+      font-size: 13px;
+      font-weight: var(--weight-medium);
+      color: #FFFFFF;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .user-role {
+      font-size: 11px;
+      color: var(--sidebar-text);
+    }
+
+    .preview-info {
+      padding: 40px;
+      color: var(--foreground-muted);
+      font-size: 13px;
+      max-width: 400px;
+      line-height: 1.6;
+    }
+    .preview-info strong {
+      color: var(--foreground);
+    }
+    .nav-icon svg { width: 18px; height: 18px; stroke-width: 1.75; }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-logo"></div>
+    relowa.
+  </div>
+  <nav class="sidebar-nav">
+
+    <div class="nav-section">
+      <div class="nav-section-title">ANA MENÜ</div>
+      <a class="nav-item">
+        <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
+        Kontrol Paneli
+      </a>
+      <a class="nav-item">
+        <span class="nav-icon"><i data-lucide="store"></i></span>
+        Pazar Yeri
+      </a>
+      <a class="nav-item">
+        <span class="nav-icon"><i data-lucide="plus-circle"></i></span>
+        İhale Oluştur
+      </a>
+      <a class="nav-item">
+        <span class="nav-icon"><i data-lucide="activity"></i></span>
+        Canlı İhale Takip
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">RAPORLAR</div>
+      <a class="nav-item">
+        <span class="nav-icon"><i data-lucide="dollar-sign"></i></span>
+        Finansal Veriler
+      </a>
+      <a class="nav-item">
+        <span class="nav-icon"><i data-lucide="history"></i></span>
+        Geçmiş İhaleler
+      </a>
+      <a class="nav-item">
+        <span class="nav-icon"><i data-lucide="leaf"></i></span>
+        ESG Raporu
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">OPERASYONEL</div>
+      <a class="nav-item">
+        <span class="nav-icon"><i data-lucide="megaphone"></i></span>
+        Taşıyıcı İlanı Aç
+      </a>
+      <a class="nav-item">
+        <span class="nav-icon"><i data-lucide="truck"></i></span>
+        Operasyon Takip
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">HESAP</div>
+      <a class="nav-item">
+        <span class="nav-icon"><i data-lucide="file-text"></i></span>
+        Faturalar
+      </a>
+      <a class="nav-item active">
+        <span class="nav-icon"><i data-lucide="settings"></i></span>
+        Ayarlar
+      </a>
+      <a class="nav-item">
+        <span class="nav-icon"><i data-lucide="help-circle"></i></span>
+        Yardım
+      </a>
+    </div>
+
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-avatar"></div>
+    <div class="user-info">
+      <div class="user-name">Esko Geri Dönüşüm</div>
+      <div class="user-role">Admin</div>
+    </div>
+  </div>
+</div>
+
+<div class="preview-info">
+  <strong>Sidebar Preview</strong><br>
+  Width: 260px · Background: <code>#0A2E1C</code> (--primary)<br>
+  Active item: <strong>Ayarlar</strong> — green text, subtle green background<br>
+  All nav items are 48px height · No borders between items<br>
+  Section headers: 10px uppercase, 0.1em letter-spacing
+</div>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>

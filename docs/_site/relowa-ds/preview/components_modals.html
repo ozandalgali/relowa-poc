@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modals — Relowa DS</title>
+  <link rel="stylesheet" href="../colors_and_type.css">
+  <style>
+    body {
+      padding: 40px;
+      background: var(--background);
+      font-family: var(--font-sans);
+      color: var(--foreground);
+    }
+    h2 {
+      font-size: var(--text-h2);
+      font-weight: var(--weight-bold);
+      margin: 0 0 4px;
+    }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: var(--weight-medium);
+      color: var(--foreground-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 32px;
+    }
+    .modal-row {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+    .modal-spec {
+      flex: 0 0 auto;
+    }
+    .modal-label {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: var(--weight-semibold);
+      color: var(--foreground-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 16px;
+    }
+
+    /* Simulated overlay + centered modal */
+    .modal-stage {
+      position: relative;
+      background: var(--overlay);
+      border-radius: var(--radius-xl);
+      padding: 48px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+    .modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 24px 24px 0;
+    }
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--foreground);
+      margin: 0;
+    }
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      color: var(--foreground-muted);
+      cursor: default;
+      border-radius: var(--radius-md);
+      flex-shrink: 0;
+      transition: background var(--transition-fast);
+    }
+    .modal-close:hover { background: var(--surface-muted); }
+    .modal-body {
+      padding: 24px;
+    }
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 0 24px 24px;
+    }
+
+    .field { margin-bottom: 16px; }
+    .field-label {
+      display: block;
+      font-size: 14px;
+      font-weight: var(--weight-medium);
+      margin-bottom: 6px;
+      color: var(--foreground);
+    }
+    .input {
+      display: block;
+      width: 100%;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      background: var(--input-bg);
+      color: var(--foreground);
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      outline: none;
+      transition: box-shadow var(--transition-fast);
+    }
+    .input::placeholder { color: var(--foreground-subtle); }
+    .input:focus {
+      box-shadow: 0 0 0 3px var(--input-focus-ring), inset 0 0 0 1px var(--accent);
+    }
+    .select-wrap {
+      position: relative;
+    }
+    .select-wrap select {
+      appearance: none;
+      width: 100%;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      background: var(--input-bg);
+      color: var(--foreground);
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 12px 40px 12px 16px;
+      outline: none;
+      cursor: pointer;
+    }
+    .select-chevron {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--foreground-subtle);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      padding: 9px 20px;
+      cursor: default;
+      transition: all var(--transition-fast);
+      border: none;
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .btn-primary { background: var(--accent); color: var(--accent-foreground); }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--foreground);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--surface-muted); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--foreground-muted);
+    }
+    .btn-ghost:hover { background: var(--surface-muted); }
+    .btn-danger { background: var(--danger); color: #FFFFFF; }
+    .btn-danger:hover { background: #DC2626; }
+
+    /* Modal 2 specific */
+    .warning-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--danger-bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--danger);
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+    .confirm-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 8px;
+    }
+    .confirm-body {
+      font-size: 14px;
+      color: var(--foreground-muted);
+      line-height: 1.5;
+    }
+
+    /* Modal 3 specific */
+    .success-center {
+      text-align: center;
+      padding: 8px 0;
+    }
+    .success-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--success);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      font-size: 26px;
+      margin-bottom: 20px;
+    }
+    .success-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .success-subtitle {
+      font-size: 14px;
+      color: var(--foreground-muted);
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Modal System</h2>
+<p class="eyebrow">Form Modal &middot; Confirmation &middot; Success</p>
+
+<div class="modal-row">
+
+  <!-- Modal 1: Form -->
+  <div class="modal-spec">
+    <div class="modal-label">Form Modal — Yeni Yetkili Ekle</div>
+    <div class="modal-stage">
+      <div class="modal" style="width:440px">
+        <div class="modal-header">
+          <h3 class="modal-title">Yeni Yetkili Ekle</h3>
+          <button class="modal-close">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="field">
+            <label class="field-label">Ad Soyad</label>
+            <input class="input" type="text" placeholder="Ad ve soyad giriniz">
+          </div>
+          <div class="field">
+            <label class="field-label">E-Posta</label>
+            <input class="input" type="email" placeholder="ornek@esko.com">
+          </div>
+          <div class="field">
+            <label class="field-label">Yetki Seviyesi</label>
+            <div class="select-wrap">
+              <select>
+                <option value="" disabled selected>Yetki seviyesi seçin</option>
+                <option>Admin</option>
+                <option>Operatör</option>
+                <option>Muhasebe</option>
+                <option>İzleyici</option>
+              </select>
+              <span class="select-chevron">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3,6 8,11 13,6"/></svg>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost">İptal</button>
+          <button class="btn btn-primary">Kaydet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Confirm -->
+  <div class="modal-spec">
+    <div class="modal-label">Confirm Modal — İhaleyi İptal Et</div>
+    <div class="modal-stage">
+      <div class="modal" style="width:400px">
+        <div class="modal-body" style="padding-top: 32px">
+          <div class="warning-icon">⚠</div>
+          <div class="confirm-title">İhaleyi iptal etmek istediğine emin misin?</div>
+          <div class="confirm-body">Bu işlem geri alınamaz. Tüm teklifler geçersiz olacak.</div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary">Vazgeç</button>
+          <button class="btn btn-danger">İptal Et</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Success -->
+  <div class="modal-spec">
+    <div class="modal-label">Success Modal — İhale Yayınlandı</div>
+    <div class="modal-stage">
+      <div class="modal" style="width:400px">
+        <div class="modal-body success-center" style="padding: 40px 32px">
+          <div class="success-icon">✓</div>
+          <div class="success-title">İhalen Başarıyla Yayınlandı</div>
+          <div class="success-subtitle">İHALE-2026-0042 numaralı ihale tüm geri dönüşüm tesislerine iletildi.</div>
+          <button class="btn btn-primary" style="width:100%">İhalelerime Dön</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Relowa Design System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="colors_and_type.css">
+<style>
+body { margin: 0; background: var(--background); min-height: 100vh; }
+.wrap { max-width: 960px; margin: 0 auto; padding: 80px 48px 120px; }
+header { margin-bottom: 56px; }
+header img { height: 32px; margin-bottom: 32px; }
+h1 { font-size: 56px; font-weight: 700; letter-spacing: -0.025em; margin: 0 0 14px; line-height: 1.05; color: var(--foreground); }
+h1 em { font-style: normal; color: var(--accent); }
+.lede { font-size: 19px; color: var(--foreground-muted); max-width: 620px; line-height: 1.5; margin: 0; }
+.eyebrow { font-size: 11.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 18px; display: inline-flex; align-items: center; gap: 10px; padding: 5px 12px; background: var(--primary-subtle); border-radius: 999px; border: 1px solid rgba(0, 230, 118, 0.2); }
+.eyebrow .dot { width: 6px; height: 6px; background: var(--accent); border-radius: 999px; }
+
+section { margin-top: 48px; }
+.section-title { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--foreground-subtle); margin: 0 0 20px; }
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.card { display: flex; justify-content: space-between; align-items: center; padding: 22px 24px; background: var(--surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); text-decoration: none; color: inherit; transition: var(--transition-base); box-shadow: var(--shadow-xs); cursor: pointer; }
+.card:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.card .t { font-size: 16px; font-weight: 600; letter-spacing: -0.005em; }
+.card .s { font-size: 13.5px; color: var(--foreground-muted); margin-top: 3px; }
+.card .arrow { color: var(--foreground-subtle); font-family: var(--font-mono); }
+.card:hover .arrow { color: var(--accent); }
+.list { display: grid; gap: 10px; grid-template-columns: 1fr; }
+
+.footer { margin-top: 80px; padding-top: 32px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; color: var(--foreground-subtle); font-size: 13px; }
+.footer .mono { font-family: var(--font-mono); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="assets/relowa-logo-big.svg" alt="relowa." onerror="this.style.display='none'">
+    <div class="eyebrow"><span class="dot"></span>Design system · v0.1</div>
+    <h1>A system for <em>waste that works.</em></h1>
+    <p class="lede">Tokens, primitives, and full-product surfaces for the Relowa B2B platform — neutral-first UI, neon green as the action signal, dark green as the trust anchor. Turkish-first, EU-expandable, industrial-scale.</p>
+  </header>
+
+  <section>
+    <div class="section-title">UI kits</div>
+    <div class="grid">
+      <a class="card" href="ui_kits/recycler-web/index.html">
+        <div><div class="t">Recycler · Web</div><div class="s">Dashboard → Pazar Yeri → İhaleler → Operasyon → ESG</div></div>
+        <span class="arrow">→</span>
+      </a>
+      <a class="card" href="ui_kits/producer-web/index.html">
+        <div><div class="t">Producer · Web</div><div class="s">Dashboard → İhale Oluştur → Teklif Yönetimi</div></div>
+        <span class="arrow">→</span>
+      </a>
+      <a class="card" href="ui_kits/carrier-web/index.html">
+        <div><div class="t">Carrier · Web</div><div class="s">Dashboard → Aktif İlanlar → Tekliflerim → Geçmiş</div></div>
+        <span class="arrow">→</span>
+      </a>
+      <a class="card" href="ui_kits/marketing/index.html">
+        <div><div class="t">Marketing site</div><div class="s">Public landing · hero + features + CTA</div></div>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">Design tokens</div>
+    <div class="grid">
+      <a class="card" href="preview/colors_brand.html"><div><div class="t">Brand colors</div><div class="s">Green palette — the trust stack</div></div><span class="arrow">→</span></a>
+      <a class="card" href="preview/colors_neutrals.html"><div><div class="t">Neutrals</div><div class="s">Gray scale + surface tokens</div></div><span class="arrow">→</span></a>
+      <a class="card" href="preview/colors_semantic.html"><div><div class="t">Semantic colors</div><div class="s">Success · warning · danger · info</div></div><span class="arrow">→</span></a>
+      <a class="card" href="preview/type_display.html"><div><div class="t">Typography · Display</div><div class="s">Headings h1–h4</div></div><span class="arrow">→</span></a>
+      <a class="card" href="preview/type_body.html"><div><div class="t">Typography · Body</div><div class="s">Body, labels, captions, mono</div></div><span class="arrow">→</span></a>
+      <a class="card" href="preview/spacing_scale.html"><div><div class="t">Spacing scale</div><div class="s">4px base grid · space-1 → space-20</div></div><span class="arrow">→</span></a>
+      <a class="card" href="preview/radii.html"><div><div class="t">Corner radii</div><div class="s">xs → full · visual comparison</div></div><span class="arrow">→</span></a>
+      <a class="card" href="preview/shadows.html"><div><div class="t">Shadows</div><div class="s">Elevation system · focus ring</div></div><span class="arrow">→</span></a>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">Components</div>
+    <div class="grid">
+      <a class="card" href="preview/components_buttons.html"><div><div class="t">Buttons</div><div class="s">Primary · secondary · outline · ghost · danger · sizes</div></div><span class="arrow">→</span></a>
+      <a class="card" href="preview/components_inputs.html"><div><div class="t">Inputs</div><div class="s">Text · select · search · textarea · states</div></div><span class="arrow">→</span></a>
+      <a class="card" href="preview/components_badges.html"><div><div class="t">Badges</div><div class="s">Status pills — 6 variants · AKTİF, BEKLEMEDE…</div></div><span class="arrow">→</span></a>
+      <a class="card" href="preview/components_cards.html"><div><div class="t">Cards</div><div class="s">KPI · content · AI insight · role selection</div></div><span class="arrow">→</span></a>
+      <a class="card" href="preview/components_tables.html"><div><div class="t">Tables</div><div class="s">Data table · headers · pagination · hover</div></div><span class="arrow">→</span></a>
+      <a class="card" href="preview/components_sidebar.html"><div><div class="t">Sidebar</div><div class="s">Navigation · sections · active states</div></div><span class="arrow">→</span></a>
+      <a class="card" href="preview/components_modals.html"><div><div class="t">Modals</div><div class="s">Form · confirm · success</div></div><span class="arrow">→</span></a>
+      <a class="card" href="preview/brand_logos.html"><div><div class="t">Brand · Logos</div><div class="s">Icon mark + wordmark · svg + png</div></div><span class="arrow">→</span></a>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">Reference</div>
+    <div class="list">
+      <a class="card" href="README.md"><div><div class="t">README.md</div><div class="s">Brand context · voice · visual foundations · iconography · IA</div></div><span class="arrow">→</span></a>
+      <a class="card" href="colors_and_type.css"><div><div class="t">colors_and_type.css</div><div class="s">Design tokens · semantic type scale</div></div><span class="arrow">→</span></a>
+      <a class="card" href="SKILL.md"><div><div class="t">SKILL.md</div><div class="s">Agent-invocable skill definition</div></div><span class="arrow">→</span></a>
+      <a class="card" href="../../figma/design-spec.md"><div><div class="t">Figma design spec ↗</div><div class="s">60-screen extraction · routes · M5 mapping</div></div><span class="arrow">→</span></a>
+    </div>
+  </section>
+
+  <div class="footer">
+    <span>© 2026 Relowa · İstanbul — Frankfurt</span>
+    <span class="mono">v0.1 · TR EN DE</span>
+  </div>
+</div>
+</body>
+</html>

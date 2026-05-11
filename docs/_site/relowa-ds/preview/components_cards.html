@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cards — Relowa DS</title>
+  <link rel="stylesheet" href="../colors_and_type.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      padding: 40px;
+      background: var(--background);
+      font-family: var(--font-sans);
+      color: var(--foreground);
+    }
+    h2 {
+      font-size: var(--text-h2);
+      font-weight: var(--weight-bold);
+      margin: 0 0 4px;
+    }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: var(--weight-medium);
+      color: var(--foreground-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 32px;
+    }
+    .section { margin-bottom: 40px; }
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: var(--weight-semibold);
+      color: var(--foreground-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 16px;
+    }
+    .grid { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+    .card-wrap { flex: 1; min-width: 260px; max-width: 340px; }
+
+    .card {
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+    .card-light {
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+    }
+    .card-dark {
+      background: var(--primary);
+      color: #FFFFFF;
+      box-shadow: var(--shadow-sm);
+    }
+    .card-ai {
+      background: var(--primary);
+      color: #FFFFFF;
+      box-shadow: var(--shadow-md);
+      border-radius: var(--radius-lg);
+      border-left: 4px solid var(--accent);
+    }
+    .card-role {
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+      border-radius: 16px;
+      border: 2px solid transparent;
+    }
+    .card-role-selected {
+      border-color: var(--accent);
+    }
+    .card-metric {
+      font-size: 24px;
+      font-weight: var(--weight-bold);
+      margin: 4px 0;
+    }
+    .card-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--foreground-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .card-dark .card-label { color: #8CA699; }
+    .card-trend {
+      font-size: 14px;
+      font-weight: var(--weight-semibold);
+      margin-top: 8px;
+    }
+    .card-trend-up { color: var(--success); }
+    .card-dark .card-trend-up { color: var(--green-300); }
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 8px;
+    }
+    .card-body {
+      font-size: 14px;
+      color: var(--foreground-muted);
+      line-height: 1.5;
+    }
+    .card-dark .card-body { color: #8CA699; }
+    .card-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .ai-icon {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+    .role-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--primary-subtle);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+    .role-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .role-desc {
+      font-size: 13px;
+      color: var(--foreground-muted);
+      margin-bottom: 16px;
+    }
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--success-bg);
+      color: var(--success);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: var(--radius-full);
+    }
+    .ai-icon svg { width: 24px; height: 24px; stroke-width: 1.75; }
+    .role-icon svg { width: 24px; height: 24px; stroke-width: 1.75; }
+  </style>
+</head>
+<body>
+
+<h2>Card Variants</h2>
+<p class="eyebrow">KPI Light &middot; KPI Dark &middot; Content &middot; AI Insight &middot; Role Selection</p>
+
+<!-- Cards 1 & 2: KPI -->
+<div class="section">
+  <div class="section-label">KPI Cards</div>
+  <div class="grid">
+    <div class="card-wrap">
+      <div class="card card-light">
+        <div class="card-label">TOPLAM İŞLEM HACMİ</div>
+        <div class="card-metric">₺1.245.800</div>
+        <div class="card-trend card-trend-up">↑ %12.4</div>
+      </div>
+    </div>
+    <div class="card-wrap">
+      <div class="card card-dark">
+        <div class="card-label">KARBON TASARRUFU</div>
+        <div class="card-metric">124.5 tCO₂e</div>
+        <div class="card-trend card-trend-up">↑ %8.7</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Card 3: Content -->
+<div class="section">
+  <div class="section-label">Content Card</div>
+  <div class="grid">
+    <div class="card-wrap" style="max-width: 480px">
+      <div class="card card-light">
+        <div class="card-header-row">
+          <div class="card-title">İhale Detayı</div>
+          <span class="badge" style="display:inline-flex;align-items:center;border-radius:999px;font-weight:600;letter-spacing:0.02em;font-size:12px;padding:4px 10px;background:var(--success-bg);color:var(--success)">AKTİF</span>
+        </div>
+        <div class="card-body">
+          Plastik (PET) atık için açılan ihale. Tahmini miktar 500 ton. Son teklif verme tarihi 25 Mayıs 2026.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Card 4: AI Insight -->
+<div class="section">
+  <div class="section-label">AI Insight Card</div>
+  <div class="grid">
+    <div class="card-wrap">
+      <div class="card card-ai">
+        <div class="ai-icon"><i data-lucide="bot"></i></div>
+        <div class="card-title" style="margin-top:8px">AI Analiz Sonucu</div>
+        <div class="card-body">Materyal kalitesi: %94 saflık. Piyasa ortalamasının üzerinde. Önerilen taban fiyat: ₺285/ton.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Card 5: Role Selection -->
+<div class="section">
+  <div class="section-label">Role Selection Card</div>
+  <div class="grid">
+    <div class="card-wrap">
+      <div class="card card-role card-role-selected">
+        <div class="role-icon"><i data-lucide="factory"></i></div>
+        <div class="role-title">Geri Dönüşüm Tesisi</div>
+        <div class="role-desc">Atık alım ihalelerine katılabilir, teklif verebilir ve operasyonları yönetebilir.</div>
+        <span class="role-badge">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3,8 6,13 13,3"/></svg>
+          Seçildi
+        </span>
+      </div>
+    </div>
+    <div class="card-wrap">
+      <div class="card card-role">
+        <div class="role-icon"><i data-lucide="truck"></i></div>
+        <div class="role-title">Lojistik Operatörü</div>
+        <div class="role-desc">Taşıma ilanlarını görüntüleyebilir ve nakliye operasyonlarını yönetebilir.</div>
+        <span class="badge" style="display:inline-flex;align-items:center;border-radius:999px;font-weight:600;letter-spacing:0.02em;font-size:12px;padding:4px 10px;background:var(--surface-muted);color:var(--foreground-muted)">Seç</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>
