@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phase 1 Milestones — Relowa Docs</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <h1>Relowa Docs</h1>
+    <div class="sub">Architecture &middot; Concepts &middot; Runbooks</div>
+  </div>
+  <a href="index.html" class="home-link">← Home</a>
+
+  <div class="sidebar-section">Milestones</div>
+  <a href="milestones.html" class="active">Phase 1 Milestones</a>
+
+  <div class="sidebar-section">ADRs</div>
+  <a href="adr/0001-postgres-as-system-of-record.html">0001 — Postgres as SoR</a>
+  <a href="adr/0002-supabase-realtime-standalone.html">0002 — Supabase Realtime</a>
+  <a href="adr/0003-rls-with-jwt-guc-pattern.html">0003 — RLS &amp; JWT GUC</a>
+  <a href="adr/0004-multi-agent-orchestration.html">0004 — Multi-Agent Orchestration</a>
+  <a href="adr/0008-arbitrum-hash-anchoring.html">0008 — Arbitrum Hash Anchoring</a>
+  <a href="adr/0009-local-bidding-architecture.html">0009 — Bidding Architecture</a>
+
+  <div class="sidebar-section">Concepts</div>
+  <a href="concepts/auth-uid-pattern.html">auth.uid() Pattern</a>
+  <a href="concepts/audit-hash-chain.html">Audit Hash Chain</a>
+  <a href="concepts/hash-anchoring.html">Hash Anchoring</a>
+  <a href="concepts/idempotency.html">Idempotency</a>
+  <a href="concepts/multi-tenancy.html">Multi-Tenancy</a>
+  <a href="concepts/server-authoritative-state.html">Server-Authoritative State</a>
+
+  <div class="sidebar-section" style="margin-top:12px">Design System</div>
+  <div class="sidebar-nav">
+    <a href="relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
+  </div>
+</nav>
+
+<main class="main">
+
+  <!-- Page Cover -->
+  <div class="page-cover index">
+    <div class="cover-title">
+      <h1>Phase 1 Milestones</h1>
+    </div>
+  </div>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="index.html">Home</a> <span class="sep">/</span> Phase 1 Milestones
+  </div>
+
+  <!-- Subtitle -->
+  <p style="font-size: 15px; color: var(--text-secondary); margin-bottom: 18px;">
+    <strong>4-month build — B2B Waste Operating System for Turkey</strong>
+  </p>
+
+  <!-- Properties Panel -->
+  <div class="properties">
+    <div class="prop-row">
+      <span class="prop-label">Start</span>
+      <span class="prop-value">Week 1</span>
+    </div>
+    <div class="prop-row">
+      <span class="prop-label">Duration</span>
+      <span class="prop-value">16 weeks (+2 buffer)</span>
+    </div>
+    <div class="prop-row">
+      <span class="prop-label">Team</span>
+      <span class="prop-value">Solo lead (Ozan) + AI agents</span>
+    </div>
+    <div class="prop-row">
+      <span class="prop-label">Deploy target</span>
+      <span class="prop-value">AWS eu-central-1 (Frankfurt)</span>
+    </div>
+    <div class="prop-row">
+      <span class="prop-label">Compliance target</span>
+      <span class="prop-value">KVKK + EU CSRD/ESPR-ready</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- M0 -->
+  <div class="milestone-card">
+    <div class="m-header">
+      <h3>M0 — Environment &amp; Infrastructure</h3>
+      <span class="badge badge-draft">📋 Planned</span>
+    </div>
+    <div class="m-meta">Weeks 1–3</div>
+    <div class="callout callout-info">
+      <span class="callout-icon">🎯</span>
+      <div class="callout-content">
+        <p><strong>Goal:</strong> Every AWS service is provisioned, networked, and reachable before a single line of business logic is written.</p>
+      </div>
+    </div>
+    <ul>
+      <li><span class="check">☐</span> AWS Organizations + SSO, IAM roles (dev/prod)</li>
+      <li><span class="check">☐</span> VPC with public/private subnets, NAT Gateway, VPC Endpoints</li>
+      <li><span class="check">☐</span> RDS PostgreSQL Multi-AZ (db.t4g.medium)</li>
+      <li><span class="check">☐</span> ElastiCache Redis (cache.t4g.micro)</li>
+      <li><span class="check">☐</span> Cognito User Pool + App Client + Pre-Token-Generation Lambda</li>
+      <li><span class="check">☐</span> ECS Fargate cluster + ECR repositories</li>
+      <li><span class="check">☐</span> S3 buckets: audit-archive (WORM), documents, static-assets</li>
+      <li><span class="check">☐</span> GitHub Actions → ECR → ECS deploy pipeline</li>
+      <li><span class="check">☐</span> CloudWatch + CloudTrail</li>
+      <li><span class="check">☐</span> Sentry EU + PostHog EU provisioned</li>
+    </ul>
+    <div class="deliverable">
+      <strong>Deliverables:</strong> Terraform/CDK stack, architecture diagram, runbook
+    </div>
+  </div>
+
+  <!-- M1 -->
+  <div class="milestone-card">
+    <div class="m-header">
+      <h3>M1 — Auth, Data &amp; RLS Substrate</h3>
+      <span class="badge badge-accepted">⏳ In progress (POC done)</span>
+    </div>
+    <div class="m-meta">Weeks 4–6</div>
+    <div class="callout callout-info">
+      <span class="callout-icon">🎯</span>
+      <div class="callout-content">
+        <p><strong>Goal:</strong> User logs in via Cognito, JWT issued, every Postgres query transparently scoped to org via RLS.</p>
+      </div>
+    </div>
+    <ul>
+      <li><span class="check">☑</span> Drizzle schema v1 — 7 tables, 4 enums, 16 indexes</li>
+      <li><span class="check">☑</span> RLS policies — 21 policies across all 7 tables</li>
+      <li><span class="check">☑</span> <code>auth.*</code> helper functions — <code>uid()</code>, <code>org_id()</code>, <code>has_role()</code>, <code>is_member()</code>, <code>email()</code>, <code>user_org_ids()</code></li>
+      <li><span class="check">☐</span> JWT-via-GUC middleware (in Hono API, M2)</li>
+      <li><span class="check">☐</span> Cognito User Pool + Pre-Token-Generation Lambda</li>
+      <li><span class="check">☐</span> Org switching flow (new JWT, never client-claimed)</li>
+      <li><span class="check">☑</span> <code>idempotency_keys</code> table + schema</li>
+      <li><span class="check">☐</span> <code>anchor_log</code> table for daily Merkle root records</li>
+      <li><span class="check">☑</span> Audit hash chain trigger — SHA-256, BEFORE INSERT</li>
+      <li><span class="check">☐</span> DB backup + PITR (RDS config, Phase 1 deploy)</li>
+    </ul>
+    <div class="deliverable">
+      <strong>Deliverables:</strong> RLS isolation test suite ✅, auth flow integration test, seed data ✅
+    </div>
+  </div>
+
+  <!-- M2 -->
+  <div class="milestone-card">
+    <div class="m-header">
+      <h3>M2 — Core API &amp; Business Logic</h3>
+      <span class="badge badge-accepted">⏳ Next up</span>
+    </div>
+    <div class="m-meta">Weeks 7–10</div>
+    <div class="callout callout-info">
+      <span class="callout-icon">🎯</span>
+      <div class="callout-content">
+        <p><strong>Goal:</strong> All CRUD for tenders and bids live behind Hono API. Idempotency on every mutation. EventBridge events on every state change. Full local deployable demo.</p>
+      </div>
+    </div>
+    <ul>
+      <li><span class="check">☐</span> Hono API scaffold (<code>apps/api/</code>) with route groups</li>
+      <li><span class="check">☐</span> JWT-via-GUC middleware (dev HMAC, Cognito-ready)</li>
+      <li><span class="check">☐</span> Idempotency middleware on all mutation endpoints</li>
+      <li><span class="check">☐</span> POST / GET / PATCH <code>/tenders</code> (RLS-enforced)</li>
+      <li><span class="check">☐</span> POST <code>/tenders/:id/bids</code> + soft-close trigger</li>
+      <li><span class="check">☐</span> GET <code>/audit</code> (org-scoped, hash-chain verified)</li>
+      <li><span class="check">☐</span> Zod validation on all request bodies</li>
+      <li><span class="check">☐</span> EventBridge <code>PutEvents</code> publish from route handlers</li>
+      <li><span class="check">☐</span> <code>docker-compose.yml</code> api service + healthcheck</li>
+      <li><span class="check">☐</span> OpenAPI/Swagger auto-generated via <code>@hono/zod-openapi</code></li>
+    </ul>
+    <div class="deliverable">
+      <strong>Deliverables:</strong> Deployable local bidding API, integration test, EventBridge trace
+    </div>
+  </div>
+
+  <!-- M3 -->
+  <div class="milestone-card">
+    <div class="m-header">
+      <h3>M3 — Real-time Push + Background Workers</h3>
+      <span class="badge badge-draft">📋 Planned</span>
+    </div>
+    <div class="m-meta">Weeks 11–13</div>
+    <div class="callout callout-info">
+      <span class="callout-icon">🎯</span>
+      <div class="callout-content">
+        <p><strong>Goal:</strong> Live UI via AppSync subscriptions. Background work on SQS workers. Auction close Lambda deployed. S3 audit mirror + Arbitrum anchor running daily.</p>
+      </div>
+    </div>
+    <ul>
+      <li><span class="check">☐</span> Outbox table + DB trigger (CDC → AppSync publish)</li>
+      <li><span class="check">☐</span> AppSync GraphQL schema + <code>onBidPlaced</code>, <code>onTenderUpdated</code> subscriptions</li>
+      <li><span class="check">☐</span> SQS → Lambda workers (email notifications, webhook dispatches)</li>
+      <li><span class="check">☐</span> Auction close Lambda deployment (production IAM + monitoring)</li>
+      <li><span class="check">☐</span> S3 audit mirror daily export (JSON-Lines + Object Lock)</li>
+      <li><span class="check">☐</span> Arbitrum One anchor Lambda (daily Merkle root → Anchor contract)</li>
+    </ul>
+    <div class="deliverable">
+      <strong>Deliverables:</strong> End-to-end real-time test (bid → AppSync push → UI), EventBridge trace, anchored hash proof
+    </div>
+  </div>
+
+  <!-- M4 -->
+  <div class="milestone-card">
+    <div class="m-header">
+      <h3>M4 — Escrow, Providers &amp; ESG</h3>
+      <span class="badge badge-draft">📋 Planned</span>
+    </div>
+    <div class="m-meta">Weeks 14–16</div>
+    <div class="callout callout-info">
+      <span class="callout-icon">🎯</span>
+      <div class="callout-content">
+        <p><strong>Goal:</strong> Step Functions escrow machine with provider-agnostic interface. e-fatura on settlement. ESG certs on-chain.</p>
+      </div>
+    </div>
+    <ul>
+      <li><span class="check">☐</span> Provider-agnostic escrow interface (<code>EscrowProvider</code> abstract class)</li>
+      <li><span class="check">☐</span> <code>ManualProvider</code> (DB-simulated for dev)</li>
+      <li><span class="check">☐</span> <code>IyzicoProvider</code> (Marketplace API + sub-merchant)</li>
+      <li><span class="check">☐</span> Step Functions escrow state machine</li>
+      <li><span class="check">☐</span> Escrow webhook handler (idempotent)</li>
+      <li><span class="check">☐</span> <code>material_recovery_certificate</code> generation</li>
+      <li><span class="check">☐</span> ESG certificate in daily Merkle root</li>
+      <li><span class="check">☐</span> Nilvera/Foriba e-fatura integration</li>
+      <li><span class="check">☐</span> IBAN hashing at rest (PII, KVKK)</li>
+      <li><span class="check">☐</span> KVKK aydınlatma metni flow</li>
+    </ul>
+    <div class="deliverable">
+      <strong>Deliverables:</strong> Escrow state machine diagram, provider adapter test, ESG verification demo
+    </div>
+  </div>
+
+  <!-- M5 -->
+  <div class="milestone-card">
+    <div class="m-header">
+      <h3>M5 — Frontend &amp; Launch</h3>
+      <span class="badge badge-draft">📋 Planned</span>
+    </div>
+    <div class="m-meta">Weeks 17–18</div>
+    <div class="callout callout-info">
+      <span class="callout-icon">🎯</span>
+      <div class="callout-content">
+        <p><strong>Goal:</strong> Next.js app deployed. Monitoring live. Compliance package complete.</p>
+      </div>
+    </div>
+    <ul>
+      <li><span class="check">☐</span> Next.js App Router (TypeScript, shadcn/ui, Tailwind)</li>
+      <li><span class="check">☐</span> Auth pages (login, register, org selection, Cognito)</li>
+      <li><span class="check">☐</span> Dashboard (tender list, live bid feed, audit tail)</li>
+      <li><span class="check">☐</span> Tender detail page (bid form, countdown, history)</li>
+      <li><span class="check">☐</span> Admin pages</li>
+      <li><span class="check">☐</span> PostHog EU + Sentry EU</li>
+      <li><span class="check">☐</span> CloudWatch dashboard</li>
+      <li><span class="check">☐</span> KVKK compliance package (SCC, VERBİS, breach notification)</li>
+      <li><span class="check">☐</span> Load test (k6/Artillery)</li>
+      <li><span class="check">☐</span> Production runbook</li>
+    </ul>
+    <div class="deliverable">
+      <strong>Deliverables:</strong> Deployed Next.js app, monitoring dashboard, KVKK compliance folder
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <h2>Timeline</h2>
+
+  <div class="timeline-view">
+    <div style="display:flex; align-items:center; gap:3px; margin: 16px 0 8px;">
+      <div style="height:40px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; font-size:12px; font-weight:700; border-radius:6px 0 0 6px; width:16.67%; letter-spacing:0.02em; font-family:var(--font-mono);">M0 · W1–3</div>
+      <div style="height:40px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#11998e,#38ef7d); color:#fff; font-size:12px; font-weight:700; width:16.67%; letter-spacing:0.02em; font-family:var(--font-mono);">M1 · W4–6</div>
+      <div style="height:40px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#2383e2,#0b6bcb); color:#fff; font-size:12px; font-weight:700; width:22.22%; letter-spacing:0.02em; font-family:var(--font-mono);">M2 · W7–10</div>
+      <div style="height:40px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; font-size:12px; font-weight:700; width:16.67%; letter-spacing:0.02em; font-family:var(--font-mono);">M3 · W11–13</div>
+      <div style="height:40px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#ef4444,#dc2626); color:#fff; font-size:12px; font-weight:700; width:16.67%; letter-spacing:0.02em; font-family:var(--font-mono);">M4 · W14–16</div>
+      <div style="height:40px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#8b5cf6,#6d28d9); color:#fff; font-size:12px; font-weight:700; border-radius:0 6px 6px 0; width:11.11%; letter-spacing:0.02em; font-family:var(--font-mono);">M5 · W17–18</div>
+    </div>
+    <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-tertiary); padding:0 6px; font-family:var(--font-mono);">
+      <span>Week 1</span>
+      <span>4</span>
+      <span>7</span>
+      <span>11</span>
+      <span>14</span>
+      <span>17</span>
+      <span>18</span>
+    </div>
+  </div>
+
+  <!-- Progress bars per milestone -->
+  <div style="margin-top: 24px;">
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:13px;">
+      <span style="font-weight:600; min-width:48px; font-family:var(--font-mono);">M0</span>
+      <span style="color:var(--text-secondary);">Environment &amp; Infrastructure</span>
+      <span style="color:var(--text-tertiary); margin-left:auto; font-family:var(--font-mono);">W1–3</span>
+    </div>
+    <div class="progress-bar"><div class="fill m0"></div></div>
+
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:13px; margin-top:14px;">
+      <span style="font-weight:600; min-width:48px; font-family:var(--font-mono);">M1</span>
+      <span style="color:var(--text-secondary);">Auth, Data &amp; RLS</span>
+      <span style="color:var(--text-tertiary); margin-left:auto; font-family:var(--font-mono);">W4–6</span>
+    </div>
+    <div class="progress-bar"><div class="fill m1"></div></div>
+
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:13px; margin-top:14px;">
+      <span style="font-weight:600; min-width:48px; font-family:var(--font-mono);">M2</span>
+      <span style="color:var(--text-secondary);">Core API &amp; Business Logic</span>
+      <span style="color:var(--text-tertiary); margin-left:auto; font-family:var(--font-mono);">W7–10</span>
+    </div>
+    <div class="progress-bar"><div class="fill m2"></div></div>
+
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:13px; margin-top:14px;">
+      <span style="font-weight:600; min-width:48px; font-family:var(--font-mono);">M3</span>
+      <span style="color:var(--text-secondary);">Real-time, Events &amp; Scheduling</span>
+      <span style="color:var(--text-tertiary); margin-left:auto; font-family:var(--font-mono);">W11–13</span>
+    </div>
+    <div class="progress-bar"><div class="fill m3"></div></div>
+
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:13px; margin-top:14px;">
+      <span style="font-weight:600; min-width:48px; font-family:var(--font-mono);">M4</span>
+      <span style="color:var(--text-secondary);">Escrow, Providers &amp; ESG</span>
+      <span style="color:var(--text-tertiary); margin-left:auto; font-family:var(--font-mono);">W14–16</span>
+    </div>
+    <div class="progress-bar"><div class="fill m4"></div></div>
+
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:13px; margin-top:14px;">
+      <span style="font-weight:600; min-width:48px; font-family:var(--font-mono);">M5</span>
+      <span style="color:var(--text-secondary);">Frontend &amp; Launch</span>
+      <span style="color:var(--text-tertiary); margin-left:auto; font-family:var(--font-mono);">W17–18</span>
+    </div>
+    <div class="progress-bar"><div class="fill m5"></div></div>
+  </div>
+
+  <!-- Risk Register -->
+  <h2>Risk Register</h2>
+
+  <table class="notion-table">
+    <thead>
+      <tr>
+        <th>Risk</th>
+        <th>Impact</th>
+        <th>Mitigation</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Iyzico sandbox unavailable / slow approval</td>
+        <td>Blocks M4 escrow testing</td>
+        <td><code>ManualProvider</code> works independently; PayTR fallback</td>
+      </tr>
+      <tr>
+        <td>Cognito Lambda cold starts &gt; 200ms</td>
+        <td>Auth latency for every request</td>
+        <td>Provisioned concurrency for Pre-Token Lambda</td>
+      </tr>
+      <tr>
+        <td>AppSync latency in eu-central-1</td>
+        <td>Real-time feels sluggish</td>
+        <td>Measure; fall back to API Gateway WebSocket if &gt;500ms p95</td>
+      </tr>
+      <tr>
+        <td>Solo throughput ceiling</td>
+        <td>4 months is tight</td>
+        <td>AI agents parallelize; scope-cut AI/KPS to Phase 2</td>
+      </tr>
+      <tr>
+        <td>KVKK registration delays</td>
+        <td>Cannot launch without VERBİS</td>
+        <td>Start registration Week 1</td>
+      </tr>
+      <tr>
+        <td>Arbitrum testnet→mainnet migration</td>
+        <td>Contract address changes</td>
+        <td>Config-driven; trivial redeploy</td>
+      </tr>
+    </tbody>
+  </table>
+
+</main>
+
+</body>
+</html>

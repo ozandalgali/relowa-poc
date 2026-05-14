@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-tenancy — Relowa Docs</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .schema-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 14px 0;
+    }
+    @media (max-width: 768px) { .schema-grid { grid-template-columns: 1fr; } }
+    .schema-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      font-size: 14px;
+    }
+    .schema-card .table-name {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .schema-card .col-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      font-size: 0.83rem;
+      line-height: 2;
+    }
+    .schema-card .col-list .col-name {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--text);
+    }
+    .schema-card .col-list .col-type {
+      color: var(--text-tertiary);
+      font-size: 0.78rem;
+    }
+    .schema-card .col-list .pk-badge {
+      display: inline-block;
+      font-size: 0.62rem;
+      background: #fef3c7;
+      color: #92400e;
+      padding: 0px 5px;
+      border-radius: 2px;
+      margin-left: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+      vertical-align: middle;
+    }
+    .schema-card .card-note {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+    }
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 14px 0;
+    }
+    @media (max-width: 768px) { .profile-grid { grid-template-columns: 1fr; } }
+    .profile-grid .schema-card {
+      border-left: 3px solid var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-header"><h1 onclick="location.href='../index.html'">🏭 Relowa POC</h1></div>
+    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> ADRs</div>
+    <div class="sidebar-nav">
+      <a href="../adr/0001-postgres-as-system-of-record.html"><span class="page-icon">📄</span>0001 — Postgres as SoR</a>
+      <a href="../adr/0002-supabase-realtime-standalone.html"><span class="page-icon">📄</span>0002 — Realtime</a>
+      <a href="../adr/0003-rls-with-jwt-guc-pattern.html"><span class="page-icon">📄</span>0003 — RLS JWT-via-GUC</a>
+      <a href="../adr/0004-multi-agent-orchestration.html"><span class="page-icon">📄</span>0004 — Multi-Agent</a>
+      <a href="../adr/0008-arbitrum-hash-anchoring.html"><span class="page-icon">📄</span>0008 — Arbitrum Anchoring</a>
+      <a href="../adr/0009-local-bidding-architecture.html"><span class="page-icon">📄</span>0009 — Bidding Architecture</a>
+    </div>
+    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> Concepts</div>
+    <div class="sidebar-nav">
+      <a href="auth-uid-pattern.html"><span class="page-icon">💡</span>auth.uid() Pattern</a>
+      <a href="audit-hash-chain.html"><span class="page-icon">💡</span>Audit Hash Chain</a>
+      <a href="hash-anchoring.html"><span class="page-icon">💡</span>Hash Anchoring</a>
+      <a href="idempotency.html"><span class="page-icon">💡</span>Idempotency</a>
+      <a href="multi-tenancy.html" class="active"><span class="page-icon">💡</span>Multi-tenancy</a>
+      <a href="server-authoritative-state.html"><span class="page-icon">💡</span>Server-Auth State</a>
+    </div>
+    <div class="sidebar-nav" style="margin-top:8px"><a href="../milestones.html"><span class="page-icon">🗓️</span>Phase 1 Milestones</a></div>
+    <div class="sidebar-section" style="margin-top:12px">Design System</div>
+    <div class="sidebar-nav">
+      <a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
+    </div>
+    <div class="sidebar-footer">Relowa POC · v0.1</div>
+  </aside>
+  <main class="main">
+    <div class="page-cover concept"></div>
+    <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="../index.html">Concepts</a> <span class="sep">/</span> Multi-tenancy</div>
+    <h2 style="border:none;font-size:1.8rem;margin-top:8px">Multi-tenancy</h2>
+    <div class="properties">
+      <div class="prop-row"><span class="prop-label">Type</span><span class="prop-value"><span class="badge badge-concept">Concept</span></span></div>
+    </div>
+    <hr class="divider">
+
+    <p style="font-size:1.05rem;color:#6b6966">
+      The org / user / role data model. Why <code>org_members</code> over <code>users.org_id</code>, and how RLS policies enforce cross-tenant isolation.
+    </p>
+
+    <!-- The core insight -->
+    <h3>The core insight</h3>
+    <div class="callout callout-info">
+      <span class="callout-icon">💡</span>
+      <div class="callout-content">
+        <p>In Relowa, <strong>the customer is the organization</strong>, not the user. A producer firm signs up; multiple employees of that firm operate the account; each has different responsibilities (admin / accounting / operations).</p>
+        <p style="margin-top:10px;">Crucially, a single user might belong to <strong>multiple organizations</strong> — a consultant working with several producers, a Relowa staff member auditing multiple recyclers. This is common in the Turkish waste ecosystem where independent consultants manage compliance for many small facilities.</p>
+        <p style="margin-top:10px;font-weight:600;">This rules out the naive design where <code>users.org_id</code> is a foreign key.</p>
+      </div>
+    </div>
+
+    <!-- The schema -->
+    <h3>The schema</h3>
+    <p>Three tables capture the model:</p>
+
+    <div class="schema-grid">
+      <div class="schema-card">
+        <div class="table-name">organizations</div>
+        <ul class="col-list">
+          <li><span class="col-name">id</span> <span class="col-type">uuid</span> <span class="pk-badge">PK</span></li>
+          <li><span class="col-name">type</span> <span class="col-type">enum</span></li>
+          <li><span class="col-name">name</span> <span class="col-type">text</span></li>
+          <li><span class="col-name">vergi_no</span> <span class="col-type">text</span></li>
+          <li><span class="col-name">region</span> <span class="col-type">text</span></li>
+          <li><span class="col-name">…</span></li>
+        </ul>
+        <div class="card-note">The tenant. <code>type</code> ∈ {producer, recycler, carrier}.</div>
+      </div>
+
+      <div class="schema-card">
+        <div class="table-name">users</div>
+        <ul class="col-list">
+          <li><span class="col-name">id</span> <span class="col-type">uuid</span> <span class="pk-badge">PK</span></li>
+          <li><span class="col-name">email</span> <span class="col-type">text</span></li>
+          <li><span class="col-name">password_hash</span> <span class="col-type">text</span></li>
+          <li><span class="col-name">…</span></li>
+        </ul>
+        <div class="card-note">No <code>org_id</code> column. Users are org-agnostic.</div>
+      </div>
+
+      <div class="schema-card">
+        <div class="table-name">org_members</div>
+        <ul class="col-list">
+          <li><span class="col-name">org_id</span> <span class="col-type">uuid</span> <span class="pk-badge">PK</span></li>
+          <li><span class="col-name">user_id</span> <span class="col-type">uuid</span> <span class="pk-badge">PK</span></li>
+          <li><span class="col-name">role</span> <span class="col-type">enum</span></li>
+          <li><span class="col-name">accepted_at</span> <span class="col-type">timestamptz</span></li>
+        </ul>
+        <div class="card-note">Composite PK bridge table. <code>role</code> ∈ {admin, member, viewer}.</div>
+      </div>
+    </div>
+
+    <!-- Org-type-specific profiles -->
+    <h3>Org-type-specific profiles</h3>
+    <p>Type-specific data lives at the <strong>org</strong> level, not the user level. Each org type gets its own profile table, joined by <code>org_id</code>:</p>
+
+    <div class="profile-grid">
+      <div class="schema-card">
+        <div class="table-name">org_profile_producer</div>
+        <ul class="col-list">
+          <li><span class="col-name">org_id</span> <span class="col-type">uuid</span> <span class="pk-badge">PK</span></li>
+          <li><span class="col-name">capacity_tons</span> <span class="col-type">numeric</span></li>
+          <li><span class="col-name">sector</span> <span class="col-type">text</span></li>
+          <li><span class="col-name">…</span></li>
+        </ul>
+      </div>
+      <div class="schema-card">
+        <div class="table-name">org_profile_recycler</div>
+        <ul class="col-list">
+          <li><span class="col-name">org_id</span> <span class="col-type">uuid</span> <span class="pk-badge">PK</span></li>
+          <li><span class="col-name">license_no</span> <span class="col-type">text</span></li>
+          <li><span class="col-name">license_expires</span> <span class="col-type">date</span></li>
+          <li><span class="col-name">…</span></li>
+        </ul>
+      </div>
+      <div class="schema-card">
+        <div class="table-name">org_profile_carrier</div>
+        <ul class="col-list">
+          <li><span class="col-name">org_id</span> <span class="col-type">uuid</span> <span class="pk-badge">PK</span></li>
+          <li><span class="col-name">fleet_size</span> <span class="col-type">int</span></li>
+          <li><span class="col-name">…</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- The JWT claim -->
+    <h3>The JWT claim that ties it together</h3>
+    <p>When a user logs in, the JWT contains:</p>
+
+    <pre><code>{
+  <span class="syn-str">"sub"</span>: <span class="syn-str">"550e8400-e29b-41d4-a716-446655440000"</span>,
+  <span class="syn-str">"email"</span>: <span class="syn-str">"ahmet@acme.example"</span>,
+  <span class="syn-str">"active_org_id"</span>: <span class="syn-str">"7c9e6679-7425-40de-944b-e07fc1f90ae7"</span>
+}</code></pre>
+
+    <p>The <code>active_org_id</code> is <strong>server-issued, never client-claimed</strong>. When a user switches orgs, the server issues a new JWT. We never trust a client that says &ldquo;I switched to org X.&rdquo;</p>
+
+    <!-- How RLS uses this -->
+    <h3>How RLS uses this</h3>
+    <p>The policies mention nothing user-specific — just <code>org_id</code> and <code>role</code>. RLS does not care <em>who</em> you are; it cares <em>which org you&rsquo;re acting for</em> and <em>what role you hold there</em>.</p>
+
+    <pre><code><span class="syn-cm">-- "Show me my org's tenders"</span>
+<span class="syn-kw">CREATE</span> <span class="syn-kw">POLICY</span> tenders_select_own_org <span class="syn-kw">ON</span> tenders
+  <span class="syn-kw">FOR SELECT</span>
+  <span class="syn-kw">USING</span> (org_id = <span class="syn-fn">auth.org_id</span>());
+
+<span class="syn-cm">-- "Only admins can publish tenders"</span>
+<span class="syn-kw">CREATE</span> <span class="syn-kw">POLICY</span> tenders_insert_admin <span class="syn-kw">ON</span> tenders
+  <span class="syn-kw">FOR INSERT</span>
+  <span class="syn-kw">WITH CHECK</span> (
+    org_id = <span class="syn-fn">auth.org_id</span>()
+    <span class="syn-kw">AND</span> <span class="syn-fn">auth.has_role</span>(<span class="syn-str">'admin'</span>)
+  );</code></pre>
+
+    <!-- Why this matters for audit trail -->
+    <h3>Why this matters for the audit trail</h3>
+    <div class="callout callout-warning">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-content">
+        <p><code>audit_events</code> records <code>(org_id, user_id, action, …)</code>. The <code>user_id</code> is <strong>who took the action</strong>; the <code>org_id</code> is <strong>which tenant context</strong> they were acting in.</p>
+        <p style="margin-top:8px;">If the same person is admin in two orgs, audit events for each org are properly scoped. This is essential for <strong>KVKK compliance</strong> — we can answer &ldquo;show everything Ahmet did in Acme&rdquo; without leaking what he did in another org.</p>
+      </div>
+    </div>
+
+    <!-- Common mistakes -->
+    <h3>Common mistakes</h3>
+    <div class="callout callout-danger">
+      <span class="callout-icon">🚫</span>
+      <div class="callout-content">
+        <ul style="margin:0;padding-left:20px;">
+          <li><strong><code>users.org_id</code> foreign key</strong> — works for single-tenant SaaS; breaks for multi-org users.</li>
+          <li><strong>Joining <code>org_members</code> in every query</strong> — slow, repetitive. Use <code>auth.user_org_ids()</code> helper.</li>
+          <li><strong>Storing <code>active_org_id</code> in a session table</strong> — the JWT claim is the source of truth.</li>
+          <li><strong>Type-specific data on the user</strong> (e.g. <code>users.is_recycler_admin</code>) — the type belongs to the org, not the user.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- See also -->
+    <div class="see-also">
+      <div class="heading">See Also</div>
+      <a href="auth-uid-pattern.html">auth.uid() Pattern</a>
+      <a href="audit-hash-chain.html">Audit Hash Chain</a>
+      <a href="../adr/0003-rls-with-jwt-guc-pattern.html">ADR-0003 — RLS with JWT-via-GUC</a>
+    </div>
+  </main>
+</body>
+</html>

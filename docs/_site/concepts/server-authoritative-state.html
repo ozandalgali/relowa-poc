@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Server-authoritative State — Relowa Docs</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-header"><h1 onclick="location.href='../index.html'">🏭 Relowa POC</h1></div>
+    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> ADRs</div>
+    <div class="sidebar-nav">
+      <a href="../adr/0001-postgres-as-system-of-record.html"><span class="page-icon">📄</span>0001 — Postgres as SoR</a>
+      <a href="../adr/0002-supabase-realtime-standalone.html"><span class="page-icon">📄</span>0002 — Realtime</a>
+      <a href="../adr/0003-rls-with-jwt-guc-pattern.html"><span class="page-icon">📄</span>0003 — RLS JWT-via-GUC</a>
+      <a href="../adr/0004-multi-agent-orchestration.html"><span class="page-icon">📄</span>0004 — Multi-Agent</a>
+      <a href="../adr/0008-arbitrum-hash-anchoring.html"><span class="page-icon">📄</span>0008 — Arbitrum Anchoring</a>
+      <a href="../adr/0009-local-bidding-architecture.html"><span class="page-icon">📄</span>0009 — Bidding Architecture</a>
+    </div>
+    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> Concepts</div>
+    <div class="sidebar-nav">
+      <a href="auth-uid-pattern.html"><span class="page-icon">💡</span>auth.uid() Pattern</a>
+      <a href="audit-hash-chain.html"><span class="page-icon">💡</span>Audit Hash Chain</a>
+      <a href="hash-anchoring.html"><span class="page-icon">💡</span>Hash Anchoring</a>
+      <a href="idempotency.html"><span class="page-icon">💡</span>Idempotency</a>
+      <a href="multi-tenancy.html"><span class="page-icon">💡</span>Multi-tenancy</a>
+      <a href="server-authoritative-state.html" class="active"><span class="page-icon">💡</span>Server-Auth State</a>
+    </div>
+    <div class="sidebar-nav" style="margin-top:8px"><a href="../milestones.html"><span class="page-icon">🗓️</span>Phase 1 Milestones</a></div>
+    <div class="sidebar-section" style="margin-top:12px">Design System</div>
+    <div class="sidebar-nav">
+      <a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
+    </div>
+    <div class="sidebar-footer">Relowa POC · v0.1</div>
+  </aside>
+  <main class="main">
+    <div class="page-cover concept"></div>
+    <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="../index.html">Concepts</a> <span class="sep">/</span> Server-authoritative State</div>
+    <h2 style="border:none;font-size:1.8rem;margin-top:8px">Server-authoritative State Transitions</h2>
+    <div class="properties">
+      <div class="prop-row"><span class="prop-label">Type</span><span class="prop-value"><span class="badge badge-concept">Concept</span></span></div>
+    </div>
+    <hr class="divider">
+
+    <p style="font-size:1.05rem;color:#6b6966">
+      Why the server, not the client, decides when an auction closes. And why this is non-negotiable for anything touching money.
+    </p>
+
+    <!-- The bait -->
+    <h3>The bait</h3>
+    <p>
+      Auctions have countdowns: <strong>&ldquo;04:12:33 remaining.&rdquo;</strong> It&rsquo;s tempting to let the client transition the auction to <code>CLOSING</code> when the timer hits zero. The UI already knows the time. Why not?
+    </p>
+
+    <!-- The trap -->
+    <h3>The trap</h3>
+
+    <div class="callout callout-danger">
+      <span class="callout-icon">🔴</span>
+      <div class="callout-content">
+        <p><strong>Three reasons this fails, ranked by severity:</strong></p>
+        <ol style="margin:10px 0 0 20px;">
+          <li><strong>Client clocks lie</strong> — NTP drift, user-adjusted system time, DevTools manipulation. A determined bidder can win every auction.</li>
+          <li><strong>Network races</strong> — even with honest clocks, two bids arriving within milliseconds are ambiguous. Only the server can resolve ordering.</li>
+          <li><strong>Sniping</strong> — bidders submit a winning bid 1 second before the buzzer, leaving competitors no time to respond. Auctions degrade to &ldquo;fastest connection wins.&rdquo;</li>
+        </ol>
+      </div>
+    </div>
+
+    <h4>1. Client clocks lie</h4>
+
+    <table class="notion-table">
+      <thead>
+        <tr>
+          <th>Cause</th>
+          <th>Effect</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>NTP drift on the user&rsquo;s device</td>
+          <td>Auction &ldquo;closes&rdquo; 30s early</td>
+        </tr>
+        <tr>
+          <td>User adjusted their system clock</td>
+          <td>Auction &ldquo;closes&rdquo; 5 minutes early — or never</td>
+        </tr>
+        <tr>
+          <td>DevTools manipulation</td>
+          <td>Bidder sets close time to 23:59:59 — &ldquo;too late, you lose&rdquo;</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      A determined bidder can win every auction by simply telling their browser the auction closed <em>before</em> the rival&rsquo;s high bid arrived.
+    </p>
+
+    <h4>2. Network races</h4>
+    <p>
+      Even with honest clocks, network latency makes it ambiguous which bid arrived &ldquo;first&rdquo; if both arrive within a few hundred milliseconds. Client-driven closes can&rsquo;t resolve this — the server can.
+    </p>
+
+    <h4>3. Sniping</h4>
+    <p>
+      Without server-side soft-close, sophisticated bidders submit a winning bid 1 second before the buzzer, leaving competitors no time to respond. Auctions degrade to <strong>&ldquo;who has the fastest connection.&rdquo;</strong>
+    </p>
+
+    <!-- Our pattern -->
+    <h3>Our pattern</h3>
+
+    <div class="callout callout-success">
+      <span class="callout-icon">✅</span>
+      <div class="callout-content">
+        <p><strong>The server, never the client, owns state transitions.</strong></p>
+        <ul style="margin:10px 0 0 20px;">
+          <li>Server stores <code>closes_at</code> timestamp at <code>PUBLISH</code>.</li>
+          <li>Client renders countdown by subtracting <code>now()</code> from <code>closes_at</code>.</li>
+          <li>EventBridge Scheduler runs every 30 seconds:</li>
+        </ul>
+
+        <pre style="margin-top:10px;"><code><span class="syn-kw">UPDATE</span> tenders <span class="syn-kw">SET</span> status = <span class="syn-str">'closing'</span>
+<span class="syn-kw">WHERE</span> status = <span class="syn-str">'published'</span> <span class="syn-kw">AND</span> closes_at &lt; <span class="syn-fn">now</span>();</code></pre>
+
+        <p style="margin-top:12px;margin-bottom:0;">The client <strong>never</strong> sends &ldquo;close this auction&rdquo; requests. There is no such endpoint.</p>
+      </div>
+    </div>
+
+    <!-- Soft-close -->
+    <h3>Soft-close (anti-sniping)</h3>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-content">
+        <p><strong>When a bid arrives within 60s of <code>closes_at</code>:</strong></p>
+
+        <pre style="margin-top:10px;"><code><span class="syn-kw">UPDATE</span> tenders
+<span class="syn-kw">SET</span> closes_at = <span class="syn-fn">greatest</span>(closes_at, <span class="syn-fn">now</span>() + <span class="syn-ty">interval</span> <span class="syn-str">'60 seconds'</span>)
+<span class="syn-kw">WHERE</span> id = $1 <span class="syn-kw">AND</span> status = <span class="syn-str">'published'</span>;</code></pre>
+
+        <p style="margin-top:10px;margin-bottom:0;">The auction extends by 60s <em>every time</em> a late bid lands. Equivalent to &ldquo;the gavel doesn&rsquo;t fall while bids are still flying.&rdquo;</p>
+      </div>
+    </div>
+
+    <!-- Where else this applies -->
+    <h3>Where else this applies</h3>
+    <p>
+      Any state transition driven by <strong>time, not user action</strong>, must be server-side:
+    </p>
+
+    <table class="notion-table">
+      <thead>
+        <tr>
+          <th>Transition</th>
+          <th>Mechanism</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Auction expiry</td>
+          <td>EventBridge Scheduler</td>
+        </tr>
+        <tr>
+          <td>Bid window soft-close</td>
+          <td>Trigger on bid <code>INSERT</code></td>
+        </tr>
+        <tr>
+          <td>Escrow auto-release after delivery confirmation timeout</td>
+          <td>EventBridge Scheduler</td>
+        </tr>
+        <tr>
+          <td>Idempotency key TTL cleanup</td>
+          <td>EventBridge Scheduler</td>
+        </tr>
+        <tr>
+          <td>Tender draft auto-discard after 30 days</td>
+          <td>EventBridge Scheduler</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- pg_cron vs EventBridge -->
+    <h3>pg_cron vs EventBridge Scheduler</h3>
+    <p>We use both. The decision rule:</p>
+
+    <div class="decision-grid">
+      <div class="decision-card">
+        <div class="label pos">pg_cron — pure SQL work</div>
+        <p style="font-size:0.85rem;color:#475569;margin-bottom:8px;">
+          Use when the transition does not need to call an external service.
+        </p>
+        <ul style="margin:0 0 0 16px;font-size:0.85rem;color:#334155;">
+          <li>Auction expiry (UPDATE rows)</li>
+          <li>Idempotency key cleanup</li>
+          <li>Materialized view refresh</li>
+        </ul>
+      </div>
+      <div class="decision-card">
+        <div class="label pos">EventBridge Scheduler — cross-service</div>
+        <p style="font-size:0.85rem;color:#475569;margin-bottom:8px;">
+          Use when the transition requires coordination across service boundaries.
+        </p>
+        <ul style="margin:0 0 0 16px;font-size:0.85rem;color:#334155;">
+          <li>Scheduled emails</li>
+          <li>Scheduled webhook retries</li>
+          <li>Scheduled S3 uploads</li>
+        </ul>
+      </div>
+    </div>
+
+    <p style="margin-top:4px;">
+      <strong>The line:</strong> if the work is pure SQL, <code>pg_cron</code>. If it crosses a service boundary, EventBridge Scheduler.
+    </p>
+
+    <!-- See also -->
+    <div class="see-also">
+      <div class="heading">See Also</div>
+      <a href="idempotency.html">Idempotency</a>
+      <a href="../adr/0002-supabase-realtime-standalone.html">ADR-0002 — Supabase Realtime Standalone</a>
+    </div>
+  </main>
+</body>
+</html>

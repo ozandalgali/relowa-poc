@@ -1,0 +1,24 @@
+{
+  "name": "relowa-poc",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Relowa POC — Plan B+ stack validation (Postgres + Drizzle + Hono + Realtime)",
+  "packageManager": "pnpm@10.32.1",
+  "scripts": {
+    "db:generate": "pnpm --filter @relowa/db generate",
+    "db:migrate": "pnpm --filter @relowa/db migrate",
+    "db:studio": "pnpm --filter @relowa/db studio",
+    "db:seed": "pnpm --filter @relowa/db seed",
+    "db:reset": "docker compose down -v && docker compose up -d && sleep 10 && pnpm db:migrate && pnpm db:seed",
+    "api:dev": "pnpm --filter @relowa/api dev",
+    "web:dev": "pnpm --filter @relowa/web dev",
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "infra:logs": "docker compose logs -f"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "tsx": "^4.19.2",
+    "@types/node": "^22.10.0"
+  }
+}

@@ -1,0 +1,102 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: relowa-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: relowa
+      POSTGRES_PASSWORD: dev_password_change_me
+      POSTGRES_DB: relowa
+    ports:
+      # Host port 5433 → container port 5432.
+      # Host port 5432 is reserved on this machine by an existing
+      # local Postgres install (e.g. Homebrew postgresql@16).
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"
+      - "-c"
+      - "max_wal_senders=10"
+      - "-c"
+      - "max_replication_slots=10"
+      - "-c"
+      - "shared_preload_libraries=pg_stat_statements"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U relowa -d relowa"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  realtime:
+    image: supabase/realtime:v2.30.34
+    container_name: relowa-realtime
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: relowa
+      DB_USER: relowa
+      DB_PASSWORD: dev_password_change_me
+      DB_ENC_KEY: supabaseencrypti
+      API_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
+      SECRET_KEY_BASE: UpNVntn3cDxHJpq99YMc1T1AQgQpc8kfYTuRgBiYa15BLrx8etQoXz3gZv1/u2oq
+      APP_NAME: realtime
+      ERL_AFLAGS: -proto_dist inet_tcp
+      DNS_NODES: "''"
+      RLIMIT_NOFILE: "10000"
+      SEED_SELF_HOST: "true"
+      RUN_JANITOR: "true"
+    healthcheck:
+      test: ["CMD", "curl", "-sSfL", "--head", "-o", "/dev/null", "-H", "Authorization: Bearer ${ANON_TOKEN:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiJ9.placeholder}", "http://localhost:4000/api/tenants/realtime-dev/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  localstack:
+    image: localstack/localstack:3.7
+    container_name: relowa-localstack
+    restart: unless-stopped
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: s3,events,scheduler,lambda,sqs,ses,secretsmanager
+      DEFAULT_REGION: eu-central-1
+      AWS_DEFAULT_REGION: eu-central-1
+      LAMBDA_EXECUTOR: docker-reuse
+      DEBUG: 0
+      PERSISTENCE: 1
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  adminer:
+    image: adminer:latest
+    container_name: relowa-adminer
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+      ADMINER_DESIGN: dracula
+
+volumes:
+  postgres_data:
+  localstack_data:

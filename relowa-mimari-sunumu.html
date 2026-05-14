@@ -1,0 +1,1771 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relowa Mimari Yaklaşımı — Brainstorm Notları</title>
+<style>
+  :root {
+    --bg: #0a0f0a;
+    --bg-card: #111815;
+    --bg-card-2: #161e1a;
+    --border: #1f2a23;
+    --green: #4ade80;
+    --green-soft: #86efac;
+    --green-dark: #14532d;
+    --text: #e5e7eb;
+    --text-dim: #9ca3af;
+    --text-faint: #6b7280;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    font-size: 15px;
+  }
+  .container {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 60px 32px 80px;
+  }
+  header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 32px;
+    margin-bottom: 48px;
+  }
+  .eyebrow {
+    color: var(--green);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  h1 {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
+  }
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 17px;
+    max-width: 720px;
+  }
+  h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 56px 0 8px;
+    letter-spacing: -0.01em;
+    border-left: 3px solid var(--green);
+    padding-left: 16px;
+  }
+  h2 .num {
+    color: var(--green);
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  .section-intro {
+    color: var(--text-dim);
+    margin-bottom: 28px;
+    padding-left: 19px;
+    font-size: 14.5px;
+  }
+  h3 {
+    font-size: 19px;
+    font-weight: 600;
+    margin: 32px 0 14px;
+    color: var(--green-soft);
+  }
+  h4 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 20px 0 8px;
+    color: var(--text);
+  }
+  p { margin-bottom: 14px; }
+  ul, ol { margin: 0 0 16px 22px; }
+  li { margin-bottom: 6px; }
+  strong { color: #fff; font-weight: 600; }
+  em { color: var(--green-soft); font-style: normal; }
+  code {
+    background: var(--bg-card-2);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 13px;
+    color: var(--green-soft);
+    border: 1px solid var(--border);
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin: 18px 0;
+  }
+  .card-tight {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 12px 0;
+  }
+  .quote {
+    background: var(--bg-card-2);
+    border-left: 3px solid var(--green);
+    padding: 16px 20px;
+    margin: 18px 0;
+    color: var(--text-dim);
+    font-style: italic;
+    border-radius: 0 6px 6px 0;
+  }
+  .quote::before {
+    content: "Güneş'in mesajından: ";
+    color: var(--green);
+    font-style: normal;
+    font-weight: 600;
+  }
+  .tradeoff {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 16px 0;
+  }
+  .tradeoff > div {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+  .pro { border-left: 3px solid var(--green); }
+  .con { border-left: 3px solid var(--warn); }
+  .pro h4 { color: var(--green-soft); }
+  .con h4 { color: var(--warn); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0;
+    background: var(--bg-card);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 14px;
+  }
+  th, td {
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th {
+    background: var(--bg-card-2);
+    color: var(--green-soft);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  tr:last-child td { border-bottom: none; }
+  td.check { color: var(--green); font-weight: 600; }
+  td.cross { color: var(--danger); font-weight: 600; }
+  td.warn { color: var(--warn); font-weight: 600; }
+  .phase-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .phase {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px 24px;
+    position: relative;
+  }
+  .phase-1 { border-top: 3px solid var(--green); }
+  .phase-2 { border-top: 3px solid #60a5fa; }
+  .phase-3 { border-top: 3px solid #c084fc; }
+  .phase-label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 6px;
+  }
+  .phase-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .phase-time {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+  }
+  .phase ul { margin-left: 18px; font-size: 13.5px; }
+  .phase li { margin-bottom: 5px; }
+  .flow-diagram {
+    background: var(--bg-card-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin: 18px 0;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    overflow-x: auto;
+    color: var(--text-dim);
+  }
+  .flow-diagram .step { color: var(--green-soft); }
+  .flow-diagram .arrow { color: var(--text-faint); }
+  .glossary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .glossary-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+  .glossary-item .term {
+    color: var(--green);
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+  .glossary-item .def {
+    font-size: 13.5px;
+    color: var(--text-dim);
+  }
+  .cost-box {
+    background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-2) 100%);
+    border: 1px solid var(--green-dark);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin: 20px 0;
+  }
+  .cost-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .cost-line:last-child { border-bottom: none; }
+  .cost-line.total {
+    margin-top: 8px;
+    padding-top: 14px;
+    border-top: 1px solid var(--green-dark);
+    font-weight: 700;
+    color: var(--green);
+    border-bottom: none;
+  }
+  .callout {
+    background: linear-gradient(90deg, rgba(74, 222, 128, 0.06) 0%, transparent 100%);
+    border-left: 3px solid var(--green);
+    padding: 14px 18px;
+    margin: 16px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+  }
+  .callout strong { color: var(--green-soft); }
+  .nav {
+    position: sticky;
+    top: 0;
+    background: rgba(10, 15, 10, 0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 32px;
+    z-index: 10;
+    margin-bottom: 0;
+  }
+  .nav-inner {
+    max-width: 980px;
+    margin: 0 auto;
+    display: flex;
+    gap: 22px;
+    flex-wrap: wrap;
+    font-size: 13px;
+  }
+  .nav a {
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .nav a:hover { color: var(--green); }
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    color: var(--text-faint);
+    font-size: 13px;
+    text-align: center;
+  }
+  .diagram-wrap {
+    background: var(--bg-card-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin: 22px 0;
+    overflow-x: auto;
+  }
+  .diagram-wrap svg {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    height: auto;
+  }
+  .diagram-caption {
+    text-align: center;
+    color: var(--text-faint);
+    font-size: 12px;
+    margin-top: 14px;
+    font-style: italic;
+  }
+  .diagram-caption strong {
+    color: var(--green-soft);
+    font-style: normal;
+  }
+  .ddia-tag {
+    display: inline-block;
+    background: rgba(74, 222, 128, 0.1);
+    color: var(--green);
+    border: 1px solid var(--green-dark);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    margin-right: 6px;
+    text-transform: uppercase;
+  }
+  .principle-card {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--green);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 14px 0;
+    align-items: start;
+  }
+  .principle-card .badge {
+    background: var(--bg-card-2);
+    border-radius: 6px;
+    padding: 10px 12px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .principle-card .badge .ddia {
+    color: var(--green);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .principle-card .badge .ch {
+    color: var(--green-soft);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .principle-card .badge .term {
+    color: var(--text);
+    font-size: 11px;
+    margin-top: 6px;
+    line-height: 1.3;
+  }
+  .principle-card .body h4 {
+    margin: 0 0 6px;
+    color: var(--text);
+    font-size: 15px;
+  }
+  .principle-card .body p {
+    margin: 0;
+    font-size: 13.5px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  @media (max-width: 720px) {
+    .tradeoff, .phase-grid, .glossary { grid-template-columns: 1fr; }
+    .principle-card { grid-template-columns: 1fr; }
+    h1 { font-size: 28px; }
+    .container { padding: 40px 20px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#ozet">Özet</a>
+    <a href="#fazlar">Faz Tanımları</a>
+    <a href="#stack">Teknoloji Yığını</a>
+    <a href="#supabase">Supabase Tartışması</a>
+    <a href="#planB">Plan B (Yedek Mimari)</a>
+    <a href="#kvkk">KVKK & Veri Yerleşimi</a>
+    <a href="#akis">Veri Akışı</a>
+    <a href="#ai">Yapay Zeka Kullanımı</a>
+    <a href="#maliyet">Maliyet</a>
+    <a href="#sozluk">Sözlük</a>
+  </div>
+</nav>
+
+<div class="container">
+
+<header>
+  <div class="eyebrow">Brainstorm Notları — 7 Mayıs 2026</div>
+  <h1>Relowa Platformu Mimari Yaklaşımı</h1>
+  <p class="subtitle">Bu doküman, ilk teknik beyin fırtınamızdan çıkan yaklaşımın detaylı bir açıklamasıdır. Mail'deki özetin arkasındaki gerekçeleri, trade-off'ları ve karar noktalarını burada açıyorum — sohbette derinleşmek istediğimiz her başlık burada referans olarak duruyor.</p>
+</header>
+
+<section id="ozet">
+<h2><span class="num">01.</span> Yaklaşımın Özeti</h2>
+<p class="section-intro">Üç prensip her kararı yönetiyor: substrate sıkıcı ve sağlam, modüller bağımsız evrilebilir, KVKK pozisyonu ilk günden hukuki olarak savunulabilir.</p>
+
+<div class="card">
+<p>Senin koyduğun çerçeve çok netti — Klasik MVP-sonra-rewrite mantığı yok, her faz production-ready ve kalıcı. Buna bağlı kaldım. Mimaride üç katman var:</p>
+
+<ol>
+  <li><strong>Substrate (temel):</strong> Postgres + AWS yönetilen servisleri + Supabase açık kaynak bileşenleri. Bu katman değişmiyor; üzerinde modüller geliyor.</li>
+  <li><strong>Modüller (Lego parçaları):</strong> Marketplace (ihale akışı), AI Analiz, Lojistik & Filo, ESG Raporlama, Escrow Ödeme. Her biri EventBridge omurgası üzerinden bağımsız konuşuyor.</li>
+  <li><strong>Frontend:</strong> Next.js (web + PWA), gerekirse Phase 2'de carrier için React Native.</li>
+</ol>
+
+<p>Bu yapı senin "her faz production-ready, sonraki faz Lego parçası" çerçeveni mühendislik diline çeviriyor.</p>
+</div>
+
+<div class="quote">"Klasik 'hızlıca bir MVP yapalım, sonra kodu çöpe atıp baştan yazarız' mantığında ilerlemeyeceğiz. Ürünü faz faz, tamamen modüler bir yapıda geliştireceğiz. Ancak canlıya alacağımız her bir faz/modül, geçici bir MVP değil, projenin 'son noktasıymış' gibi production-ready kalitede olacak."</div>
+</section>
+
+<section id="fazlar">
+<h2><span class="num">02.</span> Faz Tanımları</h2>
+<p class="section-intro">Senin "Çekirdek Akış 3-4 ay, sonra Faz 2 ve Faz 3 modüller" çerçevenden yola çıkarak fazları somut hale getirdim. İçerikleri yarın birlikte netleştirebiliriz; bu benim önerim.</p>
+
+<div class="phase-grid">
+
+<div class="phase phase-1">
+  <div class="phase-label">Faz 1 · 3-4 Ay</div>
+  <div class="phase-title">Çekirdek Akış</div>
+  <div class="phase-time">Senin tanımladığın faz: talep açılır → tesiste kapanır</div>
+  <ul>
+    <li>Multi-tenant kayıt + auth (org + intra-org rol modeli)</li>
+    <li>Üretici talep oluşturma (3 adımlı wizard)</li>
+    <li>Tesis ihale görüntüleme + teklif verme</li>
+    <li>Auction lifecycle (yayınla → bid → kapan → kazananı seç)</li>
+    <li>AI foto analizi (Greyparrot entegrasyonu)</li>
+    <li>Escrow ödeme entegrasyonu (Iyzico veya muadili)</li>
+    <li>Temel ESG sertifikası (PDF üretim)</li>
+    <li>Audit trail + KVKK altyapı disiplinleri</li>
+  </ul>
+</div>
+
+<div class="phase phase-2">
+  <div class="phase-label">Faz 2 · ~3 Ay</div>
+  <div class="phase-title">Lojistik & Operasyon</div>
+  <div class="phase-time">Substrate üzerine modül olarak ekleniyor</div>
+  <ul>
+    <li>Carrier kullanıcı surface'i (mobil uygulama, Phase 1'de scope dışı kaldıysa)</li>
+    <li>Canlı GPS filo takibi (IoT Core veya Lambda + WebSocket)</li>
+    <li>Rota optimizasyonu (Mapbox / Google Routes entegrasyonu)</li>
+    <li>İrsaliye dijitalleştirme + sevkiyat lifecycle</li>
+    <li>Karbon skoru hesaplaması (PostGIS ile mesafe + emisyon)</li>
+    <li>Operasyon Müdürü dashboard'u</li>
+    <li>Phase 2 değerlendirmesi: AWS İstanbul Local Zone'a hot path migration</li>
+  </ul>
+</div>
+
+<div class="phase phase-3">
+  <div class="phase-label">Faz 3 · ~3 Ay</div>
+  <div class="phase-title">Zeka & Sürdürülebilirlik</div>
+  <div class="phase-time">Veri olgunlaşınca açılan ileri yetenekler</div>
+  <ul>
+    <li>IoT cihaz entegrasyonu (akıllı tartı, Sensoneo benzeri)</li>
+    <li>Akıllı eşleştirme & öneri motoru (gerçek ML, sadece SQL heuristik değil)</li>
+    <li>Otomatik ESG & karbon raporlama (regülatif standartlarla uyumlu)</li>
+    <li>Public API & developer portal (üçüncü taraf entegrasyonları)</li>
+    <li>Enterprise SSO (SAML / SCIM, büyük müşteri ihtiyacı geldiğinde)</li>
+    <li>Genişletilmiş analytics & BI</li>
+  </ul>
+</div>
+
+</div>
+
+<div class="callout">
+<strong>Faz tanımları niye bu sırayla?</strong> Her faz, bir öncekinin verisi olmadan anlamsız oluyor. Lojistik için talep ve tesis verisi lazım (Faz 1'den). IoT akıllı tartılar için lojistik akışı lazım (Faz 2'den). Akıllı öneri motoru için 6-9 ay'lık gerçek kullanım verisi lazım — daha önce yaparsak heuristik üstünde ML tutuyoruz, bu da false confidence verir.
+</div>
+</section>
+
+<section id="stack">
+<h2><span class="num">03.</span> Teknoloji Yığını ve Gerekçeleri</h2>
+<p class="section-intro">Her teknoloji seçimi bir trade-off'la geliyor. Burada sadece "ne kullandığımı" değil, "neyi reddettiğimi ve niye" yi açıyorum — çünkü bu projede yanlış aracı seçmek yanlış aracı kullanmaktan daha pahalıya patlar.</p>
+
+<h3>Veri Katmanı: PostgreSQL (RDS)</h3>
+<p><strong>Neden:</strong> İlişkisel veri (organizasyon → kullanıcı → ihale → teklif → sevkiyat → ödeme) Postgres'in tam olarak en iyi olduğu alan. Multi-tenant izolasyon için Row-Level Security (RLS) native — kural veritabanının içinde, uygulama bug'ı bypass edemez. Time-series veri (piyasa fiyat endeksi, GPS log'ları) için TimescaleDB extension'ı, coğrafi sorgular için PostGIS extension'ı aynı veritabanında çalışıyor. Ayrı bir time-series DB veya GIS DB gerekmiyor.</p>
+<p><strong>RDS Multi-AZ ne demek:</strong> Aynı verinin Frankfurt'ta iki farklı binada (availability zone) eşzamanlı kopyası tutuluyor. Bir bina kapansa bile diğeri otomatik devralıyor (~30 saniye downtime). Backup, point-in-time recovery, otomatik patching hepsi AWS sorumluluğunda — biz uygulama kodunu yazıyoruz.</p>
+
+<h3>Uygulama Servisleri: Supabase OSS Bileşenleri</h3>
+<p>Supabase Cloud'a bağlı kalmıyoruz, açık kaynak bileşenlerini kendi AWS hesabımızda çalıştırıyoruz. Şu beş bileşen:</p>
+<ul>
+  <li><code>GoTrue</code> — Auth servisi (login, signup, JWT, email doğrulama)</li>
+  <li><code>PostgREST</code> — Postgres'i otomatik REST API'ye çeviriyor</li>
+  <li><code>Realtime</code> — WebSocket katmanı (Postgres değişikliklerini canlı UI'ye push)</li>
+  <li><code>Storage API</code> — S3'e bağlı dosya yönetimi (RLS-aware access control)</li>
+  <li><code>Studio</code> — Admin UI (sadece iç ekip için, public değil)</li>
+</ul>
+
+<div class="tradeoff">
+<div class="pro">
+<h4>Niye Supabase OSS</h4>
+<ul>
+  <li>Vendor lock-in yok — vendor biziz, bileşenler kendi AWS hesabımızda</li>
+  <li>Veri tamamen bizim VPC'mizde, KVKK posture clean</li>
+  <li>Phase 1'de 6-8 hafta tasarruf — auth, REST, realtime sıfırdan yazmıyoruz</li>
+  <li>Her bileşen bağımsız değiştirilebilir — auth'u Cognito'ya, REST'i NestJS'e taşımak Phase 3'te mümkün, schema yerinde durur</li>
+  <li>Postgres altta, Supabase üstte ince katman — geri çekildiğinde sadece Postgres kalır, kod kaybı yok</li>
+</ul>
+</div>
+<div class="con">
+<h4>Niye Supabase OSS Değil (alternatif)</h4>
+<ul>
+  <li>Operasyonel basitlik isteniyorsa <strong>Supabase Cloud EU region (Frankfurt)</strong> — zaten AWS üzerinde, KVKK için DPA imzalanabiliyor, SOC 2 + ISO 27001 sertifikalı</li>
+  <li>Phase 1'de Cloud, Phase 2'de self-host'a migration — schema ve kod migrasyonda değişmiyor</li>
+  <li>Tamamen AWS-native istiyorsak: Cognito (auth) + Lambda (API) + AppSync (realtime) — ama bu ~2 ay ek geliştirme</li>
+  <li>"Hand-rolled NestJS + custom auth" — full kontrol, ama solo lead için Phase 1 takvimini patlatır</li>
+</ul>
+</div>
+</div>
+
+<h3>Container Orkestrasyon: ECS Fargate</h3>
+<p>Konteyner çalıştırma katmanı. Fargate "sunucusuz konteyner" demek — biz "şu Docker image'ı 1 kopya çalıştır, 0.5 vCPU + 1 GB RAM ver" diyoruz, AWS arkasında EC2'ları yönetiyor, biz görmüyoruz. Konteyner çökerse Fargate yeniden başlatıyor.</p>
+
+<table>
+<thead>
+<tr><th>Seçenek</th><th>Avantaj</th><th>Dezavantaj</th><th>Phase 1 için</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td>EC2 (sanal sunucu)</td>
+  <td>En ucuz, en fazla kontrol</td>
+  <td>OS patch, scaling, AMI, monitoring hepsi sende</td>
+  <td class="cross">Solo lead için ops yükü çok</td>
+</tr>
+<tr>
+  <td>ECS Fargate</td>
+  <td>Sunucu yönetmiyorsun, container restart otomatik</td>
+  <td>EC2'dan ~%20 daha pahalı</td>
+  <td class="check">Doğru tercih</td>
+</tr>
+<tr>
+  <td>EKS (Kubernetes)</td>
+  <td>Industry standard, çok esnek</td>
+  <td>Solo lead için aşırı karmaşık, ayrı uzmanlık</td>
+  <td class="cross">Phase 4+ konuşması</td>
+</tr>
+<tr>
+  <td>Lambda (sunucusuz fonksiyon)</td>
+  <td>Sıfır boştayken maliyet, otomatik scale</td>
+  <td>Cold start (1-3sn), uzun süreçler için uygunsuz</td>
+  <td class="warn">Yardımcı işler için iyi (audit job, scheduler)</td>
+</tr>
+</tbody>
+</table>
+
+<h3>Entegrasyon Omurgası: AWS EventBridge</h3>
+<p><strong>Niye Phase 1'de gerekli:</strong> Senin "Lego parçası" çerçeven tam olarak bu. Modüller birbirine doğrudan bağımlı olmak yerine event'ler üzerinden konuşuyor. Phase 1'de <code>tender.created</code> event'i atılıyor, Phase 2'de matching servisi geldiğinde bu event'i dinlemeye başlıyor — Phase 1 koduna dokunmadan. Phase 3'te IoT modülü geldiğinde aynı şekilde.</p>
+<p>EventBridge yerine Kafka / MSK yapsak overkill — pilot ölçekte EventBridge yeterli, Kafka'ya geçiş Phase 4+'da yapılır eğer event log replay gerektiren karmaşık stream processing ihtiyacı çıkarsa.</p>
+
+<h3>Frontend: Next.js + PWA</h3>
+<p>Üretici, tesis, admin ekranları tek codebase. App Router + TypeScript + Tailwind + shadcn/ui (Radix altyapısı), i18n (TR/EN), Zod form validation, Zustand local state, TanStack Query server state. PWA olarak çalışıyor — "ekrana ekle" + push notifications + offline tolerance, ama mobile app store'a girme yükü yok.</p>
+<p><strong>Carrier (sürücü) tarafı için ayrı karar:</strong> Eğer Phase 1'de carrier sürücü aktif kullanıcıysa (canlı GPS yayını, background tracking, native push), iOS'un PWA kısıtlamaları yüzünden React Native (Expo) ile minimal mobil app gerekiyor. Eğer carrier elle yönetilen bir hizmetse Phase 1'de PWA yeterli, mobil app Phase 2'ye kalır. Bu ~2 ay'lık scope farkı.</p>
+
+<h3>AI / Görsel İşleme: FastAPI</h3>
+<p>İhale yayın akışında foto analizi (saflık, kontaminasyon, kalite skoru) Phase 1 critical path. FastAPI ECS Fargate üzerinde ayrı bir servis olarak duruyor; auto-generated OpenAPI ile dokümantasyon kendiliğinden geliyor. Phase 1'de Greyparrot commercial API entegrasyonu en hızlı yol — KVKK ve ekonomi gerektirirse Phase 2'de self-hosted vision modele geçiş.</p>
+
+<h3>Observability (Gözlem)</h3>
+<ul>
+  <li><strong>Sentry (EU region)</strong> — uygulama hata takibi, source map'li stack trace, release health</li>
+  <li><strong>PostHog (self-hosted)</strong> — ürün analitiği, funnel'lar, feature adoption — KVKK için kendi VPC'mizde</li>
+  <li><strong>CloudWatch + CloudTrail</strong> — AWS infrastructure metric'leri ve API audit log'ları</li>
+  <li><strong>Audit trail (uygulama-level)</strong> — Postgres'te append-only <code>audit_events</code> tablosu + S3 Object Lock mirror; bu observability değil, yasal kanıt katmanı, ayrı tutuyoruz</li>
+</ul>
+
+<h3>Bilinçli Olarak Kullanmadıklarım</h3>
+<table>
+<thead><tr><th>Reddedilen</th><th>Niye</th></tr></thead>
+<tbody>
+<tr><td>Vercel</td><td>Sen zaten dışarıda bıraktın, AWS-native</td></tr>
+<tr><td>Cognito</td><td>GoTrue Postgres RLS ile çok daha entegre, RBAC modelimizi Postgres'te yazmak Cognito Groups + Lambda triggers'tan çok daha temiz</td></tr>
+<tr><td>Kafka / MSK</td><td>Pilot ölçek için aşırı, EventBridge yeterli</td></tr>
+<tr><td>Kubernetes / EKS</td><td>Solo lead için aşırı karmaşık, Fargate çözüyor</td></tr>
+<tr><td>Mikroservis mimarisi</td><td>Doğru cevap modüler monolith — kod modüler, deployment tek, karmaşıklık ihtiyaç duyduğumuzda gelir</td></tr>
+<tr><td>NoSQL (DynamoDB, MongoDB)</td><td>Verimiz ilişkisel, Postgres + JSON fields karma ihtiyaçları zaten karşılıyor</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="supabase">
+<h2><span class="num">04.</span> Supabase Tartışması</h2>
+<p class="section-intro">Bu seçim haklı sorulara açık. Bu yüzden bu bölüm sadece "Supabase iyidir" demiyor — endişeleri tek tek karşılıyor.</p>
+
+<h3>Endişe 1: "Supabase MVP-vari değil mi? Ciddi bir proje için zayıf kalmaz mı?"</h3>
+<p>Burada iki ayrı şeyi karıştırmamak lazım:</p>
+<ul>
+  <li><strong>Yazdığımız kod:</strong> Schema, RLS politikaları, business logic, audit altyapısı, migration disiplini, test suite. Bunların hiçbiri Phase 1'de yaz Phase 3'te at değil. Year-1 schema'sı year-5'te de yaşıyor. Bu senin "production-ready, atılmayacak" ilkenle birebir.</li>
+  <li><strong>Substrate bileşenleri:</strong> Postgres, GoTrue, PostgREST, Realtime, Storage. Bunlar infrastructure parçaları — bir SaaS'in yaşam döngüsünde infrastructure parçaları zaten zamanla swap edilir. Bu rewrite değil, healthy evolution. Notion ilk yıllarında tek Postgres'teydi, sonra sharding ekledi. GitHub MySQL'le başladı, Vitess ekledi. Bu "kod atma" değil.</li>
+</ul>
+<p>Yani Supabase OSS bizi "ciddi olamayan bir noktaya" hapsetmiyor. Tam tersine — her bileşen swappable, sadece doğru zamanda swap ediyoruz. Bu senin Lego çerçevenin tam olarak aradığı şey.</p>
+
+<h3>Endişe 2: "Supabase'in RBAC'i zayıf değil mi? Org / role hiyerarşisini nasıl yapacağız?"</h3>
+<p>Burada haklı bir gözlem ama yanlış sonuç çıkarılabiliyor. Supabase Auth'un "built-in RBAC"i basit case için yeterli, complex B2B case için biz kendi modelimizi yazıyoruz — ki <strong>bu Supabase'in eksikliği değil, B2B SaaS'in doğası.</strong> Aynı şeyi Cognito ya da Auth0 ile yapsak da bu modeli sıfırdan yazmamız gerekirdi.</p>
+
+<p>Pratikte 4 tablo + 2 SQL helper function + bir kaç RLS policy:</p>
+<div class="flow-diagram">
+<span class="step">organizations</span> (id, type, name, vergi_no, address, ...)<br>
+<span class="step">users</span> (auth.users'ı extend eder, profile bilgileri)<br>
+<span class="step">org_members</span> (org_id, user_id, role)<br>
+<span class="step">org_invitations</span> (token, org_id, email, role, expires_at)<br><br>
+<span class="step">current_org_id()</span> <span class="arrow">→</span> JWT'den aktif org çek<br>
+<span class="step">user_has_role(role)</span> <span class="arrow">→</span> bu org'da bu rol var mı kontrolü<br><br>
+RLS policy örneği:<br>
+&nbsp;&nbsp;<span class="step">CREATE POLICY tenant_isolation ON tenders</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;USING (org_id = current_org_id());
+</div>
+<p>Bu pattern dünya çapında her B2B SaaS'in yaptığı şey. Postgres + RLS aslında Cognito + Lambda triggers veya Auth0 Organizations'tan <em>daha temiz</em> bir cevap, çünkü kural veri katmanında — uygulama bug'ı bypass edemiyor.</p>
+
+<h3>Endişe 3: "SSO, enterprise auth, SAML gerekirse?"</h3>
+<table>
+<thead>
+<tr><th>Senaryo</th><th>Çözüm</th><th>Phase</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td>Sosyal login (Google, Microsoft)</td>
+  <td>GoTrue built-in destek, config flag</td>
+  <td>Phase 1 (lazımsa)</td>
+</tr>
+<tr>
+  <td>SAML 2.0 (Okta, Azure AD)</td>
+  <td>GoTrue OSS native SAML desteği var</td>
+  <td>Phase 2-3</td>
+</tr>
+<tr>
+  <td>SCIM provisioning, advanced enterprise</td>
+  <td>WorkOS'u SSO katmanı olarak araya koy (best-in-class), GoTrue'nun JWT'sine çevir</td>
+  <td>Phase 3</td>
+</tr>
+</tbody>
+</table>
+<p>Yani SSO esnekliği var; sadece Phase 1'de kritik değil. Pilotta 50-100 müşteriden SAML isteyen muhtemelen olmayacak.</p>
+
+<h3>Endişe 4: "PWA, mobil uyumluluk?"</h3>
+<p>Backend (Supabase + RDS + EventBridge + S3) frontend'in ne olduğunu umursamıyor — REST + WebSocket + Storage API her şeyle konuşuyor. Yani:</p>
+<ul>
+  <li><strong>Web + PWA</strong> — Supabase ile sorunsuz çalışıyor, Realtime WebSocket'leri PWA'da çalışıyor, GoTrue token refresh PWA'da çalışıyor</li>
+  <li><strong>React Native (Expo)</strong> — Supabase'in resmi React Native SDK'sı var, sıfır sürtünmeyle entegre</li>
+  <li><strong>Capacitor (web → native paketleme)</strong> — Yine sorunsuz</li>
+</ul>
+<p>Frontend kararı backend kararını değiştirmiyor. Phase 1'de PWA, Phase 2'de carrier için React Native ekleyebiliriz — backend'e dokunmadan.</p>
+
+<h3>Endişe 5: "Ölçeklenir mi gerçekten?"</h3>
+<table>
+<thead>
+<tr><th>Bileşen</th><th>Pilot (100 org)</th><th>Mature (1,000 org)</th><th>Hyperscale (100K org)</th></tr>
+</thead>
+<tbody>
+<tr><td>Postgres (RDS)</td><td>db.t4g.medium</td><td>db.r6g.xlarge + read replica</td><td>Citus / partitioning gerekir</td></tr>
+<tr><td>GoTrue</td><td>1 task</td><td>2-3 task</td><td>5+ task ya da Cognito'ya geçiş</td></tr>
+<tr><td>PostgREST</td><td>1-2 task</td><td>3-5 task</td><td>10+ task ya da custom NestJS API</td></tr>
+<tr><td>Realtime (WebSocket)</td><td>~5K concurrent</td><td>~50K concurrent</td><td>Custom Elixir cluster ya da AWS AppSync</td></tr>
+<tr><td>Storage</td><td>S3, sınırsız</td><td>S3, sınırsız</td><td>S3, sınırsız</td></tr>
+</tbody>
+</table>
+<p>Postgres katmanı leader-follower replication ile milyonlarca kullanıcıya kadar gider (GitHub yıllarca tek-leader Postgres'te çalıştı, Notion 2022'ye kadar). Supabase services katmanı stateless — task sayısını artırmak yetiyor. Gerçek "scaling wall" Realtime'ın 100K+ concurrent connection bölgesinde geliyor; bu da Relowa için en az 3-4 yıl sonrası, ve geldiğinde Realtime'ı AppSync ya da custom Elixir cluster'la swap etme planı zaten elimizde — schema değişmiyor, kod değişmiyor.</p>
+</section>
+
+<section id="planB">
+<h2><span class="num">05.</span> Plan B — Supabase OSS Yerine Hand-Rolled Stack</h2>
+<p class="section-intro">Eğer Supabase OSS yolu (operasyonel, stratejik veya başka bir nedenle) tercih edilmezse hazır bir yedek planımız var. Bu plan "panik kararı" değil — olgun, kanıtlanmış parçalardan kurulu bir alternatif. Burada anahtar prensip: <strong>Postgres ve schema yerinde duruyor, sadece üst katmanı manuel kuruyoruz.</strong></p>
+
+<div class="callout">
+<strong>Niye bu plan önemli:</strong> Supabase OSS'in <em>gerçekten</em> bir limit dayatabileceği iki senaryo var: (1) çok özel bir auth gereksinimi (örn. zorunlu offline-capable mobile auth, veya çok özel SSO compliance), (2) Realtime'ın 100K+ concurrent connection'a çıkması (yıllar sonra). İkisi de Phase 1'de gerçek değil ama "kapı açık" olduğunu göstermek istiyorum. Plan B'nin maliyeti: Phase 1 takvimi 4 ay yerine ~5.5 ay. Her parçası kanıtlanmış, hiçbiri exotic değil.</div>
+
+<h3>Plan A vs Plan B Karşılaştırma</h3>
+<table>
+<thead>
+<tr><th>Katman</th><th>Plan A (Supabase OSS)</th><th>Plan B (Hand-Rolled)</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Veritabanı</strong></td>
+  <td>PostgreSQL on RDS</td>
+  <td class="check">Aynı — PostgreSQL on RDS</td>
+</tr>
+<tr>
+  <td><strong>Multi-tenant + RLS</strong></td>
+  <td>Postgres native RLS</td>
+  <td class="check">Aynı — Postgres native RLS (schema değişmiyor)</td>
+</tr>
+<tr>
+  <td><strong>ORM / DB erişim</strong></td>
+  <td>PostgREST (otomatik REST API)</td>
+  <td><strong>Drizzle ORM</strong> (TypeScript, type-safe, RLS-uyumlu)</td>
+</tr>
+<tr>
+  <td><strong>Auth</strong></td>
+  <td>GoTrue (Supabase Auth)</td>
+  <td><strong>Better-Auth</strong> ya da Auth.js v5 + Lucia</td>
+</tr>
+<tr>
+  <td><strong>API katmanı</strong></td>
+  <td>PostgREST + Next.js Server Actions</td>
+  <td><strong>Hono</strong> ya da NestJS + Next.js Server Actions</td>
+</tr>
+<tr>
+  <td><strong>Realtime / WebSocket</strong></td>
+  <td>Supabase Realtime</td>
+  <td><strong>AWS AppSync</strong> (subscriptions) ya da Pusher / Soketi</td>
+</tr>
+<tr>
+  <td><strong>Dosya / Storage</strong></td>
+  <td>Supabase Storage API</td>
+  <td><strong>S3 + presigned URL</strong> (kendi handler'ımız)</td>
+</tr>
+<tr>
+  <td><strong>Admin / Studio UI</strong></td>
+  <td>Supabase Studio (web)</td>
+  <td><strong>Drizzle Studio</strong> (geliştirici için) + TablePlus</td>
+</tr>
+<tr>
+  <td><strong>Background jobs</strong></td>
+  <td>pg_cron + EventBridge Scheduler</td>
+  <td>Aynı — pg_cron + EventBridge Scheduler</td>
+</tr>
+</tbody>
+</table>
+
+<h3>Plan B Bileşenlerinin Detayı</h3>
+
+<div class="card-tight">
+<h4 style="color: var(--green-soft);">Drizzle ORM (PostgREST yerine)</h4>
+<p>2023-2024'te yükselen modern TypeScript ORM. Prisma'dan daha hafif, SQL'e daha yakın, RLS ile düzgün çalışıyor (Prisma'nın bilinen bir zayıflığı RLS'i unutması). Migration disiplini güçlü, schema değişiklikleri code-review'lanabilir.</p>
+<p style="font-size: 13px; color: var(--text-dim); margin-top: 8px;"><strong>Niye Drizzle, Prisma değil:</strong> Prisma generated client şişman, RLS tarafında nüans var, ve query builder bazen optimal-altı SQL üretiyor. Drizzle daha ince, SQL'e yakın ve raw SQL escape hatch'i temiz.</p>
+</div>
+
+<div class="card-tight">
+<h4 style="color: var(--green-soft);">Better-Auth (GoTrue yerine)</h4>
+<p>2024-2025'te en hızlı büyüyen auth kütüphanesi. Açık kaynak, Postgres native, Drizzle ile first-class entegrasyon. Email/password, OAuth (Google/Microsoft/GitHub), magic links, MFA, passkeys, organizations, SAML SSO — hepsi içinde. Vercel'in Auth.js'inin modern alternatifi.</p>
+<p style="font-size: 13px; color: var(--text-dim); margin-top: 8px;"><strong>Niye Better-Auth, NextAuth değil:</strong> NextAuth (Auth.js v5) iyi ama modular değil ve bazı edge case'lerde takılıyor. Better-Auth tamamen modular, plugin sistemli ve TypeScript-first.</p>
+</div>
+
+<div class="card-tight">
+<h4 style="color: var(--green-soft);">Hono (PostgREST yerine API katmanı)</h4>
+<p>Express'in modern hâli — minimalist, hızlı, edge-runtime uyumlu, Zod entegrasyonu first-class, OpenAPI auto-generation built-in. RPC mode'unda type-safe client export ediyor (tRPC benzeri ama OpenAPI-uyumlu).</p>
+<p style="font-size: 13px; color: var(--text-dim); margin-top: 8px;"><strong>NestJS alternatifi:</strong> Eğer enterprise-y dependency injection + module sistemi tercih edilirse NestJS de iyi. Ama solo lead için Hono daha az boilerplate.</p>
+</div>
+
+<div class="card-tight">
+<h4 style="color: var(--green-soft);">AWS AppSync (Supabase Realtime yerine)</h4>
+<p>AWS'in managed GraphQL + WebSocket subscription servisi. KVKK uyumlu, Frankfurt'ta var, AWS-native. Postgres CDC (change data capture) yerine event-driven subscription'lar — bid geldiğinde dashboard'a push, auction state değişince UI güncellemesi.</p>
+<p style="font-size: 13px; color: var(--text-dim); margin-top: 8px;"><strong>Pusher alternatifi:</strong> AppSync biraz karmaşıksa Pusher (managed) ya da Soketi (open source self-hosted) ile başlanabilir, sonra geçilir.</p>
+</div>
+
+<div class="card-tight">
+<h4 style="color: var(--green-soft);">S3 + Presigned URL (Supabase Storage yerine)</h4>
+<p>Direkt S3 kullanıyoruz, üzerine kendi access-control handler'ımızı yazıyoruz. Upload için presigned URL üretiyor (RLS'e benzer policy check'i Hono endpoint'inde), download için signed URL veriyor. ImgProxy container'ı resize/optimization için (open source). Audit için S3 Object Lock zaten Plan A'da da vardı.</p>
+</div>
+
+<h3>Plan B Veri Akışı (Aynı senaryoda)</h3>
+<div class="flow-diagram">
+<span class="step">1.</span> Kullanıcı login (Better-Auth → JWT, içinde user_id + active_org_id + role)<br>
+<span class="arrow">↓</span><br>
+<span class="step">2.</span> Next.js server action input'u Zod ile doğrular<br>
+<span class="arrow">↓</span><br>
+<span class="step">3.</span> Drizzle ORM ile Postgres'e insert (RLS aynı şekilde çalışıyor — PostgREST yokluğu RLS'i etkilemiyor)<br>
+<span class="arrow">↓</span><br>
+<span class="step">4.</span> audit_events tablosuna append (Plan A ile aynı)<br>
+<span class="arrow">↓</span><br>
+<span class="step">5.</span> DB trigger EventBridge event'i yayar: <code>tender.created</code> (Plan A ile aynı)<br>
+<span class="arrow">├─</span> AppSync subscription → eşleşen tesislerin WebSocket'ine push<br>
+<span class="arrow">├─</span> SES → mail bildirimi<br>
+<span class="arrow">└─</span> (Faz 2 seam) Matching servisi<br>
+<span class="arrow">↓</span><br>
+<span class="step">6.</span> Tesis dashboard'unu açar<br>
+<span class="arrow">↓</span><br>
+<span class="step">7.</span> Hono API endpoint çağrılır → Drizzle query → RLS otomatik filtreler<br>
+<span class="arrow">↓</span><br>
+<span class="step">8.</span> Yeni talebi anında görür → teklif gönderir → ayna akış geri döner
+</div>
+<p style="font-size: 13.5px; color: var(--text-dim);">Akış neredeyse <em>aynı</em> — sadece üst katman bileşenlerinin isimleri değişiyor. Schema, RLS, audit trail, EventBridge omurgası, idempotency, server-authoritative auction close — hepsi yerinde duruyor.</p>
+
+<h3>Trade-off'lar Açıkça</h3>
+
+<div class="tradeoff">
+<div class="pro">
+<h4>Plan B'nin Avantajları</h4>
+<ul>
+  <li><strong>Tam kontrol</strong> — her bileşeni biz seçiyoruz, tek başına değiştirilebilir</li>
+  <li><strong>Tek vendor algısı yok</strong> — "Supabase'e bağımlıyız" iddiası ortadan kalkıyor</li>
+  <li><strong>Modern, developer-experience odaklı parçalar</strong> — Drizzle, Better-Auth, Hono hepsi 2024-2025'in en sevilen araçları</li>
+  <li><strong>Type safety end-to-end</strong> — Drizzle'ın schema → TypeScript inferencing'i + Hono RPC mode = client-server type sharing</li>
+  <li><strong>Acquirer due diligence'ında "her şey kendimiz yazdık" hikayesi</strong> (eğer önemliyse)</li>
+</ul>
+</div>
+<div class="con">
+<h4>Plan B'nin Dezavantajları</h4>
+<ul>
+  <li><strong>~6-8 hafta ek geliştirme</strong> — Phase 1 takvimi 4 ay yerine ~5.5 ay</li>
+  <li><strong>Daha fazla integration glue kodu</strong> — Better-Auth ↔ Drizzle ↔ Hono'yu birbirine bağlamak el işi</li>
+  <li><strong>Admin UI yok hazır</strong> — Supabase Studio'nun yerine geliştirme/debug için TablePlus + Drizzle Studio (yeterli ama Supabase Studio kadar zengin değil)</li>
+  <li><strong>Realtime patterns daha manuel</strong> — AppSync'i Postgres CDC ile bağlamak ya da event-driven kurmak ekstra iş</li>
+  <li><strong>Storage RLS-uyumlu access control'ünü biz yazıyoruz</strong> — Supabase'in built-in storage policy'si yerine</li>
+  <li><strong>"Eski" değil ama daha az test edilmiş kombinasyon</strong> — Drizzle + Better-Auth + Hono kombinasyonu yeni; her parça sağlam ama birlikte yaşadığı kilometresi az</li>
+</ul>
+</div>
+</div>
+
+<h3>Hibrit 3. Yol — Bazı Şirketlerin Yaptığı Şey</h3>
+<p>Plan A ve Plan B arasında orta yol da var: <strong>Auth ve Realtime için yönetilen servisler, ORM için Drizzle.</strong></p>
+<table>
+<thead><tr><th>Katman</th><th>Hibrit Tercih</th><th>Niye</th></tr></thead>
+<tbody>
+<tr>
+  <td>Veritabanı</td>
+  <td>RDS Postgres</td>
+  <td>Sabit kalıyor</td>
+</tr>
+<tr>
+  <td>ORM</td>
+  <td>Drizzle</td>
+  <td>Type-safe, RLS uyumlu</td>
+</tr>
+<tr>
+  <td>Auth</td>
+  <td><strong>Clerk</strong> ya da <strong>WorkOS</strong></td>
+  <td>Enterprise-grade, SOC 2, SAML SSO built-in, 2 saatte entegre</td>
+</tr>
+<tr>
+  <td>API</td>
+  <td>Hono</td>
+  <td>Modern, hızlı</td>
+</tr>
+<tr>
+  <td>Realtime</td>
+  <td>Pusher ya da AppSync</td>
+  <td>Yönetilen, ölçeklenir</td>
+</tr>
+<tr>
+  <td>Storage</td>
+  <td>S3 + presigned URL</td>
+  <td>Direct integration</td>
+</tr>
+</tbody>
+</table>
+<p>Bu hibrit yaklaşımın avantajı: <strong>auth gibi en kritik parçayı tamamen managed</strong> bir servise (Clerk veya WorkOS) bırakıyorsun. Compliance burden onlara geçiyor (SOC 2, GDPR, SAML, SCIM hepsi onlarda). Dezavantajı: Clerk per-MAU ücretli (~$25/ay'dan başlayıp scale ile artıyor), WorkOS SSO başına ücretli ama enterprise sales'te değer veriyor.</p>
+
+<h3>Karar Matrisi</h3>
+<table>
+<thead><tr><th>Senaryo</th><th>Önerim</th></tr></thead>
+<tbody>
+<tr>
+  <td>Phase 1 takvimi sıkı, vendor lock-in'den kaçmak öncelik</td>
+  <td class="check">Plan A (Supabase OSS self-hosted)</td>
+</tr>
+<tr>
+  <td>"Supabase'e bağımlı" algısı kabul edilemez, takvim esnek</td>
+  <td class="check">Plan B (Hand-rolled)</td>
+</tr>
+<tr>
+  <td>Erken enterprise sales bekliyoruz, SSO/SAML kritik, takvim orta</td>
+  <td class="check">Hibrit (Clerk veya WorkOS + Drizzle + Hono)</td>
+</tr>
+<tr>
+  <td>Operasyonel basitlik öncelik, Phase 1 risk minimum</td>
+  <td class="check">Plan A varyantı: Supabase Cloud EU region</td>
+</tr>
+</tbody>
+</table>
+
+<div class="callout">
+<strong>Benim önerim:</strong> Plan A (Supabase OSS) ile başla, ama codebase'i Plan B'ye geçişe hazır şekilde yaz — yani business logic'i Supabase'e gömme, repository pattern ile DB erişimini soyutla, auth'u kendi service layer'ında wrap'le. Bu disiplin Plan A'nın hızını verirken Plan B'ye geçiş kapısını açık tutar. Bu senin "modüler mimari" çerçevenin bir başka yansıması.</div>
+</section>
+
+<section id="kvkk">
+<h2><span class="num">06.</span> KVKK & Veri Yerleşimi</h2>
+<p class="section-intro">Atık verisi + ihale verisi + escrow ödeme verisi ciddi bir KVKK posture gerektiriyor. Burada hukuki ve mühendislik tarafını net ayırıyorum.</p>
+
+<h3>Mevcut Durum: AWS Türkiye'de Ne Var, Ne Yok</h3>
+<table>
+<thead><tr><th>Konum türü</th><th>Türkiye'de var mı?</th><th>Pratik anlamı</th></tr></thead>
+<tbody>
+<tr>
+  <td>AWS Region (full region: RDS, S3, EventBridge, hepsi)</td>
+  <td class="cross">Yok</td>
+  <td>En yakın region: eu-central-1 Frankfurt</td>
+</tr>
+<tr>
+  <td>AWS Local Zone (compute uzantısı, sınırlı servis)</td>
+  <td class="check">Var (eu-central-1-ist-1, Mayıs 2025)</td>
+  <td>EC2, EBS, ALB var; RDS, S3, Lambda, EventBridge YOK — parent region'da kalıyor</td>
+</tr>
+<tr>
+  <td>AWS Direct Connect (network bağlantısı)</td>
+  <td class="check">Var (Equinix IL4, Mayıs 2025)</td>
+  <td>Sadece bir backbone bağlantısı; veri yine Frankfurt'ta tutuluyor</td>
+</tr>
+<tr>
+  <td>CloudFront edge (CDN cache)</td>
+  <td class="check">Var (Şubat 2024'ten beri)</td>
+  <td>Sadece statik asset cache, dynamic compute yok</td>
+</tr>
+</tbody>
+</table>
+
+<div class="callout">
+<strong>Kritik nokta:</strong> Direct Connect ve Local Zone duyuruları çok dolaşıyor ama "AWS Türkiye'de region açtı" anlamına gelmiyor. Local Zone <em>parent region'a bağlı bir uzantı</em>, full region değil. RDS muhtemelen yok, S3 muhtemelen yok, EventBridge muhtemelen yok. "Tüm sistem İstanbul'da" demek için bu servislerin parent region'da kalmasıyla yaşamak gerekir, ki bu pratikte hibrit bir yapı demek.
+</div>
+
+<h3>Önerilen Strateji: Hukuki + Mühendislik İki Katmanlı</h3>
+
+<h4>Hukuki Katman (DPA + SCC + Frankfurt)</h4>
+<p>KVKK'da kişisel verinin yurt dışı aktarımı için iki temel araç var:</p>
+<ul>
+  <li><strong>DPA (Data Processing Agreement):</strong> Müşteri ile imzaladığımız "verinizi şu şekilde işliyoruz, taahhüt ediyoruz" sözleşmesi. Müşteri = veri sorumlusu, Relowa = veri işleyen.</li>
+  <li><strong>SCC (Standard Contractual Clauses):</strong> Relowa ↔ AWS arasındaki "veriyi yurt dışına aktardığımda AWS de aynı koruma standartlarını uyguluyor" sözleşmesi. KVKK Kurulu'nun kabul ettiği şablon.</li>
+</ul>
+<p>İkisi birlikte "veri Frankfurt'ta ama hukuki olarak korumalı" pozisyonu. Türk B2B SaaS'lerinde yaygın ve kabul görmüş bir pratik. Sektörel düzenlemelerin (Çevre Bakanlığı yönergeleri, kurumsal müşterilerin internal compliance) ne istediği ayrı bir konu — bunun için bir KVKK danışmanı veya avukat netleştirmeli.</p>
+
+<h4>Mühendislik Katmanı (Benim Sorumluluk Alanım)</h4>
+<ul>
+  <li><strong>Encryption-at-rest:</strong> RDS encryption (KMS), S3 encryption, EBS encryption</li>
+  <li><strong>Encryption-in-transit:</strong> TLS 1.3 her yerde, internal traffic dahil</li>
+  <li><strong>Role-based access control:</strong> Multi-tenant RLS + IAM roles, least-privilege</li>
+  <li><strong>Audit trail:</strong> Append-only <code>audit_events</code> + S3 Object Lock (WORM, değiştirilemez)</li>
+  <li><strong>Data retention policy:</strong> Hangi veri ne kadar saklanıyor, kullanıcı silme hakkı</li>
+  <li><strong>Veri ihlali müdahale planı:</strong> 72 saat bildirim hazırlığı (KVKK gereksinimi)</li>
+</ul>
+
+<h3>Phase 2 Evrim Yolu</h3>
+<p>Phase 2'de İstanbul Local Zone'un servis matrisi olgunlaştığında (özellikle RDS ve Fargate desteklendiğinde), <strong>hot path bileşenlerini</strong> İstanbul'a taşıyabiliriz. Hot path = kullanıcının her tıklamada hissettiği interactive akış (login, ihale oluştur, canlı bid). <strong>Cold path</strong> = arka plan işleri (PDF üretim, audit mirror, backup) Frankfurt'ta kalıyor — latency'leri kritik değil, maliyet ve dayanıklılık önemli.</p>
+<p>Bu modüler mimarinin tam olarak söz verdiği şey — kod değişmiyor, sadece infrastructure provisioning değişiyor.</p>
+</section>
+
+<section id="akis">
+<h2><span class="num">07.</span> Veri Akışı & Sistem Mimarisi</h2>
+<p class="section-intro">Önce kelimeyle özetliyorum, sonra dört diyagramla görsel açılım yapıyorum. Her diyagrama altında hangi DDIA prensibinin yerleştiğini etiketliyorum.</p>
+
+<h3>Özet</h3>
+
+<div class="card">
+<h4 style="margin-top: 0;">Multi-tenant veri modeli</h4>
+<p>Müşteri = <strong>organizasyon</strong> (Producer / Recycler / Carrier type'lı). Her org'da birden fazla kullanıcı, kullanıcı başına intra-org rol (Full Admin, Muhasebe, Operasyon Yöneticisi — Yetkili Yönetimi ekranında görünen). Üç temel tablo: <code>organizations</code>, <code>users</code>, <code>org_members</code> (org_id + user_id + role). Org type'a özel bilgiler organizasyon seviyesinde tutulur (<code>org_profile_producer</code>, <code>org_profile_recycler</code>, <code>org_profile_carrier</code>) — kullanıcı seviyesinde değil. Bir kullanıcı teknik olarak birden fazla org'a üye olabilir; aktif org JWT claim'inde (<code>active_org_id</code>) taşınır, switch ettiğinde yeni JWT issue ediliyor.</p>
+
+<h4>Talep oluşturma akışı (özet)</h4>
+<p>Kullanıcı login olur (GoTrue → JWT, içinde <code>user_id + active_org_id + role</code> claim'leri). Next.js server action input'u Zod ile doğrular. Postgres'e insert atılır — RLS politikası org_id + role'ü doğrular, <em>tek transaction içinde</em> audit_events tablosuna da append edilir (insert-only, hash-chained, update/delete RLS ile kapalı). Commit'ten sonra DB trigger EventBridge event'i yayar: <code>tender.created</code>. Bu event'i üç yer dinler: Realtime kanalı eşleşen tesislerin WebSocket'ine push atar (anlık UI), SES mail bildirimi gönderir, ve Phase 2 seam olarak matching servisi event'i tüketip akıllı ihaleyi başlatır. Tesis dashboard'unu açtığında PostgREST sorgusu otomatik filtreler (RLS: org_id + bölge + materyal tipi), yeni talebi anında görür, teklif gönderir, mirrored akış geri döner. Carrier kullanıcısı (Phase 1'de scope'a girerse) kendi rolüne göre sadece atanmış sevkiyatları görür — aynı RLS yapısı, farklı policy.</p>
+
+<h4>Vurgulamak istediğim dört prensip</h4>
+<ul>
+  <li><strong>RLS ile çift-katmanlı izolasyon</strong> — org membership + intra-org role. Kural veritabanının içinde, uygulama bug'ı bu sınırı kıramıyor. Tüm policy'ler ortak <code>current_org_id()</code> ve <code>user_has_role_in_org()</code> helper'ı üzerinden yazılıyor; CI'da explicit RLS policy test suite ile cross-tenant data leak baştan testleniyor.</li>
+  <li><strong>Her mutasyonda idempotency key</strong> — network retry'ları çift kayıt üretmiyor; escrow Phase 1'e girince absolute zorunluluk hâline geliyor.</li>
+  <li><strong>Append-only audit log + EventBridge</strong> — hem yasal gereklilik (KVKK + landing page'deki "değiştirilemez veri" sözü), hem Phase 2/3 modüllerinin entegrasyon noktası. Aynı yapı iki amaca hizmet ediyor.</li>
+  <li><strong>Auction kapanması server-authoritative</strong> — kalan süre client'ta render ediliyor ama gerçek kapanma EventBridge Scheduler ile server-side tetikleniyor. Para'ya dokunan akışta client saatine güvenmiyoruz; last-minute sniping'e karşı standart soft-close pattern'i (son saniyelerde gelen bid süreyi uzatır).</li>
+</ul>
+</div>
+
+<h3>Diyagram 1 — Sistem Topolojisi</h3>
+<p>Tüm bileşenler ve aralarındaki bağlantılar. Her ok kimin kimi çağırdığını gösteriyor, etiket protokolü söylüyor.</p>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 1000 760" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, sans-serif" font-size="12">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#9ca3af"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#4ade80"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#60a5fa"/>
+    </marker>
+  </defs>
+
+  <!-- ============ EDGE LAYER (y: 20–110) ============ -->
+  <rect x="20" y="20" width="960" height="90" fill="#161e1a" stroke="#1f2a23" rx="6"/>
+  <text x="40" y="42" fill="#86efac" font-weight="600" font-size="11" letter-spacing="0.1em">EDGE LAYER</text>
+
+  <rect x="80" y="58" width="160" height="40" fill="#0a0f0a" stroke="#1f2a23" rx="4"/>
+  <text x="160" y="83" text-anchor="middle" fill="#e5e7eb">Browser / PWA</text>
+
+  <line x1="245" y1="78" x2="350" y2="78" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="297" y="72" text-anchor="middle" fill="#6b7280" font-size="10">HTTPS</text>
+
+  <rect x="355" y="58" width="170" height="40" fill="#0a0f0a" stroke="#1f2a23" rx="4"/>
+  <text x="440" y="83" text-anchor="middle" fill="#e5e7eb">CloudFront + WAF</text>
+
+  <line x1="530" y1="78" x2="635" y2="78" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="582" y="72" text-anchor="middle" fill="#6b7280" font-size="10">routes</text>
+
+  <rect x="640" y="58" width="160" height="40" fill="#0a0f0a" stroke="#1f2a23" rx="4"/>
+  <text x="720" y="83" text-anchor="middle" fill="#e5e7eb">Application LB</text>
+
+  <!-- LB → compute fan-out (single trunk down, then horizontal bus) -->
+  <line x1="720" y1="98" x2="720" y2="135" stroke="#6b7280" stroke-width="1" stroke-dasharray="2,3"/>
+  <line x1="120" y1="135" x2="850" y2="135" stroke="#6b7280" stroke-width="1" stroke-dasharray="2,3"/>
+  <text x="860" y="139" fill="#6b7280" font-size="10">→ services</text>
+
+  <!-- ============ COMPUTE LAYER (y: 160–460) ============ -->
+  <rect x="20" y="160" width="960" height="300" fill="#161e1a" stroke="#1f2a23" rx="6"/>
+  <text x="40" y="182" fill="#86efac" font-weight="600" font-size="11" letter-spacing="0.1em">ECS FARGATE CLUSTER · COMPUTE (stateless)</text>
+
+  <!-- Row 1 of compute -->
+  <rect x="50" y="200" width="220" height="70" fill="#0a0f0a" stroke="#4ade80" rx="4"/>
+  <text x="160" y="224" text-anchor="middle" fill="#86efac" font-size="12" font-weight="600">Next.js App</text>
+  <text x="160" y="244" text-anchor="middle" fill="#9ca3af" font-size="10">SSR + Server Actions</text>
+  <text x="160" y="259" text-anchor="middle" fill="#9ca3af" font-size="10">UI for all roles</text>
+
+  <rect x="290" y="200" width="220" height="70" fill="#0a0f0a" stroke="#1f2a23" rx="4"/>
+  <text x="400" y="224" text-anchor="middle" fill="#e5e7eb" font-size="12" font-weight="600">GoTrue (Auth)</text>
+  <text x="400" y="244" text-anchor="middle" fill="#9ca3af" font-size="10">JWT issue + refresh</text>
+  <text x="400" y="259" text-anchor="middle" fill="#9ca3af" font-size="10">org + role claims</text>
+
+  <rect x="530" y="200" width="220" height="70" fill="#0a0f0a" stroke="#1f2a23" rx="4"/>
+  <text x="640" y="224" text-anchor="middle" fill="#e5e7eb" font-size="12" font-weight="600">PostgREST</text>
+  <text x="640" y="244" text-anchor="middle" fill="#9ca3af" font-size="10">Auto REST API</text>
+  <text x="640" y="259" text-anchor="middle" fill="#9ca3af" font-size="10">RLS-aware queries</text>
+
+  <rect x="770" y="200" width="190" height="70" fill="#0a0f0a" stroke="#1f2a23" rx="4"/>
+  <text x="865" y="224" text-anchor="middle" fill="#e5e7eb" font-size="12" font-weight="600">Realtime</text>
+  <text x="865" y="244" text-anchor="middle" fill="#9ca3af" font-size="10">WebSocket subs</text>
+  <text x="865" y="259" text-anchor="middle" fill="#9ca3af" font-size="10">Postgres CDC</text>
+
+  <!-- Row 2 of compute -->
+  <rect x="50" y="295" width="220" height="70" fill="#0a0f0a" stroke="#1f2a23" rx="4"/>
+  <text x="160" y="319" text-anchor="middle" fill="#e5e7eb" font-size="12" font-weight="600">Storage API</text>
+  <text x="160" y="339" text-anchor="middle" fill="#9ca3af" font-size="10">RLS access control</text>
+  <text x="160" y="354" text-anchor="middle" fill="#9ca3af" font-size="10">→ S3 backend</text>
+
+  <rect x="290" y="295" width="220" height="70" fill="#0a0f0a" stroke="#1f2a23" rx="4"/>
+  <text x="400" y="319" text-anchor="middle" fill="#e5e7eb" font-size="12" font-weight="600">FastAPI (AI)</text>
+  <text x="400" y="339" text-anchor="middle" fill="#9ca3af" font-size="10">Image analysis</text>
+  <text x="400" y="354" text-anchor="middle" fill="#9ca3af" font-size="10">Greyparrot proxy</text>
+
+  <rect x="530" y="295" width="220" height="70" fill="#0a0f0a" stroke="#1f2a23" rx="4"/>
+  <text x="640" y="319" text-anchor="middle" fill="#e5e7eb" font-size="12" font-weight="600">Workers (Lambda)</text>
+  <text x="640" y="339" text-anchor="middle" fill="#9ca3af" font-size="10">Background jobs</text>
+  <text x="640" y="354" text-anchor="middle" fill="#9ca3af" font-size="10">PDF · scheduler</text>
+
+  <rect x="770" y="295" width="190" height="70" fill="#0a0f0a" stroke="#f59e0b" rx="4"/>
+  <text x="865" y="319" text-anchor="middle" fill="#f59e0b" font-size="12" font-weight="600">EventBridge</text>
+  <text x="865" y="339" text-anchor="middle" fill="#9ca3af" font-size="10">Event bus</text>
+  <text x="865" y="354" text-anchor="middle" fill="#9ca3af" font-size="10">Lego omurgası</text>
+
+  <!-- VPC / IAM annotation -->
+  <rect x="50" y="395" width="910" height="40" fill="#111815" stroke="#1f2a23" stroke-dasharray="3,3" rx="3"/>
+  <text x="505" y="412" text-anchor="middle" fill="#9ca3af" font-size="11" letter-spacing="0.05em">Tüm servisler aynı VPC içinde · security group'larla izole</text>
+  <text x="505" y="427" text-anchor="middle" fill="#6b7280" font-size="10" letter-spacing="0.05em">least-privilege IAM role per service · service-to-service auth via IAM</text>
+
+  <!-- ============ DATA LAYER (y: 490–650) ============ -->
+  <rect x="20" y="490" width="960" height="170" fill="#161e1a" stroke="#1f2a23" rx="6"/>
+  <text x="40" y="512" fill="#86efac" font-weight="600" font-size="11" letter-spacing="0.1em">DATA LAYER · STATEFUL</text>
+
+  <rect x="60" y="530" width="280" height="110" fill="#0a0f0a" stroke="#4ade80" stroke-width="2" rx="4"/>
+  <text x="200" y="555" text-anchor="middle" fill="#86efac" font-size="13" font-weight="600">RDS PostgreSQL</text>
+  <text x="200" y="575" text-anchor="middle" fill="#9ca3af" font-size="10">Multi-AZ · PITR · Encrypted</text>
+  <text x="200" y="589" text-anchor="middle" fill="#9ca3af" font-size="10">Frankfurt · eu-central-1</text>
+  <text x="200" y="610" text-anchor="middle" fill="#4ade80" font-size="11" font-weight="600">SYSTEM OF RECORD</text>
+  <text x="200" y="627" text-anchor="middle" fill="#6b7280" font-size="9">+ TimescaleDB · PostGIS · pg_cron</text>
+
+  <rect x="370" y="530" width="280" height="110" fill="#0a0f0a" stroke="#60a5fa" rx="4"/>
+  <text x="510" y="555" text-anchor="middle" fill="#60a5fa" font-size="13" font-weight="600">S3 (Frankfurt)</text>
+  <text x="510" y="575" text-anchor="middle" fill="#9ca3af" font-size="10">Files · Photos · Reports</text>
+  <text x="510" y="589" text-anchor="middle" fill="#9ca3af" font-size="10">Object Lock (WORM)</text>
+  <text x="510" y="610" text-anchor="middle" fill="#60a5fa" font-size="11" font-weight="600">DERIVED · ARCHIVE</text>
+  <text x="510" y="627" text-anchor="middle" fill="#6b7280" font-size="9">audit_events mirror · KVKK evidence</text>
+
+  <rect x="680" y="530" width="280" height="110" fill="#0a0f0a" stroke="#1f2a23" rx="4"/>
+  <text x="820" y="555" text-anchor="middle" fill="#e5e7eb" font-size="13" font-weight="600">Secrets Manager · KMS</text>
+  <text x="820" y="578" text-anchor="middle" fill="#9ca3af" font-size="10">DB credentials</text>
+  <text x="820" y="595" text-anchor="middle" fill="#9ca3af" font-size="10">API keys (Greyparrot, Iyzico)</text>
+  <text x="820" y="612" text-anchor="middle" fill="#9ca3af" font-size="10">Encryption keys</text>
+
+  <!-- ============ Compute → Data connections ============ -->
+  <!-- Postgres connections (green) -->
+  <line x1="400" y1="365" x2="240" y2="528" stroke="#4ade80" stroke-width="1.5" marker-end="url(#arrow-green)" opacity="0.7"/>
+  <line x1="640" y1="270" x2="220" y2="528" stroke="#4ade80" stroke-width="1.5" marker-end="url(#arrow-green)" opacity="0.7"/>
+  <text x="290" y="478" fill="#4ade80" font-size="10" font-weight="600">SQL · 5432</text>
+
+  <!-- S3 connection (blue) -->
+  <line x1="160" y1="365" x2="450" y2="528" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrow-blue)" opacity="0.7"/>
+  <text x="290" y="465" fill="#60a5fa" font-size="10" font-weight="600">S3 SDK</text>
+
+  <!-- ============ OBSERVABILITY (y: 680–740) ============ -->
+  <rect x="20" y="680" width="960" height="60" fill="#161e1a" stroke="#1f2a23" rx="6"/>
+  <text x="40" y="702" fill="#86efac" font-weight="600" font-size="11" letter-spacing="0.1em">OBSERVABILITY</text>
+  <text x="60" y="725" fill="#9ca3af" font-size="11">Sentry — application errors</text>
+  <text x="280" y="725" fill="#6b7280">·</text>
+  <text x="305" y="725" fill="#9ca3af" font-size="11">PostHog — product analytics</text>
+  <text x="540" y="725" fill="#6b7280">·</text>
+  <text x="565" y="725" fill="#9ca3af" font-size="11">CloudWatch — infra metrics</text>
+  <text x="780" y="725" fill="#6b7280">·</text>
+  <text x="805" y="725" fill="#9ca3af" font-size="11">CloudTrail — API audit</text>
+</svg>
+</div>
+<div class="diagram-caption"><strong>DDIA Ch. 1:</strong> Reliability gelmesinin nedeni — stateful katmanın (RDS) AWS yönetiminde, stateless katmanın (Fargate) horizontal scale'i kolay; <strong>Ch. 3:</strong> System of Record (Postgres) ile derived data (S3 mirror) ayrımı net.</div>
+
+<div class="principle-card">
+  <div class="badge">
+    <div class="ddia">DDIA</div>
+    <div class="ch">Ch. 5</div>
+    <div class="term">Replication</div>
+  </div>
+  <div class="body">
+    <h4>RDS Multi-AZ = Synchronous Leader-Follower</h4>
+    <p>Aynı veri Frankfurt'taki iki farklı Availability Zone'da eşzamanlı tutuluyor. Synchronous replication → write Postgres'e gider, ancak iki AZ'de de yazıldıktan sonra ACK döner. Leader düşerse otomatik failover (~30sn). Bu DDIA'nın tarif ettiği "single-leader synchronous replication" pattern'inin AWS-managed hâli.</p>
+  </div>
+</div>
+
+<h3>Diyagram 2 — Talep Oluşturma Sequence (Üretici → Tesis)</h3>
+<p>Aynı senaryo zaman ekseninde. Yukarıdan aşağıya zaman akıyor. Her dikey çizgi bir bileşen, yataylar mesajlar.</p>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 920 720" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, sans-serif" font-size="12">
+  <defs>
+    <marker id="arr2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#9ca3af"/>
+    </marker>
+    <marker id="arr2-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#4ade80"/>
+    </marker>
+    <marker id="arr2-orange" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#f59e0b"/>
+    </marker>
+  </defs>
+
+  <!-- Lifelines -->
+  <g fill="#0a0f0a" stroke="#1f2a23">
+    <rect x="30" y="20" width="100" height="40" rx="4"/>
+    <rect x="160" y="20" width="100" height="40" rx="4"/>
+    <rect x="290" y="20" width="100" height="40" rx="4"/>
+    <rect x="420" y="20" width="100" height="40" rx="4"/>
+    <rect x="550" y="20" width="100" height="40" rx="4"/>
+    <rect x="680" y="20" width="100" height="40" rx="4"/>
+    <rect x="810" y="20" width="100" height="40" rx="4"/>
+  </g>
+  <g text-anchor="middle" fill="#86efac" font-size="11" font-weight="600">
+    <text x="80" y="38">Producer</text>
+    <text x="80" y="52">Browser</text>
+    <text x="210" y="38">Next.js</text>
+    <text x="210" y="52">Server Action</text>
+    <text x="340" y="38">GoTrue</text>
+    <text x="340" y="52">Auth</text>
+    <text x="470" y="38">Postgres</text>
+    <text x="470" y="52">(RDS)</text>
+    <text x="600" y="38">Event</text>
+    <text x="600" y="52">Bridge</text>
+    <text x="730" y="38">Realtime</text>
+    <text x="730" y="52">+ SES</text>
+    <text x="860" y="38">Recycler</text>
+    <text x="860" y="52">Browser</text>
+  </g>
+
+  <!-- Lifeline lines -->
+  <g stroke="#1f2a23" stroke-dasharray="3,4">
+    <line x1="80" y1="60" x2="80" y2="700"/>
+    <line x1="210" y1="60" x2="210" y2="700"/>
+    <line x1="340" y1="60" x2="340" y2="700"/>
+    <line x1="470" y1="60" x2="470" y2="700"/>
+    <line x1="600" y1="60" x2="600" y2="700"/>
+    <line x1="730" y1="60" x2="730" y2="700"/>
+    <line x1="860" y1="60" x2="860" y2="700"/>
+  </g>
+
+  <!-- Step 1: login -->
+  <line x1="80" y1="90" x2="335" y2="90" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <text x="200" y="84" fill="#e5e7eb" font-size="11">1. POST /login (email, pw)</text>
+  <line x1="335" y1="115" x2="85" y2="115" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <text x="200" y="109" fill="#9ca3af" font-size="11">JWT (user_id, active_org_id, role)</text>
+
+  <!-- Step 2: form submit -->
+  <line x1="80" y1="155" x2="205" y2="155" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <text x="140" y="149" fill="#e5e7eb" font-size="11">2. POST tender + Idempotency-Key</text>
+
+  <!-- Step 3: Zod validation -->
+  <rect x="167" y="170" width="86" height="20" fill="#161e1a" stroke="#1f2a23" rx="2"/>
+  <text x="210" y="184" text-anchor="middle" fill="#86efac" font-size="10">Zod validate</text>
+
+  <!-- Step 4: Transaction begins -->
+  <line x1="210" y1="215" x2="465" y2="215" stroke="#4ade80" stroke-width="1.5" marker-end="url(#arr2-green)"/>
+  <text x="338" y="209" fill="#4ade80" font-size="11" font-weight="600">3. BEGIN TRANSACTION</text>
+
+  <rect x="425" y="225" width="90" height="98" fill="#0a0f0a" stroke="#4ade80" stroke-dasharray="3,3" rx="3"/>
+  <text x="470" y="245" text-anchor="middle" fill="#86efac" font-size="10" font-weight="600">Atomic</text>
+  <text x="470" y="262" text-anchor="middle" fill="#9ca3af" font-size="9">RLS check</text>
+  <text x="470" y="276" text-anchor="middle" fill="#9ca3af" font-size="9">+ INSERT tender</text>
+  <text x="470" y="290" text-anchor="middle" fill="#9ca3af" font-size="9">+ INSERT audit</text>
+  <text x="470" y="304" text-anchor="middle" fill="#9ca3af" font-size="9">  (hash chain)</text>
+  <text x="470" y="318" text-anchor="middle" fill="#9ca3af" font-size="9">+ idempotency</text>
+
+  <line x1="465" y1="345" x2="215" y2="345" stroke="#4ade80" stroke-width="1.5" marker-end="url(#arr2-green)"/>
+  <text x="338" y="339" fill="#4ade80" font-size="11" font-weight="600">4. COMMIT (or ROLLBACK)</text>
+
+  <!-- Step 5: trigger -->
+  <line x1="470" y1="375" x2="595" y2="375" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arr2-orange)"/>
+  <text x="532" y="369" fill="#f59e0b" font-size="11" font-weight="600">5. emit tender.created</text>
+  <text x="532" y="392" text-anchor="middle" fill="#9ca3af" font-size="10">(post-commit trigger)</text>
+
+  <!-- Step 6: response back to producer -->
+  <line x1="205" y1="420" x2="85" y2="420" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <text x="145" y="414" fill="#9ca3af" font-size="11">6. 201 Created</text>
+
+  <!-- Step 7: fan out -->
+  <line x1="600" y1="450" x2="725" y2="450" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arr2-orange)"/>
+  <text x="660" y="444" fill="#f59e0b" font-size="11">7a. fan out</text>
+
+  <!-- Step 7b: WS push -->
+  <line x1="730" y1="480" x2="855" y2="480" stroke="#4ade80" stroke-width="1.5" marker-end="url(#arr2-green)"/>
+  <text x="790" y="474" fill="#4ade80" font-size="11">7b. WS push</text>
+
+  <!-- Step 7c: SES email -->
+  <rect x="690" y="495" width="80" height="20" fill="#161e1a" stroke="#1f2a23" rx="2"/>
+  <text x="730" y="509" text-anchor="middle" fill="#9ca3af" font-size="10">7c. SES mail</text>
+
+  <!-- Step 8: recycler queries -->
+  <line x1="860" y1="545" x2="215" y2="545" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <text x="540" y="539" fill="#e5e7eb" font-size="11">8. GET /tenders (PostgREST)</text>
+
+  <line x1="210" y1="575" x2="465" y2="575" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <text x="338" y="569" fill="#9ca3af" font-size="11">SELECT (RLS auto-filter)</text>
+
+  <line x1="465" y1="600" x2="215" y2="600" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <text x="338" y="594" fill="#9ca3af" font-size="11">rows recycler can see</text>
+
+  <line x1="205" y1="625" x2="855" y2="625" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <text x="540" y="619" fill="#9ca3af" font-size="11">200 OK (filtered list)</text>
+
+  <!-- Annotation -->
+  <rect x="30" y="660" width="880" height="34" fill="#111815" stroke="#1f2a23" stroke-dasharray="3,3" rx="3"/>
+  <text x="470" y="675" text-anchor="middle" fill="#6b7280" font-size="10">Yeşil ok = atomic commit barrier · Turuncu ok = post-commit event (eventually consistent fan-out)</text>
+  <text x="470" y="688" text-anchor="middle" fill="#6b7280" font-size="10">DDIA Ch. 7 transaction guarantees + Ch. 11 stream processing patterns</text>
+</svg>
+</div>
+<div class="diagram-caption"><strong>DDIA Ch. 7:</strong> Transactions — RLS check + INSERT + audit + idempotency aynı atomic transaction. Birinin başarısız olması hepsini geri alıyor. <strong>Ch. 11:</strong> Stream processing — event yayını commit'ten <em>sonra</em> oluyor; eventually consistent fan-out.</div>
+
+<div class="principle-card">
+  <div class="badge">
+    <div class="ddia">DDIA</div>
+    <div class="ch">Ch. 7</div>
+    <div class="term">Transactions</div>
+  </div>
+  <div class="body">
+    <h4>RLS + Insert + Audit Aynı Transaction'da</h4>
+    <p>Üç şey atomically commit ediliyor: (1) RLS'in policy check'i, (2) tender row insertion, (3) audit_events row insertion (önceki audit row'unun hash'iyle zincirli). Birinden biri başarısız olsa hepsi geri alınıyor. Audit "best effort" değil, transactional invariant — <em>bir tender oluşmuşsa kesin audit'i de var</em>. Bu DDIA'nın tarif ettiği "ACID transactions for invariants" pattern'i.</p>
+  </div>
+</div>
+
+<div class="principle-card">
+  <div class="badge">
+    <div class="ddia">DDIA</div>
+    <div class="ch">Ch. 11</div>
+    <div class="term">Stream Processing</div>
+  </div>
+  <div class="body">
+    <h4>Post-Commit Event Emission</h4>
+    <p>Event Bridge'e <code>tender.created</code> event'i ancak transaction commit olduktan sonra atılıyor — Postgres'in transactional outbox pattern'i ile (tablodaki yeni row'u trigger okuyup EventBridge'e gönderiyor). Niye önemli: rollback olursa event de hiç atılmamış oluyor. Bid alıcılar yanlış bilgi almıyor. Bu "exactly-once-into-the-world" semantics'in pratik karşılığı.</p>
+  </div>
+</div>
+
+<h3>Diyagram 3 — Auction Lifecycle State Machine</h3>
+<p>İhale durum makinesi. Para'ya dokunan kritik akış. Hangi durum geçişlerinin server-authoritative olduğu, hangi event'lerin atıldığı görülüyor.</p>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 1000 620" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, sans-serif" font-size="12">
+  <defs>
+    <marker id="arr3" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#9ca3af"/>
+    </marker>
+    <marker id="arr3-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#4ade80"/>
+    </marker>
+    <marker id="arr3-orange" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#f59e0b"/>
+    </marker>
+    <marker id="arr3-red" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <!-- ============ HAPPY PATH (y: 50–110) ============ -->
+  <g>
+    <rect x="30" y="60" width="140" height="60" fill="#0a0f0a" stroke="#6b7280" rx="6"/>
+    <text x="100" y="85" text-anchor="middle" fill="#e5e7eb" font-weight="600">DRAFT</text>
+    <text x="100" y="103" text-anchor="middle" fill="#9ca3af" font-size="10">producer editing</text>
+
+    <rect x="225" y="60" width="140" height="60" fill="#0a0f0a" stroke="#4ade80" rx="6"/>
+    <text x="295" y="85" text-anchor="middle" fill="#86efac" font-weight="600">PUBLISHED</text>
+    <text x="295" y="103" text-anchor="middle" fill="#9ca3af" font-size="10">accepting bids</text>
+
+    <rect x="420" y="60" width="140" height="60" fill="#0a0f0a" stroke="#f59e0b" rx="6"/>
+    <text x="490" y="85" text-anchor="middle" fill="#f59e0b" font-weight="600">CLOSING</text>
+    <text x="490" y="103" text-anchor="middle" fill="#9ca3af" font-size="10">grace + soft-close</text>
+
+    <rect x="615" y="60" width="140" height="60" fill="#0a0f0a" stroke="#4ade80" rx="6"/>
+    <text x="685" y="85" text-anchor="middle" fill="#86efac" font-weight="600">WON</text>
+    <text x="685" y="103" text-anchor="middle" fill="#9ca3af" font-size="10">winner selected</text>
+
+    <rect x="810" y="60" width="140" height="60" fill="#0a0f0a" stroke="#4ade80" rx="6"/>
+    <text x="880" y="85" text-anchor="middle" fill="#86efac" font-weight="600">FUNDED</text>
+    <text x="880" y="103" text-anchor="middle" fill="#9ca3af" font-size="10">escrow holding</text>
+  </g>
+
+  <!-- Happy path arrows + labels (above arrows for action verb, below for event name) -->
+  <line x1="170" y1="90" x2="221" y2="90" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arr3)"/>
+  <text x="195" y="50" text-anchor="middle" fill="#e5e7eb" font-size="10">publish</text>
+  <text x="195" y="139" text-anchor="middle" fill="#86efac" font-size="9" font-style="italic">tender.published</text>
+
+  <line x1="365" y1="90" x2="416" y2="90" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arr3-orange)"/>
+  <text x="390" y="50" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="600">closes_at hit</text>
+  <text x="390" y="139" text-anchor="middle" fill="#f59e0b" font-size="9" font-style="italic">scheduler-fired</text>
+
+  <line x1="560" y1="90" x2="611" y2="90" stroke="#4ade80" stroke-width="1.5" marker-end="url(#arr3-green)"/>
+  <text x="585" y="50" text-anchor="middle" fill="#e5e7eb" font-size="10">winner pick</text>
+  <text x="585" y="139" text-anchor="middle" fill="#86efac" font-size="9" font-style="italic">auction.closed</text>
+
+  <line x1="755" y1="90" x2="806" y2="90" stroke="#4ade80" stroke-width="1.5" marker-end="url(#arr3-green)"/>
+  <text x="780" y="50" text-anchor="middle" fill="#e5e7eb" font-size="10">payment</text>
+  <text x="780" y="139" text-anchor="middle" fill="#86efac" font-size="9" font-style="italic">escrow.funded</text>
+
+  <!-- ============ FUNDED → DELIVERED (vertical down, then left) ============ -->
+  <!-- L-shaped path from FUNDED bottom to DELIVERED right -->
+  <path d="M 880 120 L 880 195 L 685 195 L 685 215" stroke="#4ade80" stroke-width="1.5" fill="none" marker-end="url(#arr3-green)"/>
+  <text x="785" y="187" text-anchor="middle" fill="#e5e7eb" font-size="10">delivery</text>
+  <text x="785" y="210" text-anchor="middle" fill="#86efac" font-size="9" font-style="italic">delivery.confirmed</text>
+
+  <!-- ============ COMPLETION ROW (y: 215–275) ============ -->
+  <rect x="615" y="215" width="140" height="60" fill="#0a0f0a" stroke="#4ade80" rx="6"/>
+  <text x="685" y="240" text-anchor="middle" fill="#86efac" font-weight="600">DELIVERED</text>
+  <text x="685" y="258" text-anchor="middle" fill="#9ca3af" font-size="10">recycler confirmed</text>
+
+  <rect x="420" y="215" width="140" height="60" fill="#0a0f0a" stroke="#4ade80" rx="6"/>
+  <text x="490" y="240" text-anchor="middle" fill="#86efac" font-weight="600">SETTLED</text>
+  <text x="490" y="258" text-anchor="middle" fill="#9ca3af" font-size="10">escrow released</text>
+
+  <line x1="611" y1="245" x2="565" y2="245" stroke="#4ade80" stroke-width="1.5" marker-end="url(#arr3-green)"/>
+  <text x="588" y="234" text-anchor="middle" fill="#e5e7eb" font-size="10">release</text>
+  <text x="588" y="290" text-anchor="middle" fill="#86efac" font-size="9" font-style="italic">escrow.released</text>
+
+  <!-- ============ FAILURE STATES (y: 215–275, left side) ============ -->
+  <rect x="30" y="215" width="140" height="60" fill="#0a0f0a" stroke="#ef4444" rx="6"/>
+  <text x="100" y="240" text-anchor="middle" fill="#ef4444" font-weight="600">CANCELLED</text>
+  <text x="100" y="258" text-anchor="middle" fill="#9ca3af" font-size="10">no bids / abort</text>
+
+  <rect x="225" y="215" width="140" height="60" fill="#0a0f0a" stroke="#ef4444" rx="6"/>
+  <text x="295" y="240" text-anchor="middle" fill="#ef4444" font-weight="600">DISPUTED</text>
+  <text x="295" y="258" text-anchor="middle" fill="#9ca3af" font-size="10">manual review</text>
+
+  <!-- Failure transitions: PUBLISHED → CANCELLED (no bids) -->
+  <path d="M 250 120 L 130 215" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,3" fill="none" marker-end="url(#arr3-red)"/>
+  <text x="135" y="175" fill="#ef4444" font-size="10">no bids</text>
+
+  <!-- CLOSING → CANCELLED (abort) -->
+  <path d="M 440 120 L 150 215" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,3" fill="none" marker-end="url(#arr3-red)"/>
+  <text x="265" y="195" fill="#ef4444" font-size="10">abort</text>
+
+  <!-- WON / FUNDED → DISPUTED (timeout) -->
+  <path d="M 685 120 L 320 215" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,3" fill="none" marker-end="url(#arr3-red)"/>
+  <text x="430" y="175" fill="#ef4444" font-size="10">timeout / dispute</text>
+
+  <!-- ============ LEGEND (y: 320–600) ============ -->
+  <rect x="30" y="320" width="940" height="280" fill="#111815" stroke="#1f2a23" rx="6"/>
+  <text x="50" y="346" fill="#86efac" font-weight="600" font-size="12" letter-spacing="0.1em">SERVER-AUTHORITATIVE TRANSITIONS</text>
+
+  <text x="50" y="375" fill="#e5e7eb" font-size="12">▸ <tspan fill="#f59e0b" font-weight="600">PUBLISHED → CLOSING</tspan></text>
+  <text x="80" y="395" fill="#9ca3af" font-size="11">Sadece EventBridge Scheduler tetikleyebilir (closes_at hit edince). Client butonu yok.</text>
+
+  <text x="50" y="425" fill="#e5e7eb" font-size="12">▸ <tspan fill="#4ade80" font-weight="600">CLOSING → WON</tspan></text>
+  <text x="80" y="445" fill="#9ca3af" font-size="11">Soft-close penceresi içinde son bid + winner deterministik seçimi (tx içinde lock + select).</text>
+
+  <text x="50" y="475" fill="#e5e7eb" font-size="12">▸ <tspan fill="#4ade80" font-weight="600">WON → FUNDED</tspan></text>
+  <text x="80" y="495" fill="#9ca3af" font-size="11">Escrow webhook (Iyzico) signed payload doğrulamasıyla. Idempotency key'le.</text>
+
+  <text x="50" y="525" fill="#e5e7eb" font-size="12">▸ <tspan fill="#4ade80" font-weight="600">FUNDED → DELIVERED → SETTLED</tspan></text>
+  <text x="80" y="545" fill="#9ca3af" font-size="11">Recycler "teslim aldım" onayı + (Phase 2) carrier delivery confirmation. Escrow release tx-locked.</text>
+
+  <text x="50" y="582" fill="#6b7280" font-size="10" font-style="italic">Her geçiş audit_events'e kaydediliyor + EventBridge event'i atılıyor. Phase 2 modülleri (matching, ESG cert, carbon scoring) bu event'lere subscribe oluyor — Phase 1 koduna dokunmadan.</text>
+</svg>
+</div>
+<div class="diagram-caption"><strong>DDIA Ch. 8:</strong> "Don't trust the clock" — closes_at deadline'ı sadece server-side scheduler tetikler. Client'ın saati hiçbir state geçişinde otorite değil. <strong>Ch. 12:</strong> Event log her geçişin kaydı; rebuild edilebilir.</div>
+
+<div class="principle-card">
+  <div class="badge">
+    <div class="ddia">DDIA</div>
+    <div class="ch">Ch. 8</div>
+    <div class="term">Untrustworthy Clocks</div>
+  </div>
+  <div class="body">
+    <h4>Server-Authoritative Lifecycle</h4>
+    <p>Distributed sistemde client clock'u manipüle edilebilir, network gecikmeli, NTP drift'li. DDIA Ch. 8 bu yüzden "monotonic clocks for measuring elapsed time, time-of-day clocks for points in time" diye uyarıyor. Bizde her state transition (özellikle CLOSING geçişi) sadece EventBridge Scheduler ile tetiklenir — closes_at timestamp'ı Postgres'e yazıldığı an dondurulmuş, server'ın kendi monotonic clock'una göre evaluate ediliyor. Last-minute sniping de aynı sebepten soft-close pattern'iyle absorbe ediliyor.</p>
+  </div>
+</div>
+
+<h3>Diyagram 4 — System of Record vs Derived Data (Audit + Event Log)</h3>
+<p>DDIA Ch. 12'nin merkez fikri: <strong>tek bir veri yerini kaynak olarak belirle, geri kalanı ondan derive et.</strong> Audit ve event akışında bu prensibi uyguluyoruz.</p>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 1100 620" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, sans-serif" font-size="12">
+  <defs>
+    <marker id="arr4" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#9ca3af"/>
+    </marker>
+    <marker id="arr4-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#4ade80"/>
+    </marker>
+  </defs>
+
+  <!-- ============ SoR (left, y: 30–250) ============ -->
+  <rect x="40" y="30" width="320" height="220" fill="#0a0f0a" stroke="#4ade80" stroke-width="2" rx="6"/>
+  <text x="200" y="60" text-anchor="middle" fill="#86efac" font-weight="700" font-size="13" letter-spacing="0.1em">SYSTEM OF RECORD</text>
+  <text x="200" y="80" text-anchor="middle" fill="#4ade80" font-size="11">RDS PostgreSQL · Frankfurt</text>
+
+  <rect x="60" y="100" width="280" height="34" fill="#161e1a" stroke="#1f2a23" rx="4"/>
+  <text x="200" y="121" text-anchor="middle" fill="#e5e7eb" font-size="11">tenders, bids, organizations, ...</text>
+
+  <rect x="60" y="144" width="280" height="44" fill="#161e1a" stroke="#4ade80" rx="4"/>
+  <text x="200" y="161" text-anchor="middle" fill="#86efac" font-size="11" font-weight="600">audit_events</text>
+  <text x="200" y="178" text-anchor="middle" fill="#9ca3af" font-size="9">append-only · hash-chained · RLS no-update</text>
+
+  <rect x="60" y="198" width="280" height="34" fill="#161e1a" stroke="#1f2a23" rx="4"/>
+  <text x="200" y="219" text-anchor="middle" fill="#9ca3af" font-size="10">idempotency_keys · scheduler_jobs · ...</text>
+
+  <!-- ============ Derived stores (right side, 4 boxes) ============ -->
+  <!-- Top-left: S3 Object Lock Mirror -->
+  <rect x="460" y="30" width="280" height="100" fill="#0a0f0a" stroke="#60a5fa" rx="6"/>
+  <text x="600" y="52" text-anchor="middle" fill="#60a5fa" font-weight="600" font-size="12">S3 Object Lock Mirror</text>
+  <text x="600" y="70" text-anchor="middle" fill="#9ca3af" font-size="10">audit_events → JSON Lines</text>
+  <text x="600" y="86" text-anchor="middle" fill="#9ca3af" font-size="10">Daily partition · WORM</text>
+  <text x="600" y="108" text-anchor="middle" fill="#60a5fa" font-size="10" font-weight="600">DERIVED · LEGAL EVIDENCE</text>
+  <text x="600" y="123" text-anchor="middle" fill="#6b7280" font-size="9">SoR silinse bile bu kalır</text>
+
+  <!-- Top-right: PostHog -->
+  <rect x="780" y="30" width="280" height="100" fill="#0a0f0a" stroke="#c084fc" rx="6"/>
+  <text x="920" y="52" text-anchor="middle" fill="#c084fc" font-weight="600" font-size="12">PostHog (self-hosted)</text>
+  <text x="920" y="70" text-anchor="middle" fill="#9ca3af" font-size="10">User actions, funnels</text>
+  <text x="920" y="86" text-anchor="middle" fill="#9ca3af" font-size="10">Product analytics</text>
+  <text x="920" y="108" text-anchor="middle" fill="#c084fc" font-size="10" font-weight="600">DERIVED · BI</text>
+  <text x="920" y="123" text-anchor="middle" fill="#6b7280" font-size="9">KVKK içinde, kendi VPC'mizde</text>
+
+  <!-- Bottom-left: EventBridge -->
+  <rect x="460" y="150" width="280" height="100" fill="#0a0f0a" stroke="#f59e0b" rx="6"/>
+  <text x="600" y="172" text-anchor="middle" fill="#f59e0b" font-weight="600" font-size="12">EventBridge Event Log</text>
+  <text x="600" y="190" text-anchor="middle" fill="#9ca3af" font-size="10">tender.* · bid.* · auction.*</text>
+  <text x="600" y="206" text-anchor="middle" fill="#9ca3af" font-size="10">escrow.* · delivery.*</text>
+  <text x="600" y="228" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="600">DERIVED · INTEGRATION BUS</text>
+  <text x="600" y="243" text-anchor="middle" fill="#6b7280" font-size="9">Phase 2/3 modülleri buradan tüketir</text>
+
+  <!-- Bottom-right: Materialized Views -->
+  <rect x="780" y="150" width="280" height="100" fill="#0a0f0a" stroke="#c084fc" rx="6"/>
+  <text x="920" y="172" text-anchor="middle" fill="#c084fc" font-weight="600" font-size="12">Materialized Views</text>
+  <text x="920" y="190" text-anchor="middle" fill="#9ca3af" font-size="10">Market price index</text>
+  <text x="920" y="206" text-anchor="middle" fill="#9ca3af" font-size="10">Carbon score aggregates</text>
+  <text x="920" y="228" text-anchor="middle" fill="#c084fc" font-size="10" font-weight="600">DERIVED · CACHED</text>
+  <text x="920" y="243" text-anchor="middle" fill="#6b7280" font-size="9">Refresh schedule'lı</text>
+
+  <!-- ============ Arrows from SoR — using L-paths to avoid overlap ============ -->
+  <!-- SoR → S3 Mirror (top route, daily mirror) -->
+  <path d="M 360 80 L 410 80 L 410 60 L 455 60" stroke="#4ade80" stroke-width="1.5" fill="none" marker-end="url(#arr4-green)"/>
+  <text x="412" y="50" text-anchor="middle" fill="#4ade80" font-size="10" font-weight="600">daily mirror</text>
+
+  <!-- SoR → PostHog (top route, events) -->
+  <path d="M 360 80 L 410 80 L 410 100 L 760 100 L 760 60 L 776 60" stroke="#4ade80" stroke-width="1" stroke-dasharray="3,3" fill="none" marker-end="url(#arr4-green)"/>
+  <text x="585" y="93" text-anchor="middle" fill="#4ade80" font-size="10">events → analytics</text>
+
+  <!-- SoR → EventBridge (mid route, post-commit) -->
+  <path d="M 360 200 L 410 200 L 410 200 L 455 200" stroke="#4ade80" stroke-width="1.5" fill="none" marker-end="url(#arr4-green)"/>
+  <text x="412" y="190" text-anchor="middle" fill="#4ade80" font-size="10" font-weight="600">post-commit</text>
+
+  <!-- SoR → Materialized Views (bottom route) -->
+  <path d="M 360 200 L 410 200 L 410 220 L 760 220 L 760 200 L 776 200" stroke="#4ade80" stroke-width="1" stroke-dasharray="3,3" fill="none" marker-end="url(#arr4-green)"/>
+  <text x="585" y="213" text-anchor="middle" fill="#4ade80" font-size="10">CDC + refresh</text>
+
+  <!-- ============ LEGEND (y: 290–600) ============ -->
+  <rect x="40" y="290" width="1020" height="310" fill="#111815" stroke="#1f2a23" rx="6"/>
+  <text x="60" y="316" fill="#86efac" font-weight="600" font-size="12" letter-spacing="0.05em">DDIA Ch. 12 · Deriving Data — Why This Matters</text>
+
+  <text x="60" y="350" fill="#4ade80" font-weight="600" font-size="11">SoR (Postgres)</text>
+  <text x="60" y="368" fill="#9ca3af" font-size="11">Tek doğru kaynak. Her şey buradan türer. Postgres düşse, geri yüklenecek yer burası (PITR).</text>
+
+  <text x="60" y="398" fill="#60a5fa" font-weight="600" font-size="11">S3 Mirror</text>
+  <text x="60" y="416" fill="#9ca3af" font-size="11">SoR'dan derive edilmiş immutable evidence. Birisi audit_events'i sileyim diye SQL atsa bile</text>
+  <text x="60" y="432" fill="#9ca3af" font-size="11">S3'tekine dokunamaz (Object Lock = WORM). Yasal kanıt katmanı.</text>
+
+  <text x="60" y="462" fill="#f59e0b" font-weight="600" font-size="11">EventBridge</text>
+  <text x="60" y="480" fill="#9ca3af" font-size="11">SoR'un transactional outbox'tan beslenen event stream'i. Phase 2/3 modülleri burayı consume</text>
+  <text x="60" y="496" fill="#9ca3af" font-size="11">ediyor — Phase 1'in kodu değişmiyor. Lego mimarinin tam kalbi.</text>
+
+  <text x="60" y="526" fill="#c084fc" font-weight="600" font-size="11">PostHog + Materialized Views</text>
+  <text x="60" y="544" fill="#9ca3af" font-size="11">Performans için cache'lenmiş derived data. Tutarsızsa rebuild ediyoruz — SoR'dan tekrar üretilebilir.</text>
+
+  <text x="60" y="580" fill="#6b7280" font-size="11" font-style="italic">Avantajı: yeni bir derived store eklemek (örn. Phase 2'de full-text search için OpenSearch index)</text>
+  <text x="60" y="595" fill="#6b7280" font-size="11" font-style="italic">Phase 1 koduna dokunmuyor — sadece event'lere abone bir consumer ekliyoruz.</text>
+</svg>
+</div>
+<div class="diagram-caption"><strong>DDIA Ch. 12:</strong> "Deriving data" — SoR tek, derived'lar çok. Her derived store SoR'dan rebuild edilebilir. Bu Lego mimarinin teorik temeli.</div>
+
+<div class="principle-card">
+  <div class="badge">
+    <div class="ddia">DDIA</div>
+    <div class="ch">Ch. 12</div>
+    <div class="term">Derived Data</div>
+  </div>
+  <div class="body">
+    <h4>Tek SoR, Çok Derived — Yeni Modül = Yeni Consumer</h4>
+    <p>Postgres single source of truth. EventBridge'i okuyarak yeni derived store'lar oluşturuluyor: Phase 2 IoT için TimescaleDB hypertable'ı (events → time-series); Phase 2 search için OpenSearch index (events → full-text); Phase 3 ML için S3 data lake (events → Parquet). Hepsi Phase 1 kodunu değiştirmeden ekleniyor. Bu pattern DDIA'nın "log-based architecture" olarak tarif ettiği şey, ve senin "Lego parçası gibi eklenecek" çerçevenin teorik karşılığı.</p>
+  </div>
+</div>
+
+<h3>Vurgulanması Gereken İki Ek Prensip</h3>
+
+<div class="principle-card">
+  <div class="badge">
+    <div class="ddia">DDIA</div>
+    <div class="ch">Ch. 8</div>
+    <div class="term">Idempotency</div>
+  </div>
+  <div class="body">
+    <h4>Her Mutasyonda Idempotency Key</h4>
+    <p>Distributed sistemde "exactly-once delivery" mit. Onun yerine "at-least-once delivery + idempotent receivers". Her mutasyon endpoint'i bir <code>Idempotency-Key</code> header'ı bekliyor; aynı key ikinci kez gelirse aynı response dönüyor, side effect yeniden çalışmıyor. Phase 1'de "nice to have" değil — escrow'a girince absolute zorunluluk. Aynı ödeme isteği iki kez tetiklenirse ödeme iki kez çekilir, felaket. Disiplini Phase 1'de oturtuyoruz, Phase 2'de hediye olarak hazır geliyor.</p>
+  </div>
+</div>
+
+<div class="principle-card">
+  <div class="badge">
+    <div class="ddia">DDIA</div>
+    <div class="ch">Ch. 1</div>
+    <div class="term">Evolvability</div>
+  </div>
+  <div class="body">
+    <h4>Çift-Katmanlı RLS = Schema-Level Maintainability</h4>
+    <p>Multi-tenant isolation iki boyutlu: <strong>(1) org membership</strong> (bir tenant'ın verisi başka tenant'a sızmaz), <strong>(2) intra-org role</strong> (Muhasebe finans tablosunu görür, Operasyon görmez). Kural Postgres'in içinde — uygulama kodu RLS'i bypass edemez, çünkü Postgres bağlantısının kendisi düşük yetkili. Tüm policy'ler ortak <code>current_org_id()</code> ve <code>user_has_role_in_org()</code> SQL function'ları üzerinden yazıldığı için yeni tablo eklemek tek satır policy = "<code>USING (org_id = current_org_id())</code>". CI'da explicit RLS test suite ile cross-tenant data leak baştan testleniyor — bu B2B SaaS'in en sessiz ama en kritik disiplini, ve DDIA'nın "evolvability" prensibinin somut karşılığı: yeni feature eklerken security boundary'lerini düşünmek zorunda kalmıyorsun, zaten policy pattern'i hazır.</p>
+  </div>
+</div>
+</section>
+
+<section id="ai">
+<h2><span class="num">08.</span> Yapay Zeka Kullanımı</h2>
+<p class="section-intro">AI'ı velocity için kullanırım, correctness için değil — ayrımı net tutuyorum. "Daha hızlı yazılım" ile "daha güvenli yazılım" farklı eksenler.</p>
+
+<div class="tradeoff">
+<div class="pro">
+<h4>AI'dan Faydalandığım Yerler</h4>
+<ul>
+  <li><strong>Planlama (en değerli)</strong> — mimari brainstorm, trade-off analizi, schema tasarım kritiği</li>
+  <li><strong>Debugging</strong> — log triage, hata pattern tanıma</li>
+  <li><strong>Coding</strong> — CRUD scaffold, form/tablo bileşenleri, migration draft'ları, IaC draft'ları</li>
+  <li><strong>Testing</strong> — özellikle edge case üretimi</li>
+  <li><strong>Dokümantasyon</strong> — API docs, runbook taslakları</li>
+</ul>
+<p style="margin-top: 12px; font-size: 13px; color: var(--text-dim);">Cursor + Claude Code günlük akışta sürekli açık.</p>
+</div>
+<div class="con">
+<h4>Manuel Kontrolü Asla Bırakmadığım Yerler</h4>
+<ul>
+  <li><strong>RLS politikaları</strong> — güvenlik sınırları, threat-modeled</li>
+  <li><strong>Production migration'lar</strong> — draft AI'dan, apply manuel</li>
+  <li><strong>Auth / session kodu</strong> — yüzey çok geniş, hata maliyeti yüksek</li>
+  <li><strong>Audit log şeması + append-only zorlamalar</strong> — yasal kanıt</li>
+  <li><strong>Escrow / ödeme tarafı</strong> — para'ya dokunan kod, AI auto-apply yok</li>
+</ul>
+<p style="margin-top: 12px; font-size: 13px; color: var(--text-dim);">Bunlar KVKK + para + kimliğe dokunan yüzeyler. Yanlışın maliyeti AI'ın kazandırdığı zamandan kat kat fazla.</p>
+</div>
+</div>
+
+<div class="callout">
+<strong>Somut guardrail:</strong> AI üretimli kod CI gate'lerinden geçmeden merge olmaz — typecheck, lint, RLS policy testleri, schema-drift kontrolü, secret scan. Hızı AI'dan, doğruluğu insandan.
+</div>
+</section>
+
+<section id="maliyet">
+<h2><span class="num">09.</span> Maliyet Tahminleri</h2>
+<p class="section-intro">Sayılarla gelmek önemli. Bunlar Frankfurt fiyatları, Mayıs 2026 itibariyle.</p>
+
+<h3>Phase 1 Pilot (50-100 üretici, 10-20 tesis)</h3>
+<div class="cost-box">
+<div class="cost-line"><span>RDS PostgreSQL (db.t4g.medium, Multi-AZ, 100GB storage)</span><span>~$140 / ay</span></div>
+<div class="cost-line"><span>ECS Fargate cluster (~6 service, ortalama 0.5 vCPU + 1GB)</span><span>~$80 / ay</span></div>
+<div class="cost-line"><span>Application Load Balancer</span><span>~$20 / ay</span></div>
+<div class="cost-line"><span>CloudFront + WAF (trafik bazlı)</span><span>~$20 / ay</span></div>
+<div class="cost-line"><span>S3 (100GB + transfer)</span><span>~$10 / ay</span></div>
+<div class="cost-line"><span>Route 53 + ACM</span><span>~$5 / ay</span></div>
+<div class="cost-line"><span>SES (transactional email)</span><span>~$1 / ay</span></div>
+<div class="cost-line"><span>CloudWatch + CloudTrail logs</span><span>~$10 / ay</span></div>
+<div class="cost-line"><span>Secrets Manager + KMS</span><span>~$5 / ay</span></div>
+<div class="cost-line"><span>Data transfer (egress)</span><span>~$15 / ay</span></div>
+<div class="cost-line total"><span><strong>Phase 1 Tahmini Toplam</strong></span><span><strong>~$300-400 / ay</strong></span></div>
+</div>
+
+<h3>Phase 2 Mature (1,000 org civarı)</h3>
+<div class="cost-box">
+<div class="cost-line"><span>RDS db.r6g.xlarge + read replica</span><span>~$700 / ay</span></div>
+<div class="cost-line"><span>Fargate cluster (3-5× scale)</span><span>~$300 / ay</span></div>
+<div class="cost-line"><span>ALB + CloudFront (yüksek trafik)</span><span>~$150 / ay</span></div>
+<div class="cost-line"><span>S3 (1TB+ + GPS arşiv)</span><span>~$80 / ay</span></div>
+<div class="cost-line"><span>Diğer servisler + monitoring</span><span>~$100 / ay</span></div>
+<div class="cost-line"><span>Üçüncü taraf (Sentry Pro, vb.)</span><span>~$170 / ay</span></div>
+<div class="cost-line total"><span><strong>Phase 2 Tahmini Toplam</strong></span><span><strong>~$1,500 / ay</strong></span></div>
+</div>
+
+<h3>Optimizasyon Seçenekleri</h3>
+<ul>
+  <li><strong>Fargate Spot:</strong> %70 ucuz, stateless servisler için OK</li>
+  <li><strong>Savings Plans (1 yıl taahhüt):</strong> %20-30 indirim</li>
+  <li><strong>Graviton (ARM-based):</strong> %20 ucuz, modern container'lar destekliyor</li>
+  <li><strong>S3 Intelligent Tiering:</strong> arşiv otomatik ucuz tier'a geçiyor</li>
+</ul>
+</section>
+
+<section id="terraform">
+<h2><span class="num">10.</span> Altyapı Yönetimi: Infrastructure as Code</h2>
+<p class="section-intro">Cluster'ı console'da elle tıklayarak kurmuyoruz — bu reproducible değil, "bilgi tek kişide" anti-pattern. Altyapı kod olarak yazılır.</p>
+
+<table>
+<thead><tr><th>Araç</th><th>Dil</th><th>Avantaj</th><th>Dezavantaj</th></tr></thead>
+<tbody>
+<tr>
+  <td><strong>AWS CDK</strong> (önerim)</td>
+  <td>TypeScript</td>
+  <td>Zaten kullandığımız dil, IDE intellisense, AWS resmi aracı</td>
+  <td>Sadece AWS</td>
+</tr>
+<tr>
+  <td>Terraform</td>
+  <td>HCL (kendi DSL'i)</td>
+  <td>En yaygın, multi-cloud, devasa ecosystem</td>
+  <td>Ayrı dil öğrenme yükü</td>
+</tr>
+<tr>
+  <td>Pulumi</td>
+  <td>TS / Python / Go</td>
+  <td>Modern, kod-merkezli</td>
+  <td>Ekosistem küçük, daha az yaygın</td>
+</tr>
+</tbody>
+</table>
+
+<p>Phase 1 setup için ilk 2 hafta:</p>
+<ol>
+  <li>AWS hesabı + IAM + MFA + billing alarms (yarım gün)</li>
+  <li>VPC + subnet'ler + security groups (1 gün)</li>
+  <li>RDS Postgres provisioning (yarım gün, çoğu wait time)</li>
+  <li>ECS cluster + task definitions (Supabase containers + Next.js + FastAPI) (2-3 gün)</li>
+  <li>ALB + target groups + routing (1 gün)</li>
+  <li>CloudFront + WAF + ACM cert + Route 53 (yarım gün)</li>
+  <li>CI/CD pipeline (GitHub Actions → CDK deploy) (1 gün)</li>
+</ol>
+<p>Bu yatırım sonraki 14 hafta üzerinde duracağı temeli kuruyor — sıkıştırılabilir bir iş değil ama tek seferlik. Phase 2/3'te yeni servisler eklemek artık "yeni bir ECS service tanımı yaz, deploy" meselesi.</p>
+</section>
+
+<section id="sozluk">
+<h2><span class="num">11.</span> Sözlük (Hızlı Referans)</h2>
+<p class="section-intro">Burada sürekli kullandığım terimler. Konuşurken referans olarak duruyor.</p>
+
+<div class="glossary">
+
+<div class="glossary-item">
+  <div class="term">Hot Path</div>
+  <div class="def">Kullanıcının her tıklamada hissettiği interactive akış. Latency UX'i direkt etkiliyor. Login, form submit, canlı bid, dashboard render.</div>
+</div>
+
+<div class="glossary-item">
+  <div class="term">Cold Path</div>
+  <div class="def">Arka planda çalışan, kullanıcı beklemeyen iş. Maliyet ve dayanıklılık önemli. PDF üretim, audit mirror, backup, log archival.</div>
+</div>
+
+<div class="glossary-item">
+  <div class="term">DPA</div>
+  <div class="def">Data Processing Agreement. Müşteriyle imzalanan "verinizi şu şekilde işliyoruz" sözleşmesi. KVKK için müşteri = veri sorumlusu, biz = veri işleyen.</div>
+</div>
+
+<div class="glossary-item">
+  <div class="term">SCC</div>
+  <div class="def">Standard Contractual Clauses. AWS gibi yurt dışı sağlayıcıyla "veri yurt dışında ama korumalı" pozisyonu kuran standart sözleşme şablonu.</div>
+</div>
+
+<div class="glossary-item">
+  <div class="term">RLS</div>
+  <div class="def">Row-Level Security. Postgres'in native özelliği — kullanıcının hangi satırları görebileceği veritabanı seviyesinde tanımlanır, uygulama kodu bypass edemez.</div>
+</div>
+
+<div class="glossary-item">
+  <div class="term">Multi-Tenant</div>
+  <div class="def">Tek uygulamanın birden fazla müşteri (org) verisini aynı veritabanında tutması, ama mantıksal olarak izole etmesi. RLS ile yapıyoruz.</div>
+</div>
+
+<div class="glossary-item">
+  <div class="term">Multi-AZ</div>
+  <div class="def">Multiple Availability Zones. Aynı verinin farklı binalarda kopyalanması — bir bina kapansa diğeri devralıyor.</div>
+</div>
+
+<div class="glossary-item">
+  <div class="term">Local Zone</div>
+  <div class="def">AWS'in compute uzantısı, parent region'a bağlı. İstanbul'da var ama full region değil — RDS, S3, EventBridge gibi servisler parent region'da kalıyor.</div>
+</div>
+
+<div class="glossary-item">
+  <div class="term">Idempotency</div>
+  <div class="def">Aynı isteği birden fazla göndermek aynı sonucu vermesi. Her mutasyona idempotency key veriyoruz, retry'lar duplikat üretmiyor.</div>
+</div>
+
+<div class="glossary-item">
+  <div class="term">EventBridge</div>
+  <div class="def">AWS'in managed event bus'ı. Modüller event yayar, diğer modüller pattern'e göre dinler. Bizim "Lego mimarinin" omurgası.</div>
+</div>
+
+<div class="glossary-item">
+  <div class="term">Append-Only</div>
+  <div class="def">Sadece ekleme yapılabilen, update/delete kapalı tablo. Audit log için. Postgres RLS ile zorlanıyor + S3 Object Lock ile mirror'lanıyor.</div>
+</div>
+
+<div class="glossary-item">
+  <div class="term">Server-Authoritative</div>
+  <div class="def">Önemli kararlar (auction kapanma vs.) sunucuda alınır, client'a güvenilmez. Saat manipülasyonu, network gecikmesi etkilemez.</div>
+</div>
+
+<div class="glossary-item">
+  <div class="term">Soft-Close</div>
+  <div class="def">İhalede son saniyelerde gelen bid süreyi otomatik uzatır — sniping'i (son saniye yüksek teklif) önler.</div>
+</div>
+
+<div class="glossary-item">
+  <div class="term">Vendor Lock-in</div>
+  <div class="def">Bir sağlayıcıya öyle bağlı kalmak ki çıkış maliyeti baskıcı olur. Supabase OSS self-host = vendor biziz, lock-in yok.</div>
+</div>
+
+<div class="glossary-item">
+  <div class="term">Modüler Monolith</div>
+  <div class="def">Tek deployment ama içeride modüller bağımsız. Mikroservis karmaşıklığı yok, ama büyüme yolu açık.</div>
+</div>
+
+<div class="glossary-item">
+  <div class="term">Infrastructure as Code (IaC)</div>
+  <div class="def">Altyapı kod olarak yazılır (CDK / Terraform). Console'da elle tıklamak yerine reproducible, version-controlled, code-review'lanabilir.</div>
+</div>
+
+</div>
+</section>
+
+<footer>
+<p>Bu doküman sohbet için hazırlanmıştır. İçerik tartışmaya açık — fazların scope'u, escrow sağlayıcı, carrier surface'i, AI vendor seçimi gibi noktalar yarın birlikte netleştirilecek.</p>
+<p style="margin-top: 12px;">Ozan · Mayıs 2026</p>
+</footer>
+
+</div>
+</body>
+</html>

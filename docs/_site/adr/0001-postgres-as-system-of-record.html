@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADR-0001 — Postgres as System of Record</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-header"><h1 onclick="location.href='../index.html'">🏭 Relowa POC</h1></div>
+    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> ADRs</div>
+    <div class="sidebar-nav">
+      <a href="0001-postgres-as-system-of-record.html" class="active"><span class="page-icon">📄</span>0001 — Postgres as SoR</a>
+      <a href="0002-supabase-realtime-standalone.html"><span class="page-icon">📄</span>0002 — Realtime</a>
+      <a href="0003-rls-with-jwt-guc-pattern.html"><span class="page-icon">📄</span>0003 — RLS JWT-via-GUC</a>
+      <a href="0004-multi-agent-orchestration.html"><span class="page-icon">📄</span>0004 — Multi-Agent</a>
+      <a href="0008-arbitrum-hash-anchoring.html"><span class="page-icon">📄</span>0008 — Arbitrum Anchoring</a>
+      <a href="0009-local-bidding-architecture.html"><span class="page-icon">📄</span>0009 — Bidding Architecture</a>
+    </div>
+    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> Concepts</div>
+    <div class="sidebar-nav">
+      <a href="../concepts/auth-uid-pattern.html"><span class="page-icon">💡</span>auth.uid() Pattern</a>
+      <a href="../concepts/audit-hash-chain.html"><span class="page-icon">💡</span>Audit Hash Chain</a>
+      <a href="../concepts/hash-anchoring.html"><span class="page-icon">💡</span>Hash Anchoring</a>
+      <a href="../concepts/idempotency.html"><span class="page-icon">💡</span>Idempotency</a>
+      <a href="../concepts/multi-tenancy.html"><span class="page-icon">💡</span>Multi-tenancy</a>
+      <a href="../concepts/server-authoritative-state.html"><span class="page-icon">💡</span>Server-Auth State</a>
+    </div>
+    <div class="sidebar-nav" style="margin-top:8px"><a href="../milestones.html"><span class="page-icon">🗓️</span>Phase 1 Milestones</a></div>
+    <div class="sidebar-section" style="margin-top:12px">Design System</div>
+    <div class="sidebar-nav">
+      <a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
+    </div>
+    <div class="sidebar-footer">Relowa POC · v0.1</div>
+  </aside>
+
+  <main class="main">
+    <div class="page-cover adr"></div>
+    <div class="breadcrumb">
+      <a href="../index.html">Home</a> <span class="sep">/</span> <a href="0001-postgres-as-system-of-record.html">ADR-0001</a>
+    </div>
+    <h2 style="border:none;font-size:1.8rem;margin-top:8px">ADR-0001 — Postgres as System of Record</h2>
+
+    <!-- Notion properties bar -->
+    <div class="properties">
+      <div class="prop-row"><span class="prop-label">Status</span><span class="prop-value"><span class="badge badge-accepted">Accepted</span></span></div>
+      <div class="prop-row"><span class="prop-label">Date</span><span class="prop-value">2026-05-09</span></div>
+      <div class="prop-row"><span class="prop-label">Decision-makers</span><span class="prop-value">Ozan (lead), Güneş (product)</span></div>
+    </div>
+    <hr class="divider">
+
+    <h3>Context</h3>
+    <p>Relowa is a B2B platform with relational, transactional data: organizations, users, tenders, bids, escrow holdings, audit trails. We need a System of Record that:</p>
+    <ul>
+      <li>Enforces relational integrity</li>
+      <li>Supports row-level security (RLS)</li>
+      <li>Has battle-tested replication and backup</li>
+      <li>Has a healthy ecosystem of operational tooling</li>
+      <li>Is portable across providers</li>
+    </ul>
+
+    <h3>Decision</h3>
+    <div class="callout callout-info">
+      <span class="callout-icon">💡</span>
+      <div class="callout-content"><strong>PostgreSQL is the system of record.</strong> All authoritative state lives in Postgres. In production: RDS PostgreSQL Multi-AZ in eu-central-1. Locally: Postgres 18-alpine in Docker. Everything else (S3 archives, EventBridge event log, PostHog analytics, materialized views) is derived data — rebuildable from Postgres if necessary.</div>
+    </div>
+
+    <h3>Consequences</h3>
+    <div class="decision-grid">
+      <div class="decision-card">
+        <div class="label pos">✓ Positive</div>
+        <ul>
+          <li>One source of truth — no consistency reconciliation across stores</li>
+          <li>RLS handles authorization in the database layer — application bugs cannot escape</li>
+          <li>Postgres extensions cover most needs: TimescaleDB for time-series, PostGIS for geo, <code>pg_cron</code> for scheduling, <code>pgvector</code> for embeddings, <code>pg_trgm</code> for fuzzy search</li>
+          <li>Standard backup/PITR semantics on RDS</li>
+          <li>Portable — swap RDS for Aurora, Supabase Cloud, or self-host without code change</li>
+        </ul>
+      </div>
+      <div class="decision-card">
+        <div class="label neg">✗ Negative</div>
+        <ul>
+          <li>Single-leader writes is a future scaling ceiling — acceptable through Phase 3 at projected scale</li>
+          <li>Operating Postgres yourself is non-trivial — mitigated by RDS Multi-AZ</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Alternatives considered</h3>
+    <table class="notion-table">
+      <thead><tr><th>Alternative</th><th>Verdict</th><th>Rationale</th></tr></thead>
+      <tbody>
+        <tr><td>DynamoDB</td><td><span class="badge badge-rejected">Rejected</span></td><td>Multi-tenant RLS is not a thing; B2B authorization patterns become custom application logic</td></tr>
+        <tr><td>MongoDB</td><td><span class="badge badge-rejected">Rejected</span></td><td>No equivalent of RLS, weaker transactional guarantees</td></tr>
+        <tr><td>Supabase Cloud</td><td><span class="badge badge-draft">Viable Phase 1</span></td><td>Viable for Phase 1, but management is offsite and the data plane is shared</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Reference</h3>
+    <p><em>Designing Data-Intensive Applications</em> — Ch. 12 "Deriving data": single source of truth, derivable everything else.</p>
+
+    <div class="see-also">
+      <div class="heading">📎 See also</div>
+      <a href="0002-supabase-realtime-standalone.html">ADR-0002 — Realtime Standalone</a>
+      <a href="0003-rls-with-jwt-guc-pattern.html">ADR-0003 — RLS JWT-via-GUC</a>
+      <a href="../concepts/multi-tenancy.html">Multi-Tenancy</a>
+    </div>
+  </main>
+</body>
+</html>

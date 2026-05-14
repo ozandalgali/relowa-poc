@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADR-0009 — Local EventBridge Bidding Architecture</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-header"><h1 onclick="location.href='../index.html'">🏭 Relowa POC</h1></div>
+    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> ADRs</div>
+    <div class="sidebar-nav">
+      <a href="0001-postgres-as-system-of-record.html"><span class="page-icon">📄</span>0001 — Postgres as SoR</a>
+      <a href="0002-supabase-realtime-standalone.html"><span class="page-icon">📄</span>0002 — Realtime</a>
+      <a href="0003-rls-with-jwt-guc-pattern.html"><span class="page-icon">📄</span>0003 — RLS JWT-via-GUC</a>
+      <a href="0004-multi-agent-orchestration.html"><span class="page-icon">📄</span>0004 — Multi-Agent</a>
+      <a href="0008-arbitrum-hash-anchoring.html"><span class="page-icon">📄</span>0008 — Arbitrum Anchoring</a>
+      <a href="0009-local-bidding-architecture.html" class="active"><span class="page-icon">📄</span>0009 — Bidding Architecture</a>
+    </div>
+    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> Concepts</div>
+    <div class="sidebar-nav">
+      <a href="../concepts/auth-uid-pattern.html"><span class="page-icon">💡</span>auth.uid() Pattern</a>
+      <a href="../concepts/audit-hash-chain.html"><span class="page-icon">💡</span>Audit Hash Chain</a>
+      <a href="../concepts/hash-anchoring.html"><span class="page-icon">💡</span>Hash Anchoring</a>
+      <a href="../concepts/idempotency.html"><span class="page-icon">💡</span>Idempotency</a>
+      <a href="../concepts/multi-tenancy.html"><span class="page-icon">💡</span>Multi-tenancy</a>
+      <a href="../concepts/server-authoritative-state.html"><span class="page-icon">💡</span>Server-Auth State</a>
+    </div>
+    <div class="sidebar-nav" style="margin-top:8px"><a href="../milestones.html"><span class="page-icon">🗓️</span>Phase 1 Milestones</a></div>
+    <div class="sidebar-section" style="margin-top:12px">Design System</div>
+    <div class="sidebar-nav"><a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a></div>
+    <div class="sidebar-footer">Relowa POC · v0.1</div>
+  </aside>
+  <main class="main">
+    <div class="page-cover adr"></div>
+    <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="0009-local-bidding-architecture.html">ADR-0009</a></div>
+    <h2 style="border:none;font-size:1.8rem;margin-top:8px">ADR-0009 — Local EventBridge Bidding Architecture</h2>
+    <div class="properties">
+      <div class="prop-row"><span class="prop-label">Status</span><span class="prop-value"><span class="badge badge-accepted">Accepted</span></span></div>
+      <div class="prop-row"><span class="prop-label">Date</span><span class="prop-value">2026-05-11</span></div>
+      <div class="prop-row"><span class="prop-label">Decision-makers</span><span class="prop-value">Ozan (lead)</span></div>
+    </div>
+    <hr class="divider">
+
+    <!-- ═══ CONTEXT ═══ -->
+    <h3>Context</h3>
+    <p>The Relowa platform's core business loop is a tender-auction cycle: producers post waste tenders, recyclers bid, and the server closes auctions on a fixed schedule with soft-close anti-sniping. This loop must:</p>
+    <ol>
+      <li><strong>Run locally during development</strong> — no AWS account required, no cloud dependency.</li>
+      <li><strong>Mirror the production architecture</strong> — the same event-driven pattern (EventBridge → SQS → Lambda) used in production must be testable locally via LocalStack.</li>
+      <li><strong>Enforce server-authoritative state transitions</strong> — no client ever triggers a tender close.</li>
+      <li><strong>Integrate with the existing RLS substrate</strong> — the API never checks authorization; Postgres RLS policies handle cross-tenant isolation transparently.</li>
+    </ol>
+
+    <!-- ═══ DECISION ═══ -->
+    <h3>Decision</h3>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">💡</div>
+      <div class="callout-content">
+        <p>We adopt a <strong>local-first, event-driven bidding architecture</strong> with the following six components. All AWS service calls route through LocalStack in development and real AWS in production — only the <code>AWS_ENDPOINT</code> changes.</p>
+      </div>
+    </div>
+
+    <h4>1. Hono API (<code>apps/api/</code>)</h4>
+    <p>A lightweight Hono backend providing REST endpoints for the core domain. All endpoints use two Hono middleware:</p>
+    <ul>
+      <li><strong><code>auth.ts</code></strong> — validates JWT, calls <code>SET LOCAL request.jwt.claims = '{...}'</code> on the Postgres session. RLS takes over from there.</li>
+      <li><strong><code>idempotency.ts</code></strong> — checks <code>Idempotency-Key</code> against <code>idempotency_keys</code> table, replays cached response on match, returns 409 on mismatch.</li>
+    </ul>
+    <p>After each successful mutation, the route handler publishes a structured event to LocalStack EventBridge.</p>
+
+    <table class="notion-table">
+      <thead>
+        <tr>
+          <th>Endpoint</th>
+          <th>RLS enforcement</th>
+          <th>Event published</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>POST /tenders</code></td>
+          <td>INSERT: own org + admin</td>
+          <td><code>tender.created</code></td>
+        </tr>
+        <tr>
+          <td><code>PATCH /tenders/:id/publish</code></td>
+          <td>UPDATE: own org + admin</td>
+          <td><code>tender.published</code></td>
+        </tr>
+        <tr>
+          <td><code>GET /tenders</code></td>
+          <td>SELECT: own org OR recycler + published/closing</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><code>GET /tenders/:id</code></td>
+          <td>SELECT: owner OR recycler if published</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><code>POST /tenders/:id/bids</code></td>
+          <td>INSERT: recycler org + admin/ops, tender is published</td>
+          <td><code>bid.placed</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4>2. EventBridge (<code>scripts/setup-events.sh</code>)</h4>
+    <p>A single shell script provisions the full local event infrastructure:</p>
+    <ul>
+      <li><strong>EventBus</strong> <code>relowa-events</code></li>
+      <li><strong>Rules</strong> for <code>tender.published</code>, <code>bid.placed</code>, <code>tender.won</code>, <code>tender.closing</code></li>
+      <li><strong>SQS queues</strong> as targets for each rule</li>
+      <li><strong>EventBridge Scheduler</strong> <code>tender-close-check</code> — runs every 30 seconds, invokes <code>tender-close-handler</code> Lambda</li>
+    </ul>
+
+    <h4>3. Auction Close Lambda (<code>apps/lambdas/tender-close-handler/</code>)</h4>
+    <p>A standalone TypeScript function invoked every 30s by EventBridge Scheduler. Each invocation runs a single DB transaction:</p>
+
+    <pre><code><span class="syn-cm">// Step 1: published → closing</span>
+<span class="syn-kw">UPDATE</span> tenders <span class="syn-kw">SET</span> status <span class="syn-str">= 'closing'</span>
+<span class="syn-kw">WHERE</span> status = <span class="syn-str">'published'</span> <span class="syn-kw">AND</span> closes_at &lt; <span class="syn-fn">NOW</span>()
+<span class="syn-cm">→ publish tender.closing event for each</span>
+
+<span class="syn-cm">// Step 2: closing → won (with 60s buffer)</span>
+<span class="syn-cm">// For each tender WHERE status = 'closing'</span>
+<span class="syn-cm">//   AND closes_at < NOW() - INTERVAL '60 seconds':</span>
+<span class="syn-cm">//   - Find highest bid (ORDER BY price_per_ton DESC)</span>
+<span class="syn-cm">//   - UPDATE status = 'won', winner_bid_id = winner.id, closed_at = NOW()</span>
+<span class="syn-cm">//   - publish tender.won event</span></code></pre>
+
+    <p>The 60-second buffer after <code>closes_at</code> implements the soft-close window: if a bid arrives within 60s of close, the auction extends. When no bids have arrived for 60 full seconds after <code>closes_at</code>, the auction is truly closed and the winner determined.</p>
+
+    <h4>4. Soft-close on bid placement</h4>
+    <p>In the same DB transaction as the bid INSERT — prevents last-second sniping by extending the deadline when bids land in the final 60 seconds:</p>
+
+    <pre><code><span class="syn-kw">UPDATE</span> tenders
+<span class="syn-kw">SET</span> closes_at = <span class="syn-fn">GREATEST</span>(closes_at, <span class="syn-fn">NOW</span>() + <span class="syn-str">INTERVAL '60 seconds'</span>)
+<span class="syn-kw">WHERE</span> id = <span class="syn-num">$1</span>
+  <span class="syn-kw">AND</span> status = <span class="syn-str">'published'</span>
+  <span class="syn-kw">AND</span> closes_at - <span class="syn-fn">NOW</span>() &lt; <span class="syn-str">INTERVAL '60 seconds'</span>;</code></pre>
+
+    <h4>5. LocalStack integration</h4>
+    <p>All AWS service calls (EventBridge <code>PutEvents</code>, SQS, Lambda) point to <code>http://localstack:4566</code> via environment variable <code>AWS_ENDPOINT</code>. In production, the same code works against real AWS services — only the endpoint changes. No conditional code paths between dev and prod.</p>
+
+    <h4>6. Integration test</h4>
+    <p><code>tests/bidding-flow.sh</code> exercises the full lifecycle end-to-end:</p>
+    <ol>
+      <li>Retrieve dev JWTs for each seed organization</li>
+      <li>Create tender as producer</li>
+      <li>Publish tender</li>
+      <li>Verify recycler sees it, carrier does not (RLS cross-tenant isolation)</li>
+      <li>Place bid as recycler</li>
+      <li>Verify bid appears in tender detail</li>
+      <li>Verify cross-tenant isolation (carrier sees no bids)</li>
+      <li>Verify audit hash chain integrity</li>
+    </ol>
+
+    <!-- ═══ CONSEQUENCES ═══ -->
+    <h3>Consequences</h3>
+
+    <div class="callout callout-success">
+      <div class="callout-icon">▲</div>
+      <div class="callout-content">
+        <p><strong>Positive</strong></p>
+        <ul style="margin-top:6px;">
+          <li><strong>No cloud account needed for development.</strong> Every piece runs in Docker: Postgres, LocalStack, API.</li>
+          <li><strong>One-command startup:</strong> <code>docker compose up -d && ./scripts/setup-events.sh</code></li>
+          <li><strong>Event-driven architecture is testable locally.</strong> The same event bus, rules, and scheduler patterns that run in production are exercised in every integration test.</li>
+          <li><strong>Hono is lightweight.</strong> ~280 lines of route logic, ~100 lines of middleware/lib. No DI container, no decorator boilerplate. Functions + middleware chaining.</li>
+          <li><strong>RLS is the sole authorization layer.</strong> API code contains zero <code>if (user.orgId !== row.orgId)</code> checks. The JWT-via-GUC pattern makes Drizzle queries automatically tenant-scoped.</li>
+          <li><strong>Audit trail is automatic.</strong> Every mutation produces an <code>audit_events</code> row with SHA-256 hash chaining.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout callout-warning">
+      <div class="callout-icon">▼</div>
+      <div class="callout-content">
+        <p><strong>Negative</strong></p>
+        <ul style="margin-top:6px;">
+          <li><strong>LocalStack Scheduler→Lambda has bugs.</strong> In LocalStack 3.7, the Scheduler's Lambda invocation is unreliable. Mitigation: the Lambda can also be invoked as a simple HTTP endpoint (<code>POST /internal/close-auctions</code>) that the scheduler hits.</li>
+          <li><strong>JWT is dev-only HMAC.</strong> Production will swap the <code>jwt.ts</code> helper for Cognito token verification. The middleware interface doesn't change — only the <code>verifyJwt()</code> implementation.</li>
+          <li><strong>EventBridge events are fire-and-forget locally.</strong> No dead-letter queue retry logic in local dev; production SQS→Lambda would handle retries.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ═══ ALTERNATIVES CONSIDERED ═══ -->
+    <h3>Alternatives Considered</h3>
+
+    <table class="notion-table">
+      <thead>
+        <tr>
+          <th>Alternative</th>
+          <th>Decision</th>
+          <th>Rationale</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>NestJS</strong></td>
+          <td><span class="badge badge-rejected">Rejected</span></td>
+          <td>Decorator-heavy, Angular-style DI adds ~50% more files and ~60% more code per endpoint. Not justified for a solo lead with 4-month timeline.</td>
+        </tr>
+        <tr style="background:#f0fdf4;">
+          <td><strong>Hono</strong></td>
+          <td><span class="badge badge-accepted">Selected</span></td>
+          <td>Middleware pattern maps to RLS + idempotency cleanly. <code>@hono/zod-openapi</code> provides equivalent OpenAPI generation to NestJS <code>@nestjs/swagger</code> with less ceremony.</td>
+        </tr>
+        <tr>
+          <td><strong>pg_cron</strong> for auction close</td>
+          <td><span class="badge badge-rejected">Rejected</span></td>
+          <td>EventBridge Scheduler + Lambda is the production pattern; using <code>pg_cron</code> locally would mean different code paths in dev vs prod. The Lambda pattern works in LocalStack and production identically.</td>
+        </tr>
+        <tr>
+          <td><strong>Application-level authorization</strong></td>
+          <td><span class="badge badge-rejected">Rejected</span></td>
+          <td>Per ADR-0003. RLS is the security boundary — authorization checks belong in Postgres policies, not application code.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ═══ SEE ALSO ═══ -->
+    <div class="see-also">
+      <div class="heading">See Also</div>
+      <a href="0001-postgres-as-system-of-record.html">ADR-0001 — Postgres as SoR</a>
+      <a href="0003-rls-with-jwt-guc-pattern.html">ADR-0003 — RLS JWT-via-GUC</a>
+      <a href="0008-arbitrum-hash-anchoring.html">ADR-0008 — Arbitrum Hash Anchoring</a>
+      <a href="../concepts/server-authoritative-state.html">Server-Authoritative State</a>
+    </div>
+  </main>
+</body>
+</html>
