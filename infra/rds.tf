@@ -95,7 +95,7 @@ resource "aws_db_instance" "main" {
   multi_az               = false
   skip_final_snapshot    = var.environment == "dev" ? true : false
   deletion_protection    = var.environment == "prod" ? true : false
-  backup_retention_period = var.environment == "prod" ? 35 : 0
+  backup_retention_period = var.environment == "prod" ? 35 : 1
   backup_window           = "03:00-04:00"
   maintenance_window      = "sun:04:00-sun:05:00"
 

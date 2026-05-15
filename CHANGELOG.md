@@ -24,6 +24,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - **Node.js 20 deprecation.** Added `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true` to all active CI workflows.
 - **Manual steps gap.** Added rule #6 to `AGENTS.md`: every plan MUST document human-required actions with trigger conditions. Added `## Manual steps` section to `M0-PLAN.md`.
 
+### Added (M1 — Auth, Data & RLS Substrate)
+- **14 new tables** across 5 domains: staff RBAC (5 tables), carrier sub-auction (4), escrow (3), outbox (1), anchor_log (1)
+- **6 new enums**: `staff_role`, `risk_level`, `carrier_ad_status`, `carrier_bid_status`, `shipment_status`, `escrow_status`
+- **RLS policies** on all new tables — 16 new policies (37 total)
+- **`relowa_admin` DB role** with BYPASSRLS — staff-access role separated from `app_user`
+- **Staff permissions catalog** (17 permissions with risk levels) + role-permission mapping seeded in migration
+- **`admin_audit_log` hash chain trigger** — SHA-256 tamper-detection
+- **Updated_at triggers** on `carrier_ads`, `carrier_bids`, `shipments`
+- **Realtime publication** entries for `carrier_ads`, `carrier_bids`, `shipments`, `shipment_events`
+- **RDS backup retention** enabled (1 day, free-tier max)
+
+### Changed
+- Schema grows from 7 to 21 application tables; RLS policies from 21 to 37
+- `migrate.ts` default port corrected 5432 → 5433; `drizzle.config.ts` simplified (removed dotenv)
+- `app_user` role creation now in migration side-car (was only in test scripts)
+- `docs/plans/M1-PLAN.md` created with manual steps section
+
 ### Planned
 - Hono API scaffold with tender/bid endpoints, JWT-via-GUC middleware, idempotency middleware
 - LocalStack EventBridge bus + rules: `tender.published`, `bid.placed`, `tender.won`, `tender.closing`

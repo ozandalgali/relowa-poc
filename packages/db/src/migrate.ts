@@ -31,12 +31,12 @@ import { migrate } from "drizzle-orm/postgres-js/migrator";
 import postgres from "postgres";
 
 const connectionString =
-  process.env.DATABASE_URL ?? "postgres://relowa:dev_password_change_me@localhost:5432/relowa";
+  process.env.DATABASE_URL ?? "postgres://relowa:dev_password_change_me@localhost:5433/relowa";
 
 // Files that Drizzle Kit DOES NOT manage — we run them ourselves.
 // Convention: anything other than the auto-generated `XXXX_<random>.sql`
 // pattern (we recognize them by hand-picked filenames).
-const RAW_SQL_FILES = ["0001_rls_helpers_and_policies.sql"];
+const RAW_SQL_FILES = ["0001_rls_helpers_and_policies.sql", "0002_rls_m1_tables.sql"];
 
 async function runDrizzleMigrations() {
   console.log("→ phase 1: running drizzle-generated migrations");
