@@ -23,6 +23,14 @@ resource "aws_security_group" "rds" {
     description = "Postgres from within VPC"
   }
 
+  ingress {
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion.id]
+    description     = "Postgres from bastion host"
+  }
+
   egress {
     from_port   = 0
     to_port     = 0

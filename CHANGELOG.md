@@ -35,6 +35,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - **Realtime publication** entries for `carrier_ads`, `carrier_bids`, `shipments`, `shipment_events`
 - **RDS backup retention** enabled (1 day, free-tier max)
 
+### Added (Bastion + pgAdmin)
+- **Bastion EC2** (t3.micro, free tier) in public subnet — SSH tunnel to private RDS from any IP
+- **pgAdmin** container in `docker-compose.yml` — Supabase-like dashboard at `localhost:5050`
+- **SSH key auto-generated** by Terraform, stored in Secrets Manager (`/relowa/dev/bastion/ssh-private-key`)
+- **RDS security group** updated with bastion-host ingress rule (5432 from bastion SG)
+
 ### Changed
 - Schema grows from 7 to 21 application tables; RLS policies from 21 to 37
 - `migrate.ts` default port corrected 5432 → 5433; `drizzle.config.ts` simplified (removed dotenv)

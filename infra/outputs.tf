@@ -60,3 +60,32 @@ output "jwt_signing_key_secret_arn" {
   description = "Secrets Manager ARN for JWT signing key"
   value       = aws_secretsmanager_secret.jwt_signing_key.arn
 }
+
+# ─── Bastion ─────────────────────────────────────────────────────────
+
+output "bastion_public_ip" {
+  description = "Bastion host public IP"
+  value       = aws_eip.bastion.public_ip
+}
+
+output "bastion_ssh_connect" {
+  description = "Command to download SSH key and connect to bastion"
+  value       = <<-EOT
+    # Download private key (requires AWS CLI + credentials)
+    aws secretsmanager get-secret-value \
+      --secret-id /relowa/${var.environment}/bastion/ssh-private-key \
+      --query SecretString --output text \
+      --profile relowa > ~/.ssh/relowa-bastion.pem
+
+    chmod 600 ~/.ssh/relowa-bastion.pem
+
+    # SSH into bastion
+    ssh -i ~/.ssh/relowa-bastion.pem ec2-user@${aws_eip.bastion.public_ip}
+
+    # Port-forward RDS to localhost:5433
+    ssh -i ~/.ssh/relowa-bastion.pem -N -L 5433:${aws_db_instance.main.address}:5432 ec2-user@${aws_eip.bastion.public_ip}
+
+    # Then connect with psql / Drizzle Studio / pgAdmin at localhost:5433
+    psql -h localhost -p 5433 -U relowa -d relowa
+  EOT
+}
