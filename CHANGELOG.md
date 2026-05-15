@@ -18,6 +18,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - `docs/plans/M0-PLAN.md`: progress tracker for infrastructure milestone
 - `infra/.gitignore`: Terraform state exclusion
 
+### Fixed
+- **gitleaks CI failure.** Added `.gitleaks.toml` with global allowlist for known POC dev credentials (not production secrets). Removed invalid `config-path` input from gitleaks-action.
+- **Migration CI failure.** Fixed `DATABASE_URL` default port from 5432 → 5433 in `drizzle.config.ts`. Added explicit `DATABASE_URL` env var to `test.yml`.
+- **Node.js 20 deprecation.** Added `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true` to all active CI workflows.
+- **Manual steps gap.** Added rule #6 to `AGENTS.md`: every plan MUST document human-required actions with trigger conditions. Added `## Manual steps` section to `M0-PLAN.md`.
+
 ### Planned
 - Hono API scaffold with tender/bid endpoints, JWT-via-GUC middleware, idempotency middleware
 - LocalStack EventBridge bus + rules: `tender.published`, `bid.placed`, `tender.won`, `tender.closing`
