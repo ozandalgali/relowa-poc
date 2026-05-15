@@ -73,6 +73,7 @@ Postgres extensions, not new databases. SQL functions, not microservices. shadcn
 3. **Update CHANGELOG** under `[Unreleased]` for every notable change before committing.
 4. **Tests run green** before claiming a task done. `./tests/rls-isolation.sh` is the bare minimum smoke check.
 5. **Commit messages**: imperative mood, one concept per commit. `feat(db): add audit hash chain trigger`, not `update stuff`.
+6. **Manual steps must be documented.** Every plan (`docs/plans/`) MUST include a `## Manual steps` section listing every non-automated action the human needs to take, with the exact trigger condition (e.g. "After first terraform apply, set GitHub secret X"). The `doc-keeper` agent enforces this.
 
 ## Constraints to remember
 

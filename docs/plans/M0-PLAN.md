@@ -113,3 +113,18 @@ No PII/money/audit triggers fired. Compliance-specialist not invoked for M0.
 - S3 buckets (5-bucket layout) → M1
 - Client VPN + Private CA ($400/mo) → M6
 - Sentry EU + PostHog EU → M1
+
+## 🔴 Manual steps (human action required)
+
+These are non-automated gates. Every plan MUST include this section so the human knows exactly when to act.
+
+| # | When | Action | Why |
+|---|------|--------|-----|
+| 1 | Before M0 starts | `brew install terraform` (or binary download) | No IaC tool yet |
+| 2 | Before M0 starts | Create IAM user `ozan-admin` with AdministratorAccess, generate Access Key | Root credentials never used |
+| 3 | Before M0 starts | `aws configure --profile relowa` with the IAM user's credentials | CLI needs local auth |
+| 4 | Before first `terraform apply` | Create S3 bucket `relowa-terraform-state-258975980370` + DynamoDB table `relowa-terraform-locks` | Terraform state backend must exist before Terraform can manage itself |
+| 5 | After first `terraform apply` | Go to GitHub repo → Settings → Secrets → New secret: `AWS_DEPLOY_ROLE_ARN` = `arn:aws:iam::258975980370:role/relowa-dev-deploy` | CI needs this to assume the OIDC role for deploys |
+| 6 | After each step | Verify CI green at `https://github.com/ozandalgali/relowa-poc/actions` | Catch failures before they compound |
+
+**Rule:** When any plan adds a manual step, document it here with its trigger condition. The `doc-keeper` agent enforces this at the end of every feature.

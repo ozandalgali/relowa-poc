@@ -1,0 +1,22 @@
+# Gitleaks configuration — allow known POC dev credentials
+# These are NOT production secrets. Production uses AWS Secrets Manager via OIDC.
+
+[[rules]]
+id = "relowa-poc-dev-credentials"
+description = "Allow known dev passwords used in the POC local Docker environment"
+regex = '''dev_password_change_me|supabaseencrypti|super-secret-jwt-token-with-at-least-32-characters-long'''
+
+[rules.allowlist]
+paths = [
+  '''docker/postgres/init.sql''',
+  '''docker-compose.yml''',
+  '''packages/db/drizzle.config.ts''',
+  '''packages/db/src/migrate.ts''',
+  '''packages/db/src/seed/index.ts''',
+  '''packages/db/src/client.ts''',
+  '''.env.example''',
+  '''docs/runbook/.*\.md''',
+  '''docs/memory/.*\.md''',
+  '''tests/rls-isolation.sh''',
+  '''scripts/wait-for-pg.sh''',
+]
