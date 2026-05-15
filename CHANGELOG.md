@@ -41,6 +41,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - **SSH key auto-generated** by Terraform, stored in Secrets Manager (`/relowa/dev/bastion/ssh-private-key`)
 - **RDS security group** updated with bastion-host ingress rule (5432 from bastion SG)
 
+### Fixed (RDS connectivity)
+- **RDS password not applying.** Added `apply_immediately = true` to Terraform RDS config. Previously deferred password changes to Sunday maintenance window.
+- **Node.js Postgres SSL.** Added `sslmode=require` to connection strings — RDS requires SSL but Node.js client defaults to plain.
+- **Publication syntax.** Replaced invalid `ALTER PUBLICATION ... ADD TABLE IF NOT EXISTS` with resilient `DO $$ ... EXCEPTION WHEN duplicate_object` blocks.
+- **Verified.** Full migrations + seed + RLS isolation 5/5 running on live RDS via bastion SSH tunnel.
+
 ### Changed
 - Schema grows from 7 to 21 application tables; RLS policies from 21 to 37
 - `migrate.ts` default port corrected 5432 → 5433; `drizzle.config.ts` simplified (removed dotenv)

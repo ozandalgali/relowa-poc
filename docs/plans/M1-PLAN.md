@@ -8,14 +8,14 @@
 
 | Step | Status |
 |------|--------|
-| 1. Schema additions (14 tables, 6 enums) | 🔨 In progress |
-| 2. Drizzle generate + raw SQL RLS side-car | ⬜ Pending |
-| 3. relowa_admin DB role (raw SQL) | ⬜ Pending |
-| 4. Register raw SQL in migrate.ts | ⬜ Pending |
-| 5. Extend RLS isolation tests | ⬜ Pending |
-| 6. Terraform: enable RDS backups | ⬜ Pending |
-| 7. db:reset + verify locally | ⬜ Pending |
-| 8. CHANGELOG + docs | ⬜ Pending |
+| 1. Schema additions (14 tables, 6 enums) | 🔨 Done |
+| 2. Drizzle generate + raw SQL RLS side-car | ⬜ Done |
+| 3. relowa_admin DB role (raw SQL) | ⬜ Done |
+| 4. Register raw SQL in migrate.ts | ⬜ Done |
+| 5. Extend RLS isolation tests | ⬜ Done |
+| 6. Terraform: enable RDS backups | ⬜ Done |
+| 7. db:reset + verify locally | ⬜ Done |
+| 8. CHANGELOG + docs | ⬜ Done |
 
 ## Dependency graph
 
