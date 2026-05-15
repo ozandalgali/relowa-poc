@@ -304,10 +304,10 @@ CREATE TRIGGER trg_shipments_updated_at
 
 -- ─── Realtime publication — add new tables ─────────────────────────
 
-ALTER PUBLICATION supabase_realtime ADD TABLE carrier_ads;
-ALTER PUBLICATION supabase_realtime ADD TABLE carrier_bids;
-ALTER PUBLICATION supabase_realtime ADD TABLE shipments;
-ALTER PUBLICATION supabase_realtime ADD TABLE shipment_events;
+DO $$ BEGIN ALTER PUBLICATION supabase_realtime ADD TABLE carrier_ads; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN ALTER PUBLICATION supabase_realtime ADD TABLE carrier_bids; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN ALTER PUBLICATION supabase_realtime ADD TABLE shipments; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN ALTER PUBLICATION supabase_realtime ADD TABLE shipment_events; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ─── Seed: staff_permissions catalog ───────────────────────────────
 

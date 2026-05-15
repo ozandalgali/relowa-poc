@@ -106,6 +106,7 @@ resource "aws_db_instance" "main" {
   backup_retention_period = var.environment == "prod" ? 35 : 1
   backup_window           = "03:00-04:00"
   maintenance_window      = "sun:04:00-sun:05:00"
+  apply_immediately       = true
 
   tags = { Name = "relowa-${var.environment}-db" }
 }

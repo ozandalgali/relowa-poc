@@ -323,6 +323,14 @@ CREATE TRIGGER users_set_updated_at
 
 -- ----- Add tenders + bids + audit_events to realtime publication --
 
-ALTER PUBLICATION supabase_realtime ADD TABLE tenders;
-ALTER PUBLICATION supabase_realtime ADD TABLE bids;
-ALTER PUBLICATION supabase_realtime ADD TABLE audit_events;
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT FROM pg_publication WHERE pubname = 'supabase_realtime') THEN
+    CREATE PUBLICATION supabase_realtime;
+  END IF;
+END
+$$;
+
+DO $$ BEGIN ALTER PUBLICATION supabase_realtime ADD TABLE tenders; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN ALTER PUBLICATION supabase_realtime ADD TABLE bids; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN ALTER PUBLICATION supabase_realtime ADD TABLE audit_events; EXCEPTION WHEN duplicate_object THEN NULL; END $$;
