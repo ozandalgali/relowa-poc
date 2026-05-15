@@ -1,84 +1,156 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Audit Hash Chain</title>
-  <link rel="stylesheet" href="../style.css">
-</head>
-<body>
-  <aside class="sidebar">
-    <div class="sidebar-header"><h1 onclick="location.href='../index.html'">🏭 Relowa POC</h1></div>
-    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> ADRs</div>
-    <div class="sidebar-nav">
-      <a href="../adr/0001-postgres-as-system-of-record.html"><span class="page-icon">📄</span>0001 — Postgres as SoR</a>
-      <a href="../adr/0002-supabase-realtime-standalone.html"><span class="page-icon">📄</span>0002 — Realtime</a>
-      <a href="../adr/0003-rls-with-jwt-guc-pattern.html"><span class="page-icon">📄</span>0003 — RLS JWT-via-GUC</a>
-      <a href="../adr/0004-multi-agent-orchestration.html"><span class="page-icon">📄</span>0004 — Multi-Agent</a>
-      <a href="../adr/0008-arbitrum-hash-anchoring.html"><span class="page-icon">📄</span>0008 — Arbitrum Anchoring</a>
-      <a href="../adr/0009-local-bidding-architecture.html"><span class="page-icon">📄</span>0009 — Bidding Architecture</a>
-    </div>
-    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> Concepts</div>
-    <div class="sidebar-nav">
-      <a href="auth-uid-pattern.html"><span class="page-icon">💡</span>auth.uid() Pattern</a>
-      <a href="audit-hash-chain.html" class="active"><span class="page-icon">💡</span>Audit Hash Chain</a>
-      <a href="hash-anchoring.html"><span class="page-icon">💡</span>Hash Anchoring</a>
-      <a href="idempotency.html"><span class="page-icon">💡</span>Idempotency</a>
-      <a href="multi-tenancy.html"><span class="page-icon">💡</span>Multi-tenancy</a>
-      <a href="server-authoritative-state.html"><span class="page-icon">💡</span>Server-Auth State</a>
-    </div>
-    <div class="sidebar-nav" style="margin-top:8px"><a href="../milestones.html"><span class="page-icon">🗓️</span>Phase 1 Milestones</a></div>
-    <div class="sidebar-section" style="margin-top:12px">Design System</div>
-    <div class="sidebar-nav">
-      <a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
-    </div>
-    <div class="sidebar-footer">Relowa POC · v0.1</div>
-  </aside>
-  <main class="main">
-    <div class="page-cover concept"></div>
-    <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="../index.html">Concepts</a> <span class="sep">/</span> Audit Hash Chain</div>
-    <h2 style="border:none;font-size:1.8rem;margin-top:8px">Audit Hash Chain</h2>
-    <div class="properties">
-      <div class="prop-row"><span class="prop-label">Type</span><span class="prop-value"><span class="badge badge-concept">Concept</span></span></div>
-    </div>
-    <hr class="divider">
-
-    <div class="callout callout-info">
-      <div class="callout-icon">💡</div>
-      <div class="callout-content">
-        <p>Why every audit row links to the previous via SHA-256, and what tampering would look like.</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Audit Hash Chain</title>
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 onclick="location.href = '../index.html'">🏭 Relowa POC</h1>
       </div>
-    </div>
-
-    <h3>What we're protecting against</h3>
-
-    <div class="callout callout-danger">
-      <div class="callout-icon">🔴</div>
-      <div class="callout-content">
-        <p><strong>Threat 1: DB access attacker deletes rows.</strong> Someone with database credentials (compromised API key, insider, backup leaked) silently removes incriminating audit entries. Without a chain, the gap is invisible.</p>
-        <p style="margin-top:8px"><strong>Threat 2: Insider modifies rows.</strong> A DBA or ops engineer with legitimate access retroactively changes the <code>action</code> field from "rejected" to "approved". The timestamp looks plausible. Nothing screams "forgery."</p>
-        <p style="margin-top:8px"><strong>Threat 3: Bug allows retroactive insertion.</strong> A poorly-tested migration or ORM misconfiguration lets a buggy process inject audit events dated in the past. Without cryptographic chaining, the insertion looks authentic.</p>
-        <p style="margin-top:12px;font-weight:600">Cryptographic chaining defends against all three using one property: you cannot insert, delete, or modify a row without breaking every hash that comes after it.</p>
+      <div
+        class="sidebar-section"
+        onclick="
+          this.classList.toggle('collapsed');
+          this.nextElementSibling.classList.toggle('collapsed');
+        "
+      >
+        <span class="toggle">▾</span> ADRs
       </div>
-    </div>
+      <div class="sidebar-nav">
+        <a href="../adr/0001-postgres-as-system-of-record.html"
+          ><span class="page-icon">📄</span>0001 — Postgres as SoR</a
+        >
+        <a href="../adr/0002-supabase-realtime-standalone.html"
+          ><span class="page-icon">📄</span>0002 — Realtime</a
+        >
+        <a href="../adr/0003-rls-with-jwt-guc-pattern.html"
+          ><span class="page-icon">📄</span>0003 — RLS JWT-via-GUC</a
+        >
+        <a href="../adr/0004-multi-agent-orchestration.html"
+          ><span class="page-icon">📄</span>0004 — Multi-Agent</a
+        >
+        <a href="../adr/0008-arbitrum-hash-anchoring.html"
+          ><span class="page-icon">📄</span>0008 — Arbitrum Anchoring</a
+        >
+        <a href="../adr/0009-local-bidding-architecture.html"
+          ><span class="page-icon">📄</span>0009 — Bidding Architecture</a
+        >
+      </div>
+      <div
+        class="sidebar-section"
+        onclick="
+          this.classList.toggle('collapsed');
+          this.nextElementSibling.classList.toggle('collapsed');
+        "
+      >
+        <span class="toggle">▾</span> Concepts
+      </div>
+      <div class="sidebar-nav">
+        <a href="auth-uid-pattern.html"><span class="page-icon">💡</span>auth.uid() Pattern</a>
+        <a href="audit-hash-chain.html" class="active"
+          ><span class="page-icon">💡</span>Audit Hash Chain</a
+        >
+        <a href="hash-anchoring.html"><span class="page-icon">💡</span>Hash Anchoring</a>
+        <a href="idempotency.html"><span class="page-icon">💡</span>Idempotency</a>
+        <a href="multi-tenancy.html"><span class="page-icon">💡</span>Multi-tenancy</a>
+        <a href="server-authoritative-state.html"
+          ><span class="page-icon">💡</span>Server-Auth State</a
+        >
+      </div>
+      <div class="sidebar-nav" style="margin-top: 8px">
+        <a href="../milestones.html"><span class="page-icon">🗓️</span>Phase 1 Milestones</a>
+      </div>
+      <div class="sidebar-section" style="margin-top: 12px">Design System</div>
+      <div class="sidebar-nav">
+        <a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
+      </div>
+      <div class="sidebar-footer">Relowa POC · v0.1</div>
+    </aside>
+    <main class="main">
+      <div class="page-cover concept"></div>
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a> <span class="sep">/</span>
+        <a href="../index.html">Concepts</a> <span class="sep">/</span> Audit Hash Chain
+      </div>
+      <h2 style="border: none; font-size: 1.8rem; margin-top: 8px">Audit Hash Chain</h2>
+      <div class="properties">
+        <div class="prop-row">
+          <span class="prop-label">Type</span
+          ><span class="prop-value"><span class="badge badge-concept">Concept</span></span>
+        </div>
+      </div>
+      <hr class="divider" />
 
-    <h3>How it works</h3>
+      <div class="callout callout-info">
+        <div class="callout-icon">💡</div>
+        <div class="callout-content">
+          <p>
+            Why every audit row links to the previous via SHA-256, and what tampering would look
+            like.
+          </p>
+        </div>
+      </div>
 
-    <p>Every row in <code>audit_events</code> carries two extra columns:</p>
+      <h3>What we're protecting against</h3>
 
-    <table class="notion-table">
-      <thead>
-        <tr><th>Column</th><th>Type</th><th>Purpose</th></tr>
-      </thead>
-      <tbody>
-        <tr><td><code>prev_hash</code></td><td><code>text</code></td><td>SHA-256 of the previous audit row's data (or the zero-hash for the genesis row)</td></tr>
-        <tr><td><code>hash</code></td><td><code>text</code></td><td>SHA-256 of this row's data concatenated with <code>prev_hash</code></td></tr>
-      </tbody>
-    </table>
+      <div class="callout callout-danger">
+        <div class="callout-icon">🔴</div>
+        <div class="callout-content">
+          <p>
+            <strong>Threat 1: DB access attacker deletes rows.</strong> Someone with database
+            credentials (compromised API key, insider, backup leaked) silently removes incriminating
+            audit entries. Without a chain, the gap is invisible.
+          </p>
+          <p style="margin-top: 8px">
+            <strong>Threat 2: Insider modifies rows.</strong> A DBA or ops engineer with legitimate
+            access retroactively changes the <code>action</code> field from "rejected" to
+            "approved". The timestamp looks plausible. Nothing screams "forgery."
+          </p>
+          <p style="margin-top: 8px">
+            <strong>Threat 3: Bug allows retroactive insertion.</strong> A poorly-tested migration
+            or ORM misconfiguration lets a buggy process inject audit events dated in the past.
+            Without cryptographic chaining, the insertion looks authentic.
+          </p>
+          <p style="margin-top: 12px; font-weight: 600">
+            Cryptographic chaining defends against all three using one property: you cannot insert,
+            delete, or modify a row without breaking every hash that comes after it.
+          </p>
+        </div>
+      </div>
 
-    <p>A trigger fills both columns automatically on INSERT:</p>
+      <h3>How it works</h3>
 
-    <pre><code><span class="syn-cm">-- Trigger function: computes the hash chain link on every INSERT</span>
+      <p>Every row in <code>audit_events</code> carries two extra columns:</p>
+
+      <table class="notion-table">
+        <thead>
+          <tr>
+            <th>Column</th>
+            <th>Type</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>prev_hash</code></td>
+            <td><code>text</code></td>
+            <td>SHA-256 of the previous audit row's data (or the zero-hash for the genesis row)</td>
+          </tr>
+          <tr>
+            <td><code>hash</code></td>
+            <td><code>text</code></td>
+            <td>SHA-256 of this row's data concatenated with <code>prev_hash</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>A trigger fills both columns automatically on INSERT:</p>
+
+      <pre><code><span class="syn-cm">-- Trigger function: computes the hash chain link on every INSERT</span>
 <span class="syn-kw">CREATE OR REPLACE FUNCTION</span> audit_chain_link()
 <span class="syn-kw">RETURNS</span> <span class="syn-kw">TRIGGER</span> <span class="syn-kw">LANGUAGE</span> plpgsql <span class="syn-kw">SECURITY DEFINER</span>
 <span class="syn-kw">AS</span> $$
@@ -122,78 +194,329 @@ $$;
   <span class="syn-kw">FOR EACH ROW</span>
   <span class="syn-kw">EXECUTE FUNCTION</span> <span class="syn-fn">audit_chain_link</span>();</code></pre>
 
-    <p>After this trigger runs, <code>hash</code> of row N embeds row N's data and <code>prev_hash</code>, which is the hash of row N−1, which embeds row N−1's data and the hash of row N−2, and so on back to genesis. Change <em>any</em> row, and every hash after it breaks.</p>
+      <p>
+        After this trigger runs, <code>hash</code> of row N embeds row N's data and
+        <code>prev_hash</code>, which is the hash of row N−1, which embeds row N−1's data and the
+        hash of row N−2, and so on back to genesis. Change <em>any</em> row, and every hash after it
+        breaks.
+      </p>
 
-    <h3>Visual: what tampering looks like</h3>
+      <h3>Visual: what tampering looks like</h3>
 
-    <svg class="diagram" viewBox="0 0 720 160" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-          <polygon points="0 0, 10 3.5, 0 7" fill="#9b9a97"/>
-        </marker>
-        <marker id="arrowBroken" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-          <polygon points="0 0, 10 3.5, 0 7" fill="#c22b21"/>
-        </marker>
-      </defs>
+      <svg class="diagram" viewBox="0 0 720 160" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#9b9a97" />
+          </marker>
+          <marker
+            id="arrowBroken"
+            markerWidth="10"
+            markerHeight="7"
+            refX="10"
+            refY="3.5"
+            orient="auto"
+          >
+            <polygon points="0 0, 10 3.5, 0 7" fill="#c22b21" />
+          </marker>
+        </defs>
 
-      <!-- Row 1 -->
-      <rect x="10" y="40" width="100" height="56" rx="6" fill="#f7f6f3" stroke="#e9e9e7" stroke-width="2"/>
-      <text x="60" y="62" text-anchor="middle" font-size="11" font-family="sans-serif" fill="#6b6966">Row 1</text>
-      <text x="60" y="82" text-anchor="middle" font-size="9" font-family="monospace" fill="#9b9a97">a3f2e8d1...</text>
+        <!-- Row 1 -->
+        <rect
+          x="10"
+          y="40"
+          width="100"
+          height="56"
+          rx="6"
+          fill="#f7f6f3"
+          stroke="#e9e9e7"
+          stroke-width="2"
+        />
+        <text
+          x="60"
+          y="62"
+          text-anchor="middle"
+          font-size="11"
+          font-family="sans-serif"
+          fill="#6b6966"
+        >
+          Row 1
+        </text>
+        <text
+          x="60"
+          y="82"
+          text-anchor="middle"
+          font-size="9"
+          font-family="monospace"
+          fill="#9b9a97"
+        >
+          a3f2e8d1...
+        </text>
 
-      <!-- Arrow 1 → 2 -->
-      <line x1="110" y1="68" x2="148" y2="68" stroke="#9b9a97" stroke-width="2" marker-end="url(#arrow)"/>
+        <!-- Arrow 1 → 2 -->
+        <line
+          x1="110"
+          y1="68"
+          x2="148"
+          y2="68"
+          stroke="#9b9a97"
+          stroke-width="2"
+          marker-end="url(#arrow)"
+        />
 
-      <!-- Row 2 -->
-      <rect x="150" y="40" width="100" height="56" rx="6" fill="#f7f6f3" stroke="#e9e9e7" stroke-width="2"/>
-      <text x="200" y="62" text-anchor="middle" font-size="11" font-family="sans-serif" fill="#6b6966">Row 2</text>
-      <text x="200" y="82" text-anchor="middle" font-size="9" font-family="monospace" fill="#9b9a97">7b1c4f92...</text>
+        <!-- Row 2 -->
+        <rect
+          x="150"
+          y="40"
+          width="100"
+          height="56"
+          rx="6"
+          fill="#f7f6f3"
+          stroke="#e9e9e7"
+          stroke-width="2"
+        />
+        <text
+          x="200"
+          y="62"
+          text-anchor="middle"
+          font-size="11"
+          font-family="sans-serif"
+          fill="#6b6966"
+        >
+          Row 2
+        </text>
+        <text
+          x="200"
+          y="82"
+          text-anchor="middle"
+          font-size="9"
+          font-family="monospace"
+          fill="#9b9a97"
+        >
+          7b1c4f92...
+        </text>
 
-      <!-- Arrow 2 → 3 -->
-      <line x1="250" y1="68" x2="288" y2="68" stroke="#9b9a97" stroke-width="2" marker-end="url(#arrow)"/>
+        <!-- Arrow 2 → 3 -->
+        <line
+          x1="250"
+          y1="68"
+          x2="288"
+          y2="68"
+          stroke="#9b9a97"
+          stroke-width="2"
+          marker-end="url(#arrow)"
+        />
 
-      <!-- Row 3 — TAMPERED -->
-      <rect x="290" y="40" width="100" height="56" rx="6" fill="#fdebec" stroke="#c22b21" stroke-width="2.5"/>
-      <text x="340" y="62" text-anchor="middle" font-size="11" font-family="sans-serif" fill="#c22b21" font-weight="bold">Row 3 ✕</text>
-      <text x="340" y="82" text-anchor="middle" font-size="9" font-family="monospace" fill="#c22b21">b2d9e03f...</text>
+        <!-- Row 3 — TAMPERED -->
+        <rect
+          x="290"
+          y="40"
+          width="100"
+          height="56"
+          rx="6"
+          fill="#fdebec"
+          stroke="#c22b21"
+          stroke-width="2.5"
+        />
+        <text
+          x="340"
+          y="62"
+          text-anchor="middle"
+          font-size="11"
+          font-family="sans-serif"
+          fill="#c22b21"
+          font-weight="bold"
+        >
+          Row 3 ✕
+        </text>
+        <text
+          x="340"
+          y="82"
+          text-anchor="middle"
+          font-size="9"
+          font-family="monospace"
+          fill="#c22b21"
+        >
+          b2d9e03f...
+        </text>
 
-      <!-- Broken arrow 3 → 4 -->
-      <line x1="390" y1="48" x2="428" y2="68" stroke="#c22b21" stroke-width="2"/>
-      <line x1="390" y1="68" x2="428" y2="68" stroke="#c22b21" stroke-width="2" stroke-dasharray="6,3"/>
-      <line x1="390" y1="88" x2="428" y2="68" stroke="#c22b21" stroke-width="2"/>
-      <text x="390" y="35" text-anchor="middle" font-size="8" font-family="sans-serif" fill="#c22b21" font-weight="bold">hash mismatch</text>
+        <!-- Broken arrow 3 → 4 -->
+        <line x1="390" y1="48" x2="428" y2="68" stroke="#c22b21" stroke-width="2" />
+        <line
+          x1="390"
+          y1="68"
+          x2="428"
+          y2="68"
+          stroke="#c22b21"
+          stroke-width="2"
+          stroke-dasharray="6,3"
+        />
+        <line x1="390" y1="88" x2="428" y2="68" stroke="#c22b21" stroke-width="2" />
+        <text
+          x="390"
+          y="35"
+          text-anchor="middle"
+          font-size="8"
+          font-family="sans-serif"
+          fill="#c22b21"
+          font-weight="bold"
+        >
+          hash mismatch
+        </text>
 
-      <!-- Row 4 -->
-      <rect x="430" y="40" width="100" height="56" rx="6" fill="#f7f6f3" stroke="#e9e9e7" stroke-width="2"/>
-      <text x="480" y="62" text-anchor="middle" font-size="11" font-family="sans-serif" fill="#6b6966">Row 4</text>
-      <text x="480" y="82" text-anchor="middle" font-size="9" font-family="monospace" fill="#9b9a97">e8d2a140...</text>
-      <text x="480" y="46" text-anchor="middle" font-size="7" font-family="sans-serif" fill="#9b9a97">prev_hash broken</text>
+        <!-- Row 4 -->
+        <rect
+          x="430"
+          y="40"
+          width="100"
+          height="56"
+          rx="6"
+          fill="#f7f6f3"
+          stroke="#e9e9e7"
+          stroke-width="2"
+        />
+        <text
+          x="480"
+          y="62"
+          text-anchor="middle"
+          font-size="11"
+          font-family="sans-serif"
+          fill="#6b6966"
+        >
+          Row 4
+        </text>
+        <text
+          x="480"
+          y="82"
+          text-anchor="middle"
+          font-size="9"
+          font-family="monospace"
+          fill="#9b9a97"
+        >
+          e8d2a140...
+        </text>
+        <text
+          x="480"
+          y="46"
+          text-anchor="middle"
+          font-size="7"
+          font-family="sans-serif"
+          fill="#9b9a97"
+        >
+          prev_hash broken
+        </text>
 
-      <!-- Arrow 4 → 5 -->
-      <line x1="530" y1="68" x2="568" y2="68" stroke="#e9e9e7" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <!-- Arrow 4 → 5 -->
+        <line
+          x1="530"
+          y1="68"
+          x2="568"
+          y2="68"
+          stroke="#e9e9e7"
+          stroke-width="1.5"
+          marker-end="url(#arrow)"
+        />
 
-      <!-- Row 5 -->
-      <rect x="570" y="40" width="100" height="56" rx="6" fill="#fbfbfa" stroke="#e9e9e7" stroke-width="1.5" stroke-dasharray="4,2"/>
-      <text x="620" y="62" text-anchor="middle" font-size="11" font-family="sans-serif" fill="#9b9a97">Row 5</text>
-      <text x="620" y="82" text-anchor="middle" font-size="9" font-family="monospace" fill="#9b9a97">9c1f552e...</text>
-      <text x="620" y="46" text-anchor="middle" font-size="7" font-family="sans-serif" fill="#9b9a97">unreachable</text>
+        <!-- Row 5 -->
+        <rect
+          x="570"
+          y="40"
+          width="100"
+          height="56"
+          rx="6"
+          fill="#fbfbfa"
+          stroke="#e9e9e7"
+          stroke-width="1.5"
+          stroke-dasharray="4,2"
+        />
+        <text
+          x="620"
+          y="62"
+          text-anchor="middle"
+          font-size="11"
+          font-family="sans-serif"
+          fill="#9b9a97"
+        >
+          Row 5
+        </text>
+        <text
+          x="620"
+          y="82"
+          text-anchor="middle"
+          font-size="9"
+          font-family="monospace"
+          fill="#9b9a97"
+        >
+          9c1f552e...
+        </text>
+        <text
+          x="620"
+          y="46"
+          text-anchor="middle"
+          font-size="7"
+          font-family="sans-serif"
+          fill="#9b9a97"
+        >
+          unreachable
+        </text>
 
-      <!-- Annotations -->
-      <text x="340" y="120" text-anchor="middle" font-size="10" font-family="sans-serif" fill="#c22b21" font-weight="bold">Row 3 was tampered with</text>
-      <text x="340" y="135" text-anchor="middle" font-size="9" font-family="sans-serif" fill="#9b9a97">→ All subsequent rows fail verification</text>
+        <!-- Annotations -->
+        <text
+          x="340"
+          y="120"
+          text-anchor="middle"
+          font-size="10"
+          font-family="sans-serif"
+          fill="#c22b21"
+          font-weight="bold"
+        >
+          Row 3 was tampered with
+        </text>
+        <text
+          x="340"
+          y="135"
+          text-anchor="middle"
+          font-size="9"
+          font-family="sans-serif"
+          fill="#9b9a97"
+        >
+          → All subsequent rows fail verification
+        </text>
 
-      <!-- Key -->
-      <rect x="10" y="140" width="8" height="8" rx="2" fill="#fdebec" stroke="#c22b21" stroke-width="1"/>
-      <text x="22" y="148" font-size="9" font-family="sans-serif" fill="#6b6966">Tampered row</text>
-      <rect x="120" y="140" width="8" height="8" rx="2" fill="#fbfbfa" stroke="#e9e9e7" stroke-width="1" stroke-dasharray="4,2"/>
-      <text x="132" y="148" font-size="9" font-family="sans-serif" fill="#6b6966">Unreachable (orphaned)</text>
-    </svg>
+        <!-- Key -->
+        <rect
+          x="10"
+          y="140"
+          width="8"
+          height="8"
+          rx="2"
+          fill="#fdebec"
+          stroke="#c22b21"
+          stroke-width="1"
+        />
+        <text x="22" y="148" font-size="9" font-family="sans-serif" fill="#6b6966">
+          Tampered row
+        </text>
+        <rect
+          x="120"
+          y="140"
+          width="8"
+          height="8"
+          rx="2"
+          fill="#fbfbfa"
+          stroke="#e9e9e7"
+          stroke-width="1"
+          stroke-dasharray="4,2"
+        />
+        <text x="132" y="148" font-size="9" font-family="sans-serif" fill="#6b6966">
+          Unreachable (orphaned)
+        </text>
+      </svg>
 
-    <h3>How we verify</h3>
+      <h3>How we verify</h3>
 
-    <p>A periodic job (EventBridge Scheduler → Lambda) runs this validation query:</p>
+      <p>A periodic job (EventBridge Scheduler → Lambda) runs this validation query:</p>
 
-    <pre><code><span class="syn-cm">-- Validates the entire hash chain using a window function</span>
+      <pre><code><span class="syn-cm">-- Validates the entire hash chain using a window function</span>
 <span class="syn-kw">WITH</span> chained <span class="syn-kw">AS</span> (
   <span class="syn-kw">SELECT</span>
     id,
@@ -212,61 +535,104 @@ $$;
 )
 <span class="syn-kw">SELECT</span> * <span class="syn-kw">FROM</span> chained <span class="syn-kw">WHERE</span> status = <span class="syn-str">'BROKEN'</span>;</code></pre>
 
-    <p>If any row comes back, the chain is broken → CloudWatch alarm fires → incident opened. The gap tells you exactly which row was inserted, deleted, or modified.</p>
+      <p>
+        If any row comes back, the chain is broken → CloudWatch alarm fires → incident opened. The
+        gap tells you exactly which row was inserted, deleted, or modified.
+      </p>
 
-    <h3>Why not bigint sequences</h3>
+      <h3>Why not bigint sequences</h3>
 
-    <p>A <code>BIGSERIAL</code> ID column gives a natural ordering, but it provides <strong>zero</strong> tamper resistance. An attacker with INSERT access can:</p>
+      <p>
+        A <code>BIGSERIAL</code> ID column gives a natural ordering, but it provides
+        <strong>zero</strong> tamper resistance. An attacker with INSERT access can:
+      </p>
 
-    <ul>
-      <li>Delete row 47, re-insert a modified copy — the sequence still looks contiguous.</li>
-      <li>Insert a forged row at the current sequence position — gaps are common from aborted transactions, so no one notices.</li>
-      <li>Update any row in place — the ID doesn't change.</li>
-    </ul>
+      <ul>
+        <li>Delete row 47, re-insert a modified copy — the sequence still looks contiguous.</li>
+        <li>
+          Insert a forged row at the current sequence position — gaps are common from aborted
+          transactions, so no one notices.
+        </li>
+        <li>Update any row in place — the ID doesn't change.</li>
+      </ul>
 
-    <p>SHA-256 chaining can't be forged without recomputing the entire chain from the point of insertion onward. Given even a modest audit volume (thousands/day), this is computationally infeasible to do unnoticed — especially with a second copy in S3.</p>
+      <p>
+        SHA-256 chaining can't be forged without recomputing the entire chain from the point of
+        insertion onward. Given even a modest audit volume (thousands/day), this is computationally
+        infeasible to do unnoticed — especially with a second copy in S3.
+      </p>
 
-    <div class="callout callout-info">
-      <div class="callout-icon">📦</div>
-      <div class="callout-content">
-        <strong>S3 WORM mirror</strong>
-        <p style="margin-top:8px">Every 24 hours, a Lambda exports the day's audit events to an S3 bucket configured with <strong>Object Lock in Compliance mode</strong> (write-once-read-many). No IAM principal — not even the root account — can delete or modify the objects before the retention date.</p>
-        <p style="margin-top:8px"><strong>DB chain = in-flight protection.</strong> Tamper detection within seconds.</p>
-        <p><strong>S3 mirror = legal backstop.</strong> Proves to an auditor that data at time T was X, and cannot have been altered afterward.</p>
+      <div class="callout callout-info">
+        <div class="callout-icon">📦</div>
+        <div class="callout-content">
+          <strong>S3 WORM mirror</strong>
+          <p style="margin-top: 8px">
+            Every 24 hours, a Lambda exports the day's audit events to an S3 bucket configured with
+            <strong>Object Lock in Compliance mode</strong> (write-once-read-many). No IAM principal
+            — not even the root account — can delete or modify the objects before the retention
+            date.
+          </p>
+          <p style="margin-top: 8px">
+            <strong>DB chain = in-flight protection.</strong> Tamper detection within seconds.
+          </p>
+          <p>
+            <strong>S3 mirror = legal backstop.</strong> Proves to an auditor that data at time T
+            was X, and cannot have been altered afterward.
+          </p>
+        </div>
       </div>
-    </div>
 
-    <h3>Operational notes</h3>
+      <h3>Operational notes</h3>
 
-    <table class="notion-table">
-      <thead>
-        <tr><th>Concern</th><th>Decision</th><th>Trade-off</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Chain scope</td>
-          <td>Global (all orgs share one chain)</td>
-          <td>One broken row blocks verification for everyone. But per-org chains would be trivially forkable — a tenant could delete their entire chain and recreate it. Global chain uses the total volume as a security multiplier.</td>
-        </tr>
-        <tr>
-          <td>Trigger timing</td>
-          <td><code>BEFORE INSERT</code></td>
-          <td>Ensures the trigger <em>always</em> fires (unlike AFTER INSERT, which can be skipped). Concurrent inserts are deterministic because each reads the latest hash at the time its BEFORE trigger runs — whichever transaction commits first gets its hash embedded into the next.</td>
-        </tr>
-        <tr>
-          <td>Trigger bypass</td>
-          <td>If bypassed, next hash still fails</td>
-          <td>Even if someone disables the trigger (<code>ALTER TABLE DISABLE TRIGGER</code>), inserts a row, and re-enables it, the next legitimate INSERT will have a <code>prev_hash</code> that doesn't match the tampered row's hash. The chain detects tampering regardless of how it was achieved.</td>
-        </tr>
-      </tbody>
-    </table>
+      <table class="notion-table">
+        <thead>
+          <tr>
+            <th>Concern</th>
+            <th>Decision</th>
+            <th>Trade-off</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Chain scope</td>
+            <td>Global (all orgs share one chain)</td>
+            <td>
+              One broken row blocks verification for everyone. But per-org chains would be trivially
+              forkable — a tenant could delete their entire chain and recreate it. Global chain uses
+              the total volume as a security multiplier.
+            </td>
+          </tr>
+          <tr>
+            <td>Trigger timing</td>
+            <td><code>BEFORE INSERT</code></td>
+            <td>
+              Ensures the trigger <em>always</em> fires (unlike AFTER INSERT, which can be skipped).
+              Concurrent inserts are deterministic because each reads the latest hash at the time
+              its BEFORE trigger runs — whichever transaction commits first gets its hash embedded
+              into the next.
+            </td>
+          </tr>
+          <tr>
+            <td>Trigger bypass</td>
+            <td>If bypassed, next hash still fails</td>
+            <td>
+              Even if someone disables the trigger (<code>ALTER TABLE DISABLE TRIGGER</code>),
+              inserts a row, and re-enables it, the next legitimate INSERT will have a
+              <code>prev_hash</code> that doesn't match the tampered row's hash. The chain detects
+              tampering regardless of how it was achieved.
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-    <div class="see-also">
-      <div class="heading">See also</div>
-      <a href="../adr/0001-postgres-as-system-of-record.html">adr/0001-postgres-as-system-of-record</a>
-      <a href="multi-tenancy.html">concepts/multi-tenancy</a>
-      <a href="idempotency.html">concepts/idempotency</a>
-    </div>
-  </main>
-</body>
+      <div class="see-also">
+        <div class="heading">See also</div>
+        <a href="../adr/0001-postgres-as-system-of-record.html"
+          >adr/0001-postgres-as-system-of-record</a
+        >
+        <a href="multi-tenancy.html">concepts/multi-tenancy</a>
+        <a href="idempotency.html">concepts/idempotency</a>
+      </div>
+    </main>
+  </body>
 </html>

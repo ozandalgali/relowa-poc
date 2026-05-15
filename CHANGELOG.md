@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+### Added (M0 — Infrastructure & CI)
+- GitHub Actions CI pipeline: `lint.yml` (typecheck + prettier + agents:check + gitleaks), `test.yml` (RLS isolation + substrate), `deploy-dev.yml` (Terraform plan via OIDC), plus 7 inert stubs (integration, e2e, visual, perf, security, compliance, deploy-prod)
+- Terraform IaC under `infra/`: VPC (10.0.0.0/16, 4 subnets), RDS PostgreSQL 18.4 (db.t4g.micro, single-AZ), NAT Gateway, 5 VPC endpoints (Secrets Manager, ECR API, ECR DKR, CloudWatch Logs, S3), 4 ECR repos, IAM roles (OIDC deploy + ECS task + Lambda), Secrets Manager (DB master, DB app, JWT signing key)
+- AWS OIDC trust: GitHub ↔ AWS via `token.actions.githubusercontent.com`, role `relowa-dev-deploy`
+- `scripts/sync-agents.ts`: byte-identity check for `.opencode/skills/` ↔ `.claude/agents/` with `pnpm agents:check` and `pnpm agents:sync`
+- `scripts/wait-for-pg.sh`: CI helper for Postgres readiness polling
+- Root `tsconfig.json` for workspace typechecking
+- `.prettierrc` + `pnpm format` / `pnpm format:check` scripts
+- `pnpm typecheck`, `pnpm agents:check`, `pnpm agents:sync` scripts
+- `docs/plans/M0-PLAN.md`: progress tracker for infrastructure milestone
+- `infra/.gitignore`: Terraform state exclusion
+
 ### Planned
 - Hono API scaffold with tender/bid endpoints, JWT-via-GUC middleware, idempotency middleware
 - LocalStack EventBridge bus + rules: `tender.published`, `bid.placed`, `tender.won`, `tender.closing`

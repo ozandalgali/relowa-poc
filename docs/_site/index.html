@@ -1,764 +1,1303 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Relowa POC — Master Plan & Documentation</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    /* Status pill styling — inline so we don't need to edit style.css */
-    .status-pill {
-      display: inline-block;
-      padding: 2px 8px;
-      font-size: 11px;
-      font-weight: 600;
-      border-radius: 999px;
-      vertical-align: middle;
-      margin-left: 6px;
-    }
-    .status-done    { background: #d1fae5; color: #065f46; }
-    .status-draft   { background: #fef3c7; color: #92400e; }
-    .status-planned { background: #e5e7eb; color: #374151; }
-    .status-defer   { background: #ede9fe; color: #5b21b6; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Relowa POC — Master Plan & Documentation</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* Status pill styling — inline so we don't need to edit style.css */
+      .status-pill {
+        display: inline-block;
+        padding: 2px 8px;
+        font-size: 11px;
+        font-weight: 600;
+        border-radius: 999px;
+        vertical-align: middle;
+        margin-left: 6px;
+      }
+      .status-done {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .status-draft {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .status-planned {
+        background: #e5e7eb;
+        color: #374151;
+      }
+      .status-defer {
+        background: #ede9fe;
+        color: #5b21b6;
+      }
 
-    .plan-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 12px;
-      margin: 12px 0 28px;
-    }
-    .plan-card {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 14px 16px;
-      background: var(--bg);
-      text-decoration: none;
-      color: inherit;
-      display: block;
-      transition: border-color 0.1s, box-shadow 0.1s;
-    }
-    .plan-card:hover {
-      border-color: var(--accent);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    }
-    .plan-card .pc-title {
-      font-weight: 600;
-      font-size: 14px;
-      margin-bottom: 4px;
-      color: var(--text);
-    }
-    .plan-card .pc-desc {
-      font-size: 12.5px;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-    .plan-card.disabled {
-      opacity: 0.65;
-      pointer-events: auto;
-    }
-    .module-strip {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 10px;
-      margin: 12px 0 24px;
-    }
-    .module-tile {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 12px 14px;
-      background: var(--sidebar-bg);
-    }
-    .module-tile .mt-title {
-      font-weight: 600;
-      font-size: 13px;
-      color: var(--text);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .module-tile .mt-meta {
-      font-size: 11.5px;
-      color: var(--text-tertiary);
-      margin-top: 4px;
-    }
-    .milestone-bar {
-      display: grid;
-      grid-template-columns: 80px repeat(6, 1fr);
-      gap: 4px;
-      align-items: center;
-      margin: 4px 0;
-      font-size: 12.5px;
-    }
-    .milestone-bar .ms-label { color: var(--text-secondary); }
-    .milestone-bar .ms-cell {
-      height: 18px;
-      border-radius: 3px;
-      background: var(--sidebar-hover);
-    }
-    .milestone-bar .ms-cell.active { background: #00c065; }
-    .milestone-bar .ms-cell.future { background: #ddd6fe; }
-    .ms-header {
-      display: grid;
-      grid-template-columns: 80px repeat(6, 1fr);
-      gap: 4px;
-      font-size: 11px;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      font-weight: 600;
-      margin: 12px 0 4px;
-    }
-  </style>
-</head>
-<body>
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <h1 onclick="location.href='index.html'">Relowa POC</h1>
-    </div>
-
-    <div class="sidebar-section">Master plan</div>
-    <div class="sidebar-nav">
-      <a href="#overview"><span class="page-icon">🏁</span>Overview</a>
-      <a href="#modules"><span class="page-icon">🧩</span>Modules (9 buckets)</a>
-      <a href="#milestones"><span class="page-icon">🗓️</span>Milestones M0–M6</a>
-      <a href="#agents"><span class="page-icon">🤖</span>Agent team (16)</a>
-      <a href="#testing"><span class="page-icon">🧪</span>Test strategy</a>
-      <a href="#status"><span class="page-icon">📍</span>What is done</a>
-    </div>
-
-    <div class="sidebar-section">PRDs</div>
-    <div class="sidebar-nav">
-      <a href="../prd/0001-vision.md"><span class="page-icon">📘</span>0001 — Vision</a>
-      <a href="../prd/0002-phase-1-scope.md"><span class="page-icon">📘</span>0002 — Phase 1 scope</a>
-      <a href="../prd/0003-phase1-milestones.md"><span class="page-icon">📘</span>0003 — Phase 1 milestones</a>
-      <a href="../prd/0004-module-map.md"><span class="page-icon">📘</span>0004 — Module map</a>
-      <a href="../prd/0005-i18n-and-content.md"><span class="page-icon">📘</span>0005 — i18n & content</a>
-      <a href="../prd/0006-provider-integration-specs.md"><span class="page-icon">📘</span>0006 — Provider integrations</a>
-      <a href="../prd/0007-operations-and-support.md"><span class="page-icon">📘</span>0007 — Operations & support</a>
-      <a href="../prd/0008-pricing-engine.md"><span class="page-icon">📘</span>0008 — Pricing engine</a>
-      <a href="../prd/0009-onboarding-and-verification.md"><span class="page-icon">📘</span>0009 — Onboarding & verification</a>
-    </div>
-
-    <div class="sidebar-section">ADRs — Foundation</div>
-    <div class="sidebar-nav">
-      <a href="adr/0001-postgres-as-system-of-record.html"><span class="page-icon">📄</span>0001 — Postgres SoR</a>
-      <a href="adr/0002-supabase-realtime-standalone.html"><span class="page-icon">📄</span>0002 — Realtime <em>(historical)</em></a>
-      <a href="adr/0003-rls-with-jwt-guc-pattern.html"><span class="page-icon">📄</span>0003 — RLS via JWT GUC</a>
-      <a href="adr/0004-multi-agent-orchestration.html"><span class="page-icon">📄</span>0004 — Multi-agent</a>
-    </div>
-
-    <div class="sidebar-section">ADRs — Identity & access</div>
-    <div class="sidebar-nav">
-      <a href="../adr/0005-cognito-authentication.md"><span class="page-icon">📄</span>0005 — Cognito auth</a>
-      <a href="../adr/0014-internal-staff-rbac.md"><span class="page-icon">📄</span>0014 — Staff RBAC</a>
-      <a href="../adr/0015-admin-tooling-isolation.md"><span class="page-icon">📄</span>0015 — Admin isolation</a>
-    </div>
-
-    <div class="sidebar-section">ADRs — Business</div>
-    <div class="sidebar-nav">
-      <a href="adr/0009-local-bidding-architecture.html"><span class="page-icon">📄</span>0009 — Tender auction</a>
-      <a href="../adr/0010-carrier-sub-auction.md"><span class="page-icon">📄</span>0010 — Carrier sub-auction</a>
-      <a href="../adr/0007-step-functions-escrow.md"><span class="page-icon">📄</span>0007 — Escrow SFN</a>
-    </div>
-
-    <div class="sidebar-section">ADRs — Realtime & data</div>
-    <div class="sidebar-nav">
-      <a href="../adr/0006-outbox-pattern-for-appsync.md"><span class="page-icon">📄</span>0006 — Outbox/AppSync</a>
-      <a href="adr/0008-arbitrum-hash-anchoring.html"><span class="page-icon">📄</span>0008 — Arbitrum anchoring</a>
-    </div>
-
-    <div class="sidebar-section">ADRs — Team & testing</div>
-    <div class="sidebar-nav">
-      <a href="../adr/0016-agent-team-and-orchestration.md"><span class="page-icon">📄</span>0016 — Agent team</a>
-      <a href="../adr/0017-test-strategy.md"><span class="page-icon">📄</span>0017 — Test strategy</a>
-    </div>
-
-    <div class="sidebar-section">ADRs — Platform services</div>
-    <div class="sidebar-nav">
-      <a href="../adr/0018-notifications.md"><span class="page-icon">📄</span>0018 — Notifications</a>
-      <a href="../adr/0019-file-storage.md"><span class="page-icon">📄</span>0019 — File storage</a>
-      <a href="../adr/0020-observability.md"><span class="page-icon">📄</span>0020 — Observability</a>
-      <a href="../adr/0021-backup-and-dr.md"><span class="page-icon">📄</span>0021 — Backup & DR</a>
-      <a href="../adr/0022-rate-limiting-and-abuse.md"><span class="page-icon">📄</span>0022 — Rate limiting</a>
-      <a href="../adr/0023-secrets-management.md"><span class="page-icon">📄</span>0023 — Secrets management</a>
-    </div>
-
-    <div class="sidebar-section">ADRs — Frontend & infra</div>
-    <div class="sidebar-nav">
-      <a href="../adr/0011-ui-kit-design-tokens.md"><span class="page-icon">📄</span>0011 — UI kit & tokens</a>
-      <a href="../adr/0012-frontend-app-architecture.md"><span class="page-icon">📄</span>0012 — Frontend architecture</a>
-      <a href="../adr/0013-map-provider-abstraction.md"><span class="page-icon">📄</span>0013 — Map provider</a>
-    </div>
-
-    <div class="sidebar-section">Frontend guides</div>
-    <div class="sidebar-nav">
-      <a href="../frontend/component-inventory.md"><span class="page-icon">🧱</span>Component inventory</a>
-      <a href="../frontend/status-taxonomy.md"><span class="page-icon">🏷️</span>Status taxonomy</a>
-    </div>
-
-    <div class="sidebar-section">Agent team</div>
-    <div class="sidebar-nav">
-      <a href="../agents/README.md"><span class="page-icon">📇</span>Agents index</a>
-      <a href="../agents/team-handbook.md"><span class="page-icon">📖</span>Team handbook</a>
-      <a href="../agents/sync-strategy.md"><span class="page-icon">🔄</span>Sync strategy</a>
-    </div>
-
-    <div class="sidebar-section">Testing</div>
-    <div class="sidebar-nav">
-      <a href="../testing/conventions.md"><span class="page-icon">📐</span>Conventions</a>
-      <a href="../testing/categories/rls-isolation.md"><span class="page-icon">🧪</span>Test categories</a>
-      <a href="../../tests/README.md"><span class="page-icon">▶️</span>Running tests</a>
-      <a href="../runbook/ci-pipeline.md"><span class="page-icon">⚙️</span>CI pipeline</a>
-    </div>
-
-    <div class="sidebar-section">Concepts</div>
-    <div class="sidebar-nav">
-      <a href="concepts/auth-uid-pattern.html"><span class="page-icon">💡</span>auth.uid() pattern</a>
-      <a href="concepts/audit-hash-chain.html"><span class="page-icon">💡</span>Audit hash chain</a>
-      <a href="concepts/hash-anchoring.html"><span class="page-icon">💡</span>Hash anchoring</a>
-      <a href="concepts/idempotency.html"><span class="page-icon">💡</span>Idempotency</a>
-      <a href="concepts/multi-tenancy.html"><span class="page-icon">💡</span>Multi-tenancy</a>
-      <a href="concepts/server-authoritative-state.html"><span class="page-icon">💡</span>Server-auth state</a>
-    </div>
-
-    <div class="sidebar-section">Design system</div>
-    <div class="sidebar-nav">
-      <a href="relowa-ds/index.html"><span class="page-icon">🎨</span>Design system</a>
-    </div>
-
-    <div class="sidebar-footer">Relowa POC · v0.1 · master plan</div>
-  </aside>
-
-  <!-- Main content -->
-  <main class="main">
-    <div class="page-cover index"></div>
-    <div class="breadcrumb"><a href="index.html">Home</a></div>
-
-    <h2 id="overview" style="border:none;font-size:1.8rem;margin-top:0">Relowa POC — Master Plan</h2>
-    <p style="color:var(--text-secondary);font-size:15px">
-      The single source of truth for everything planned in the Phase 1 build of the B2B Waste Operating System.
-      Every PRD, every ADR, every module, every milestone is linked here with current status.
-    </p>
-
-    <p style="color:var(--text-secondary);font-size:13.5px;margin-top:8px">
-      Updated <strong>2026-05-13</strong>.
-      Read <a href="../../HANDOFF.md">HANDOFF.md</a> first if you are picking up the project from a session boundary.
-    </p>
-
-    <hr class="divider">
-
-    <h3 id="status">Where the substrate is today</h3>
-    <div class="plan-grid">
-      <div class="plan-card">
-        <div class="pc-title">RLS substrate ✅</div>
-        <div class="pc-desc">5/5 isolation tests green. 21 policies, 7 tables, audit hash chain, idempotency table all live.</div>
+      .plan-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 12px;
+        margin: 12px 0 28px;
+      }
+      .plan-card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 14px 16px;
+        background: var(--bg);
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        transition:
+          border-color 0.1s,
+          box-shadow 0.1s;
+      }
+      .plan-card:hover {
+        border-color: var(--accent);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      }
+      .plan-card .pc-title {
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 4px;
+        color: var(--text);
+      }
+      .plan-card .pc-desc {
+        font-size: 12.5px;
+        color: var(--text-secondary);
+        line-height: 1.5;
+      }
+      .plan-card.disabled {
+        opacity: 0.65;
+        pointer-events: auto;
+      }
+      .module-strip {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 10px;
+        margin: 12px 0 24px;
+      }
+      .module-tile {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 12px 14px;
+        background: var(--sidebar-bg);
+      }
+      .module-tile .mt-title {
+        font-weight: 600;
+        font-size: 13px;
+        color: var(--text);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .module-tile .mt-meta {
+        font-size: 11.5px;
+        color: var(--text-tertiary);
+        margin-top: 4px;
+      }
+      .milestone-bar {
+        display: grid;
+        grid-template-columns: 80px repeat(6, 1fr);
+        gap: 4px;
+        align-items: center;
+        margin: 4px 0;
+        font-size: 12.5px;
+      }
+      .milestone-bar .ms-label {
+        color: var(--text-secondary);
+      }
+      .milestone-bar .ms-cell {
+        height: 18px;
+        border-radius: 3px;
+        background: var(--sidebar-hover);
+      }
+      .milestone-bar .ms-cell.active {
+        background: #00c065;
+      }
+      .milestone-bar .ms-cell.future {
+        background: #ddd6fe;
+      }
+      .ms-header {
+        display: grid;
+        grid-template-columns: 80px repeat(6, 1fr);
+        gap: 4px;
+        font-size: 11px;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-weight: 600;
+        margin: 12px 0 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 onclick="location.href = 'index.html'">Relowa POC</h1>
       </div>
-      <div class="plan-card">
-        <div class="pc-title">Infrastructure ✅</div>
-        <div class="pc-desc">Postgres 18 + Supabase Realtime + LocalStack + Adminer in docker-compose. Healthy on macOS.</div>
+
+      <div class="sidebar-section">Master plan</div>
+      <div class="sidebar-nav">
+        <a href="#overview"><span class="page-icon">🏁</span>Overview</a>
+        <a href="#modules"><span class="page-icon">🧩</span>Modules (9 buckets)</a>
+        <a href="#milestones"><span class="page-icon">🗓️</span>Milestones M0–M6</a>
+        <a href="#agents"><span class="page-icon">🤖</span>Agent team (16)</a>
+        <a href="#testing"><span class="page-icon">🧪</span>Test strategy</a>
+        <a href="#status"><span class="page-icon">📍</span>What is done</a>
       </div>
-      <div class="plan-card">
-        <div class="pc-title">Documentation system ✅</div>
-        <div class="pc-desc">23 ADRs, 9 PRDs, 6 concept notes, 4 learned notes, 16 skill files (×2 runtimes), 16 test category docs, 1 master plan (this page).</div>
+
+      <div class="sidebar-section">PRDs</div>
+      <div class="sidebar-nav">
+        <a href="../prd/0001-vision.md"><span class="page-icon">📘</span>0001 — Vision</a>
+        <a href="../prd/0002-phase-1-scope.md"
+          ><span class="page-icon">📘</span>0002 — Phase 1 scope</a
+        >
+        <a href="../prd/0003-phase1-milestones.md"
+          ><span class="page-icon">📘</span>0003 — Phase 1 milestones</a
+        >
+        <a href="../prd/0004-module-map.md"><span class="page-icon">📘</span>0004 — Module map</a>
+        <a href="../prd/0005-i18n-and-content.md"
+          ><span class="page-icon">📘</span>0005 — i18n & content</a
+        >
+        <a href="../prd/0006-provider-integration-specs.md"
+          ><span class="page-icon">📘</span>0006 — Provider integrations</a
+        >
+        <a href="../prd/0007-operations-and-support.md"
+          ><span class="page-icon">📘</span>0007 — Operations & support</a
+        >
+        <a href="../prd/0008-pricing-engine.md"
+          ><span class="page-icon">📘</span>0008 — Pricing engine</a
+        >
+        <a href="../prd/0009-onboarding-and-verification.md"
+          ><span class="page-icon">📘</span>0009 — Onboarding & verification</a
+        >
       </div>
-      <div class="plan-card">
-        <div class="pc-title">Agent team (16) 📋</div>
-        <div class="pc-desc">5 squads + lead orchestrator. Plan-then-execute. <a href="../agents/README.md">Index</a>.</div>
+
+      <div class="sidebar-section">ADRs — Foundation</div>
+      <div class="sidebar-nav">
+        <a href="adr/0001-postgres-as-system-of-record.html"
+          ><span class="page-icon">📄</span>0001 — Postgres SoR</a
+        >
+        <a href="adr/0002-supabase-realtime-standalone.html"
+          ><span class="page-icon">📄</span>0002 — Realtime <em>(historical)</em></a
+        >
+        <a href="adr/0003-rls-with-jwt-guc-pattern.html"
+          ><span class="page-icon">📄</span>0003 — RLS via JWT GUC</a
+        >
+        <a href="adr/0004-multi-agent-orchestration.html"
+          ><span class="page-icon">📄</span>0004 — Multi-agent</a
+        >
       </div>
-      <div class="plan-card">
-        <div class="pc-title">Test strategy 📋</div>
-        <div class="pc-desc">Hybrid pyramid · 16 categories · targeted coverage gates. <a href="../adr/0017-test-strategy.md">ADR-0017</a>.</div>
+
+      <div class="sidebar-section">ADRs — Identity & access</div>
+      <div class="sidebar-nav">
+        <a href="../adr/0005-cognito-authentication.md"
+          ><span class="page-icon">📄</span>0005 — Cognito auth</a
+        >
+        <a href="../adr/0014-internal-staff-rbac.md"
+          ><span class="page-icon">📄</span>0014 — Staff RBAC</a
+        >
+        <a href="../adr/0015-admin-tooling-isolation.md"
+          ><span class="page-icon">📄</span>0015 — Admin isolation</a
+        >
       </div>
-      <div class="plan-card">
-        <div class="pc-title">Hono API + EventBridge 📋</div>
-        <div class="pc-desc">Planned in ADR-0009. Next implementation milestone (M2).</div>
+
+      <div class="sidebar-section">ADRs — Business</div>
+      <div class="sidebar-nav">
+        <a href="adr/0009-local-bidding-architecture.html"
+          ><span class="page-icon">📄</span>0009 — Tender auction</a
+        >
+        <a href="../adr/0010-carrier-sub-auction.md"
+          ><span class="page-icon">📄</span>0010 — Carrier sub-auction</a
+        >
+        <a href="../adr/0007-step-functions-escrow.md"
+          ><span class="page-icon">📄</span>0007 — Escrow SFN</a
+        >
       </div>
-      <div class="plan-card">
-        <div class="pc-title">Cognito + SAML wiring 📋</div>
-        <div class="pc-desc">Planned in ADR-0005 (operators) and ADR-0015 (staff). M1 schema, M5 panel.</div>
+
+      <div class="sidebar-section">ADRs — Realtime & data</div>
+      <div class="sidebar-nav">
+        <a href="../adr/0006-outbox-pattern-for-appsync.md"
+          ><span class="page-icon">📄</span>0006 — Outbox/AppSync</a
+        >
+        <a href="adr/0008-arbitrum-hash-anchoring.html"
+          ><span class="page-icon">📄</span>0008 — Arbitrum anchoring</a
+        >
       </div>
-      <div class="plan-card">
-        <div class="pc-title">Frontend kit + apps 📋</div>
-        <div class="pc-desc">Planned in ADR-0011/0012. <code>apps/web</code> + <code>apps/admin</code>. M5.</div>
+
+      <div class="sidebar-section">ADRs — Team & testing</div>
+      <div class="sidebar-nav">
+        <a href="../adr/0016-agent-team-and-orchestration.md"
+          ><span class="page-icon">📄</span>0016 — Agent team</a
+        >
+        <a href="../adr/0017-test-strategy.md"
+          ><span class="page-icon">📄</span>0017 — Test strategy</a
+        >
       </div>
-    </div>
 
-    <hr class="divider">
-
-    <h3 id="modules">The 9 module buckets</h3>
-    <p style="color:var(--text-secondary);font-size:13.5px;margin-bottom:8px">
-      Maps the Master Icon System v2.5 poster to packages, routes, ADRs.
-      See <a href="../prd/0004-module-map.md">PRD-0004</a> for the full table.
-    </p>
-
-    <div class="module-strip">
-      <div class="module-tile">
-        <div class="mt-title">System &amp; Navigation <span class="status-pill status-planned">P1</span></div>
-        <div class="mt-meta">ADR-0011, ADR-0012, PRD-0005</div>
+      <div class="sidebar-section">ADRs — Platform services</div>
+      <div class="sidebar-nav">
+        <a href="../adr/0018-notifications.md"
+          ><span class="page-icon">📄</span>0018 — Notifications</a
+        >
+        <a href="../adr/0019-file-storage.md"
+          ><span class="page-icon">📄</span>0019 — File storage</a
+        >
+        <a href="../adr/0020-observability.md"
+          ><span class="page-icon">📄</span>0020 — Observability</a
+        >
+        <a href="../adr/0021-backup-and-dr.md"
+          ><span class="page-icon">📄</span>0021 — Backup & DR</a
+        >
+        <a href="../adr/0022-rate-limiting-and-abuse.md"
+          ><span class="page-icon">📄</span>0022 — Rate limiting</a
+        >
+        <a href="../adr/0023-secrets-management.md"
+          ><span class="page-icon">📄</span>0023 — Secrets management</a
+        >
       </div>
-      <div class="module-tile">
-        <div class="mt-title">Core Utilities <span class="status-pill status-planned">P1</span></div>
-        <div class="mt-meta">ADR-0011 (primitives)</div>
+
+      <div class="sidebar-section">ADRs — Frontend & infra</div>
+      <div class="sidebar-nav">
+        <a href="../adr/0011-ui-kit-design-tokens.md"
+          ><span class="page-icon">📄</span>0011 — UI kit & tokens</a
+        >
+        <a href="../adr/0012-frontend-app-architecture.md"
+          ><span class="page-icon">📄</span>0012 — Frontend architecture</a
+        >
+        <a href="../adr/0013-map-provider-abstraction.md"
+          ><span class="page-icon">📄</span>0013 — Map provider</a
+        >
       </div>
-      <div class="module-tile">
-        <div class="mt-title">User Roles (operator) <span class="status-pill status-done">substrate ✅</span></div>
-        <div class="mt-meta">ADR-0003, ADR-0005</div>
+
+      <div class="sidebar-section">Frontend guides</div>
+      <div class="sidebar-nav">
+        <a href="../frontend/component-inventory.md"
+          ><span class="page-icon">🧱</span>Component inventory</a
+        >
+        <a href="../frontend/status-taxonomy.md"
+          ><span class="page-icon">🏷️</span>Status taxonomy</a
+        >
       </div>
-      <div class="module-tile">
-        <div class="mt-title">Staff Roles (internal) <span class="status-pill status-planned">P1 schema</span></div>
-        <div class="mt-meta">ADR-0014, ADR-0015</div>
+
+      <div class="sidebar-section">Agent team</div>
+      <div class="sidebar-nav">
+        <a href="../agents/README.md"><span class="page-icon">📇</span>Agents index</a>
+        <a href="../agents/team-handbook.md"><span class="page-icon">📖</span>Team handbook</a>
+        <a href="../agents/sync-strategy.md"><span class="page-icon">🔄</span>Sync strategy</a>
       </div>
-      <div class="module-tile">
-        <div class="mt-title">Marketplace <span class="status-pill status-planned">P1</span></div>
-        <div class="mt-meta">ADR-0009, ADR-0006</div>
+
+      <div class="sidebar-section">Testing</div>
+      <div class="sidebar-nav">
+        <a href="../testing/conventions.md"><span class="page-icon">📐</span>Conventions</a>
+        <a href="../testing/categories/rls-isolation.md"
+          ><span class="page-icon">🧪</span>Test categories</a
+        >
+        <a href="../../tests/README.md"><span class="page-icon">▶️</span>Running tests</a>
+        <a href="../runbook/ci-pipeline.md"><span class="page-icon">⚙️</span>CI pipeline</a>
       </div>
-      <div class="module-tile">
-        <div class="mt-title">Logistics &amp; Operations <span class="status-pill status-planned">P1+P2</span></div>
-        <div class="mt-meta">ADR-0010, ADR-0013</div>
+
+      <div class="sidebar-section">Concepts</div>
+      <div class="sidebar-nav">
+        <a href="concepts/auth-uid-pattern.html"
+          ><span class="page-icon">💡</span>auth.uid() pattern</a
+        >
+        <a href="concepts/audit-hash-chain.html"
+          ><span class="page-icon">💡</span>Audit hash chain</a
+        >
+        <a href="concepts/hash-anchoring.html"><span class="page-icon">💡</span>Hash anchoring</a>
+        <a href="concepts/idempotency.html"><span class="page-icon">💡</span>Idempotency</a>
+        <a href="concepts/multi-tenancy.html"><span class="page-icon">💡</span>Multi-tenancy</a>
+        <a href="concepts/server-authoritative-state.html"
+          ><span class="page-icon">💡</span>Server-auth state</a
+        >
       </div>
-      <div class="module-tile">
-        <div class="mt-title">AI &amp; Recognition <span class="status-pill status-defer">P1 / P2</span></div>
-        <div class="mt-meta">Greyparrot adapter (TBD)</div>
+
+      <div class="sidebar-section">Design system</div>
+      <div class="sidebar-nav">
+        <a href="relowa-ds/index.html"><span class="page-icon">🎨</span>Design system</a>
       </div>
-      <div class="module-tile">
-        <div class="mt-title">IoT &amp; Field <span class="status-pill status-defer">P2 (stubbed)</span></div>
-        <div class="mt-meta">UI placeholders only</div>
+
+      <div class="sidebar-footer">Relowa POC · v0.1 · master plan</div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main">
+      <div class="page-cover index"></div>
+      <div class="breadcrumb"><a href="index.html">Home</a></div>
+
+      <h2 id="overview" style="border: none; font-size: 1.8rem; margin-top: 0">
+        Relowa POC — Master Plan
+      </h2>
+      <p style="color: var(--text-secondary); font-size: 15px">
+        The single source of truth for everything planned in the Phase 1 build of the B2B Waste
+        Operating System. Every PRD, every ADR, every module, every milestone is linked here with
+        current status.
+      </p>
+
+      <p style="color: var(--text-secondary); font-size: 13.5px; margin-top: 8px">
+        Updated <strong>2026-05-13</strong>. Read <a href="../../HANDOFF.md">HANDOFF.md</a> first if
+        you are picking up the project from a session boundary.
+      </p>
+
+      <hr class="divider" />
+
+      <h3 id="status">Where the substrate is today</h3>
+      <div class="plan-grid">
+        <div class="plan-card">
+          <div class="pc-title">RLS substrate ✅</div>
+          <div class="pc-desc">
+            5/5 isolation tests green. 21 policies, 7 tables, audit hash chain, idempotency table
+            all live.
+          </div>
+        </div>
+        <div class="plan-card">
+          <div class="pc-title">Infrastructure ✅</div>
+          <div class="pc-desc">
+            Postgres 18 + Supabase Realtime + LocalStack + Adminer in docker-compose. Healthy on
+            macOS.
+          </div>
+        </div>
+        <div class="plan-card">
+          <div class="pc-title">Documentation system ✅</div>
+          <div class="pc-desc">
+            23 ADRs, 9 PRDs, 6 concept notes, 4 learned notes, 16 skill files (×2 runtimes), 16 test
+            category docs, 1 master plan (this page).
+          </div>
+        </div>
+        <div class="plan-card">
+          <div class="pc-title">Agent team (16) 📋</div>
+          <div class="pc-desc">
+            5 squads + lead orchestrator. Plan-then-execute.
+            <a href="../agents/README.md">Index</a>.
+          </div>
+        </div>
+        <div class="plan-card">
+          <div class="pc-title">Test strategy 📋</div>
+          <div class="pc-desc">
+            Hybrid pyramid · 16 categories · targeted coverage gates.
+            <a href="../adr/0017-test-strategy.md">ADR-0017</a>.
+          </div>
+        </div>
+        <div class="plan-card">
+          <div class="pc-title">Hono API + EventBridge 📋</div>
+          <div class="pc-desc">Planned in ADR-0009. Next implementation milestone (M2).</div>
+        </div>
+        <div class="plan-card">
+          <div class="pc-title">Cognito + SAML wiring 📋</div>
+          <div class="pc-desc">
+            Planned in ADR-0005 (operators) and ADR-0015 (staff). M1 schema, M5 panel.
+          </div>
+        </div>
+        <div class="plan-card">
+          <div class="pc-title">Frontend kit + apps 📋</div>
+          <div class="pc-desc">
+            Planned in ADR-0011/0012. <code>apps/web</code> + <code>apps/admin</code>. M5.
+          </div>
+        </div>
       </div>
-      <div class="module-tile">
-        <div class="mt-title">ESG &amp; Sustainability <span class="status-pill status-planned">P1</span></div>
-        <div class="mt-meta">ADR-0008</div>
+
+      <hr class="divider" />
+
+      <h3 id="modules">The 9 module buckets</h3>
+      <p style="color: var(--text-secondary); font-size: 13.5px; margin-bottom: 8px">
+        Maps the Master Icon System v2.5 poster to packages, routes, ADRs. See
+        <a href="../prd/0004-module-map.md">PRD-0004</a> for the full table.
+      </p>
+
+      <div class="module-strip">
+        <div class="module-tile">
+          <div class="mt-title">
+            System &amp; Navigation <span class="status-pill status-planned">P1</span>
+          </div>
+          <div class="mt-meta">ADR-0011, ADR-0012, PRD-0005</div>
+        </div>
+        <div class="module-tile">
+          <div class="mt-title">
+            Core Utilities <span class="status-pill status-planned">P1</span>
+          </div>
+          <div class="mt-meta">ADR-0011 (primitives)</div>
+        </div>
+        <div class="module-tile">
+          <div class="mt-title">
+            User Roles (operator) <span class="status-pill status-done">substrate ✅</span>
+          </div>
+          <div class="mt-meta">ADR-0003, ADR-0005</div>
+        </div>
+        <div class="module-tile">
+          <div class="mt-title">
+            Staff Roles (internal) <span class="status-pill status-planned">P1 schema</span>
+          </div>
+          <div class="mt-meta">ADR-0014, ADR-0015</div>
+        </div>
+        <div class="module-tile">
+          <div class="mt-title">Marketplace <span class="status-pill status-planned">P1</span></div>
+          <div class="mt-meta">ADR-0009, ADR-0006</div>
+        </div>
+        <div class="module-tile">
+          <div class="mt-title">
+            Logistics &amp; Operations <span class="status-pill status-planned">P1+P2</span>
+          </div>
+          <div class="mt-meta">ADR-0010, ADR-0013</div>
+        </div>
+        <div class="module-tile">
+          <div class="mt-title">
+            AI &amp; Recognition <span class="status-pill status-defer">P1 / P2</span>
+          </div>
+          <div class="mt-meta">Greyparrot adapter (TBD)</div>
+        </div>
+        <div class="module-tile">
+          <div class="mt-title">
+            IoT &amp; Field <span class="status-pill status-defer">P2 (stubbed)</span>
+          </div>
+          <div class="mt-meta">UI placeholders only</div>
+        </div>
+        <div class="module-tile">
+          <div class="mt-title">
+            ESG &amp; Sustainability <span class="status-pill status-planned">P1</span>
+          </div>
+          <div class="mt-meta">ADR-0008</div>
+        </div>
+        <div class="module-tile">
+          <div class="mt-title">
+            Finance &amp; Compliance <span class="status-pill status-planned">P1</span>
+          </div>
+          <div class="mt-meta">ADR-0007</div>
+        </div>
       </div>
-      <div class="module-tile">
-        <div class="mt-title">Finance &amp; Compliance <span class="status-pill status-planned">P1</span></div>
-        <div class="mt-meta">ADR-0007</div>
+
+      <hr class="divider" />
+
+      <h3 id="milestones">Milestones M0 → M5</h3>
+      <p style="color: var(--text-secondary); font-size: 13.5px; margin-bottom: 8px">
+        Coverage of each module across the 6 milestones (per
+        <a href="../prd/0003-phase1-milestones.md">PRD-0003</a> + module map).
+      </p>
+
+      <div class="ms-header">
+        <div></div>
+        <div>M0 (1-3)</div>
+        <div>M1 (4-6)</div>
+        <div>M2 (7-10)</div>
+        <div>M3 (11-13)</div>
+        <div>M4 (14-16)</div>
+        <div>M5 (17-18)</div>
       </div>
-    </div>
-
-    <hr class="divider">
-
-    <h3 id="milestones">Milestones M0 → M5</h3>
-    <p style="color:var(--text-secondary);font-size:13.5px;margin-bottom:8px">
-      Coverage of each module across the 6 milestones (per <a href="../prd/0003-phase1-milestones.md">PRD-0003</a> + module map).
-    </p>
-
-    <div class="ms-header">
-      <div></div>
-      <div>M0 (1-3)</div>
-      <div>M1 (4-6)</div>
-      <div>M2 (7-10)</div>
-      <div>M3 (11-13)</div>
-      <div>M4 (14-16)</div>
-      <div>M5 (17-18)</div>
-    </div>
-    <div class="milestone-bar"><div class="ms-label">Infra</div>
-      <div class="ms-cell active"></div><div class="ms-cell active"></div>
-      <div class="ms-cell"></div><div class="ms-cell"></div><div class="ms-cell"></div><div class="ms-cell"></div>
-    </div>
-    <div class="milestone-bar"><div class="ms-label">Auth/RLS</div>
-      <div class="ms-cell"></div><div class="ms-cell active"></div>
-      <div class="ms-cell"></div><div class="ms-cell"></div><div class="ms-cell"></div><div class="ms-cell active"></div>
-    </div>
-    <div class="milestone-bar"><div class="ms-label">Marketplace</div>
-      <div class="ms-cell"></div><div class="ms-cell"></div>
-      <div class="ms-cell active"></div><div class="ms-cell active"></div><div class="ms-cell"></div><div class="ms-cell active"></div>
-    </div>
-    <div class="milestone-bar"><div class="ms-label">Logistics</div>
-      <div class="ms-cell"></div><div class="ms-cell"></div>
-      <div class="ms-cell"></div><div class="ms-cell active"></div><div class="ms-cell"></div><div class="ms-cell active"></div>
-    </div>
-    <div class="milestone-bar"><div class="ms-label">Escrow/ESG</div>
-      <div class="ms-cell"></div><div class="ms-cell"></div>
-      <div class="ms-cell"></div><div class="ms-cell active"></div><div class="ms-cell active"></div><div class="ms-cell active"></div>
-    </div>
-    <div class="milestone-bar"><div class="ms-label">Frontend</div>
-      <div class="ms-cell"></div><div class="ms-cell"></div>
-      <div class="ms-cell"></div><div class="ms-cell"></div><div class="ms-cell"></div><div class="ms-cell active"></div>
-    </div>
-    <div class="milestone-bar"><div class="ms-label">Admin panel</div>
-      <div class="ms-cell"></div><div class="ms-cell future"></div>
-      <div class="ms-cell"></div><div class="ms-cell"></div><div class="ms-cell"></div><div class="ms-cell future"></div>
-    </div>
-
-    <p style="color:var(--text-tertiary);font-size:12px;margin-top:6px">
-      Green = primary delivery · Purple = schema commits now / panel UI deferred to M6.
-    </p>
-
-    <hr class="divider">
-
-    <h3>Product Requirements (PRDs)</h3>
-    <div class="plan-grid">
-      <a href="../prd/0001-vision.md" class="plan-card">
-        <div class="pc-title">PRD-0001 — Vision <span class="status-pill status-done">accepted</span></div>
-        <div class="pc-desc">What Relowa is, who it's for, why now. The two-line success definition for Phase 1.</div>
-      </a>
-      <a href="../prd/0002-phase-1-scope.md" class="plan-card">
-        <div class="pc-title">PRD-0002 — Phase 1 scope <span class="status-pill status-done">accepted</span></div>
-        <div class="pc-desc">Core loop, in/out scope, deferred to P2/P3, cut criteria, risk ranking.</div>
-      </a>
-      <a href="../prd/0003-phase1-milestones.md" class="plan-card">
-        <div class="pc-title">PRD-0003 — Phase 1 milestones <span class="status-pill status-done">accepted</span></div>
-        <div class="pc-desc">M0–M5, 18-week roadmap, deliverable list per milestone, risk register.</div>
-      </a>
-      <a href="../prd/0004-module-map.md" class="plan-card">
-        <div class="pc-title">PRD-0004 — Module map <span class="status-pill status-done">accepted</span></div>
-        <div class="pc-desc">9-bucket taxonomy. Icon-poster ↔ frontend ↔ backend ↔ Figma screen reconciliation.</div>
-      </a>
-      <a href="../prd/0005-i18n-and-content.md" class="plan-card">
-        <div class="pc-title">PRD-0005 — i18n &amp; content <span class="status-pill status-done">accepted</span></div>
-        <div class="pc-desc">Turkish-first, English second. next-intl. Turkish routes, English code. Translation policy.</div>
-      </a>
-      <a href="../prd/0006-provider-integration-specs.md" class="plan-card">
-        <div class="pc-title">PRD-0006 — Provider integrations <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">Adapter interfaces + Manual reference implementation for escrow/e-fatura/AI scan. Real-provider specs deferred to ADRs 0027–0029.</div>
-      </a>
-      <a href="../prd/0007-operations-and-support.md" class="plan-card">
-        <div class="pc-title">PRD-0007 — Operations &amp; support <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">SLA tiers, escalation path, on-call (honest about solo), KVKK request flow, incident response, customer comms.</div>
-      </a>
-      <a href="../prd/0008-pricing-engine.md" class="plan-card">
-        <div class="pc-title">PRD-0008 — Pricing engine <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">Tiered + split + per-tenant override fee model. Schema deferred to M4. Default 1.5%+1.5% with caps; fully customizable per-tenant.</div>
-      </a>
-      <a href="../prd/0009-onboarding-and-verification.md" class="plan-card">
-        <div class="pc-title">PRD-0009 — Onboarding &amp; verification <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">3-stage pipeline: registration → verification (24h SLA) → activation + first-tender wizard. Çevre Lisansı + K1 docs first-class.</div>
-      </a>
-    </div>
-
-    <h3>Architecture Decision Records</h3>
-
-    <h4 style="margin-top:18px;font-size:14px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em">Foundation</h4>
-    <div class="plan-grid">
-      <a href="adr/0001-postgres-as-system-of-record.html" class="plan-card">
-        <div class="pc-title">ADR-0001 — Postgres as System of Record <span class="status-pill status-done">accepted</span></div>
-        <div class="pc-desc">Postgres is the SoR. Everything else is derived. No second source-of-truth without an ADR.</div>
-      </a>
-      <a href="adr/0002-supabase-realtime-standalone.html" class="plan-card">
-        <div class="pc-title">ADR-0002 — Supabase Realtime <span class="status-pill status-defer">historical</span></div>
-        <div class="pc-desc">Standalone Realtime container for the POC. Superseded for production by ADR-0006.</div>
-      </a>
-      <a href="adr/0003-rls-with-jwt-guc-pattern.html" class="plan-card">
-        <div class="pc-title">ADR-0003 — RLS with JWT-via-GUC <span class="status-pill status-done">validated</span></div>
-        <div class="pc-desc">Supabase's <code>auth.uid()</code> DX in vanilla Postgres. 21 policies green.</div>
-      </a>
-      <a href="adr/0004-multi-agent-orchestration.html" class="plan-card">
-        <div class="pc-title">ADR-0004 — Multi-agent orchestration <span class="status-pill status-done">accepted</span></div>
-        <div class="pc-desc">Skills + memory graph for AI agents working in this repo.</div>
-      </a>
-    </div>
-
-    <h4 style="margin-top:18px;font-size:14px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em">Identity &amp; access</h4>
-    <div class="plan-grid">
-      <a href="../adr/0005-cognito-authentication.md" class="plan-card">
-        <div class="pc-title">ADR-0005 — Cognito authentication <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">Cognito issues identity; API re-signs session JWT with active_org_id. Unified login + post-login org selection.</div>
-      </a>
-      <a href="../adr/0014-internal-staff-rbac.md" class="plan-card">
-        <div class="pc-title">ADR-0014 — Internal staff RBAC <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">5 staff roles, app-layer RBAC, mandatory reason on every action, dual-audit impersonation.</div>
-      </a>
-      <a href="../adr/0015-admin-tooling-isolation.md" class="plan-card">
-        <div class="pc-title">ADR-0015 — Admin tooling isolation <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">AWS Client VPN + Private DNS (<code>admin.relowa.local</code>) + SAML via IAM Identity Center. Three independent gates.</div>
-      </a>
-    </div>
-
-    <h4 style="margin-top:18px;font-size:14px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em">Business workflows</h4>
-    <div class="plan-grid">
-      <a href="adr/0009-local-bidding-architecture.html" class="plan-card">
-        <div class="pc-title">ADR-0009 — Local EventBridge bidding <span class="status-pill status-done">accepted</span></div>
-        <div class="pc-desc">Hono + EventBridge Scheduler + Lambda. Soft-close anti-sniping. Local-first via LocalStack.</div>
-      </a>
-      <a href="../adr/0010-carrier-sub-auction.md" class="plan-card">
-        <div class="pc-title">ADR-0010 — Carrier sub-auction <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">Second auction loop: recycler opens carrier ad, carriers bid, recycler picks winner. Schema in M1.</div>
-      </a>
-      <a href="../adr/0007-step-functions-escrow.md" class="plan-card">
-        <div class="pc-title">ADR-0007 — Step Functions escrow <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">Multi-day, multi-actor escrow state machine. Provider-agnostic adapter (Manual / Iyzico / PayTR).</div>
-      </a>
-    </div>
-
-    <h4 style="margin-top:18px;font-size:14px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em">Realtime &amp; data</h4>
-    <div class="plan-grid">
-      <a href="../adr/0006-outbox-pattern-for-appsync.md" class="plan-card">
-        <div class="pc-title">ADR-0006 — Outbox pattern for AppSync <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">Transactional outbox + relay → AppSync subscriptions in prod, Supabase Realtime in dev. Env-flagged.</div>
-      </a>
-      <a href="adr/0008-arbitrum-hash-anchoring.html" class="plan-card">
-        <div class="pc-title">ADR-0008 — Arbitrum hash anchoring <span class="status-pill status-done">accepted</span></div>
-        <div class="pc-desc">Daily Merkle root → Arbitrum One. Regulatory timestamping for CSRD/ESPR/WSR. ~$3.65/year.</div>
-      </a>
-    </div>
-
-    <h4 style="margin-top:18px;font-size:14px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em">Frontend &amp; infra</h4>
-    <div class="plan-grid">
-      <a href="../adr/0011-ui-kit-design-tokens.md" class="plan-card">
-        <div class="pc-title">ADR-0011 — UI kit &amp; design tokens <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">Canonical <code>#00E676</code> brand-500, sidebar <code>#0A2E1F</code>. Three-layer component model. Lucide + duotone wrapper.</div>
-      </a>
-      <a href="../adr/0012-frontend-app-architecture.md" class="plan-card">
-        <div class="pc-title">ADR-0012 — Frontend app architecture <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">Two Next.js apps: <code>apps/web</code> (operator) + <code>apps/admin</code> (staff). Hybrid SSR + Hono data layer.</div>
-      </a>
-      <a href="../adr/0013-map-provider-abstraction.md" class="plan-card">
-        <div class="pc-title">ADR-0013 — Map provider abstraction <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">Pluggable tile + routing. MapLibre/OSRM POC → AWS Location production. KVKK-aligned.</div>
-      </a>
-    </div>
-
-    <h4 style="margin-top:18px;font-size:14px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em">Platform services</h4>
-    <div class="plan-grid">
-      <a href="../adr/0018-notifications.md" class="plan-card">
-        <div class="pc-title">ADR-0018 — Notifications <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">Email (SES) + SMS (Netgsm/Iletimerkezi) + Web Push + in-app. ~30 templates, per-user preferences, quiet hours, EU-resident throughout.</div>
-      </a>
-      <a href="../adr/0019-file-storage.md" class="plan-card">
-        <div class="pc-title">ADR-0019 — File storage <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">5 S3 buckets (tender-photos, org-docs, e-fatura, audit-archive, public-assets). Presigned URLs + ClamAV scan + Object Lock + KMS.</div>
-      </a>
-      <a href="../adr/0020-observability.md" class="plan-card">
-        <div class="pc-title">ADR-0020 — Observability <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">Sentry EU (errors) + PostHog EU (analytics) + CloudWatch (infra). 30-event taxonomy, PII scrubbed at source, KVKK-compliant.</div>
-      </a>
-      <a href="../adr/0021-backup-and-dr.md" class="plan-card">
-        <div class="pc-title">ADR-0021 — Backup &amp; DR <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">RPO 15min / RTO 4h. Multi-AZ RDS + cross-region snapshots + S3 CRR. Quarterly restore drills. Object Lock for legal evidence.</div>
-      </a>
-      <a href="../adr/0022-rate-limiting-and-abuse.md" class="plan-card">
-        <div class="pc-title">ADR-0022 — Rate limiting <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">AWS WAF + Redis sliding window. Per-endpoint policies. CAPTCHA escalation. SMS abuse + bid manipulation defenses.</div>
-      </a>
-      <a href="../adr/0023-secrets-management.md" class="plan-card">
-        <div class="pc-title">ADR-0023 — Secrets management <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">AWS Secrets Manager + KMS. 30+ secret inventory, rotation cadences (30/90/180/365d), dual-key JWT window, compromise runbooks.</div>
-      </a>
-    </div>
-
-    <h4 style="margin-top:18px;font-size:14px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em">Reserved / future</h4>
-    <div class="plan-grid">
-      <div class="plan-card disabled">
-        <div class="pc-title">ADR-0024+ — TBD <span class="status-pill status-planned">reserved</span></div>
-        <div class="pc-desc">Greyparrot adapter spec (ADR-0029), Iyzico adapter (ADR-0027), Nilvera adapter (ADR-0028), Phase 2 IoT ingestion, mobile carrier driver app, RBAC time-bounded grants, and other future plans surfaced by ADR future-plans sections.</div>
+      <div class="milestone-bar">
+        <div class="ms-label">Infra</div>
+        <div class="ms-cell active"></div>
+        <div class="ms-cell active"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell"></div>
       </div>
-    </div>
-
-    <h3>Frontend Guides</h3>
-    <div class="plan-grid">
-      <a href="../frontend/component-inventory.md" class="plan-card">
-        <div class="pc-title">Component inventory <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">Every Figma screen → which Layer 0/1/2 components compose it. Updated when Figma batches change.</div>
-      </a>
-      <a href="../frontend/status-taxonomy.md" class="plan-card">
-        <div class="pc-title">Status taxonomy <span class="status-pill status-draft">drafted</span></div>
-        <div class="pc-desc">Canonical status codes across DB enums, audit events, badges, and TR/EN copy.</div>
-      </a>
-    </div>
-
-    <hr class="divider">
-
-    <h3 id="agents">Agent Team (16 specialists)</h3>
-    <p style="color:var(--text-secondary);font-size:13.5px;margin-bottom:8px">
-      Source of truth: <a href="../adr/0016-agent-team-and-orchestration.md">ADR-0016</a>.
-      Canonical skill files in <code>.opencode/skills/</code>; mirrored to <code>.claude/agents/</code>; sync gate via <code>pnpm agents:check</code>.
-      Plan-then-execute orchestration model with required-reading lists baked in.
-    </p>
-
-    <div class="module-strip">
-      <div class="module-tile">
-        <div class="mt-title">Lead <span class="status-pill status-draft">drafted</span></div>
-        <div class="mt-meta">lead-orchestrator</div>
+      <div class="milestone-bar">
+        <div class="ms-label">Auth/RLS</div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell active"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell active"></div>
       </div>
-      <div class="module-tile">
-        <div class="mt-title">Data &amp; RLS <span class="status-pill status-draft">4 agents</span></div>
-        <div class="mt-meta">migration-author · db-operator · rls-test-runner · audit-trail-verifier</div>
+      <div class="milestone-bar">
+        <div class="ms-label">Marketplace</div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell active"></div>
+        <div class="ms-cell active"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell active"></div>
       </div>
-      <div class="module-tile">
-        <div class="mt-title">API &amp; Workflow <span class="status-pill status-draft">3 agents</span></div>
-        <div class="mt-meta">endpoint-writer · event-bridge-wiring · state-machine-author</div>
+      <div class="milestone-bar">
+        <div class="ms-label">Logistics</div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell active"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell active"></div>
       </div>
-      <div class="module-tile">
-        <div class="mt-title">Frontend &amp; UI <span class="status-pill status-draft">4 agents</span></div>
-        <div class="mt-meta">design-system-keeper · feature-component-builder · route-page-builder · realtime-debugger</div>
+      <div class="milestone-bar">
+        <div class="ms-label">Escrow/ESG</div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell active"></div>
+        <div class="ms-cell active"></div>
+        <div class="ms-cell active"></div>
       </div>
-      <div class="module-tile">
-        <div class="mt-title">Cross-cutting <span class="status-pill status-draft">3 agents</span></div>
-        <div class="mt-meta">tester · doc-keeper · compliance-specialist</div>
+      <div class="milestone-bar">
+        <div class="ms-label">Frontend</div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell active"></div>
       </div>
-      <div class="module-tile">
-        <div class="mt-title">DevOps <span class="status-pill status-draft">1 agent</span></div>
-        <div class="mt-meta">ci-cd-engineer</div>
+      <div class="milestone-bar">
+        <div class="ms-label">Admin panel</div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell future"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell"></div>
+        <div class="ms-cell future"></div>
       </div>
-    </div>
 
-    <div class="plan-grid">
-      <a href="../agents/README.md" class="plan-card">
-        <div class="pc-title">Agents index + decision tree</div>
-        <div class="pc-desc">"Which agent handles this?" — quick-pick decision tree, agent table, tiebreakers.</div>
-      </a>
-      <a href="../agents/team-handbook.md" class="plan-card">
-        <div class="pc-title">Team handbook</div>
-        <div class="pc-desc">Worked feature walkthroughs A–F (new table+endpoint+UI, event workflows, perf, compliance, deploys).</div>
-      </a>
-      <a href="../agents/sync-strategy.md" class="plan-card">
-        <div class="pc-title">Sync strategy</div>
-        <div class="pc-desc">How <code>.opencode/skills/</code> and <code>.claude/agents/</code> stay byte-identical. CI-enforced.</div>
-      </a>
-      <a href="../adr/0016-agent-team-and-orchestration.md" class="plan-card">
-        <div class="pc-title">ADR-0016 — the constitution <span class="status-pill status-draft">accepted</span></div>
-        <div class="pc-desc">Squad model, plan-then-execute orchestration, multi-runtime support, hand-off rules.</div>
-      </a>
-    </div>
+      <p style="color: var(--text-tertiary); font-size: 12px; margin-top: 6px">
+        Green = primary delivery · Purple = schema commits now / panel UI deferred to M6.
+      </p>
 
-    <hr class="divider">
+      <hr class="divider" />
 
-    <h3 id="testing">Test Strategy</h3>
-    <p style="color:var(--text-secondary);font-size:13.5px;margin-bottom:8px">
-      Source of truth: <a href="../adr/0017-test-strategy.md">ADR-0017</a>.
-      Hybrid pyramid (bash + Vitest + Playwright), 16 categories, targeted coverage thresholds on critical paths only.
-    </p>
+      <h3>Product Requirements (PRDs)</h3>
+      <div class="plan-grid">
+        <a href="../prd/0001-vision.md" class="plan-card">
+          <div class="pc-title">
+            PRD-0001 — Vision <span class="status-pill status-done">accepted</span>
+          </div>
+          <div class="pc-desc">
+            What Relowa is, who it's for, why now. The two-line success definition for Phase 1.
+          </div>
+        </a>
+        <a href="../prd/0002-phase-1-scope.md" class="plan-card">
+          <div class="pc-title">
+            PRD-0002 — Phase 1 scope <span class="status-pill status-done">accepted</span>
+          </div>
+          <div class="pc-desc">
+            Core loop, in/out scope, deferred to P2/P3, cut criteria, risk ranking.
+          </div>
+        </a>
+        <a href="../prd/0003-phase1-milestones.md" class="plan-card">
+          <div class="pc-title">
+            PRD-0003 — Phase 1 milestones <span class="status-pill status-done">accepted</span>
+          </div>
+          <div class="pc-desc">
+            M0–M5, 18-week roadmap, deliverable list per milestone, risk register.
+          </div>
+        </a>
+        <a href="../prd/0004-module-map.md" class="plan-card">
+          <div class="pc-title">
+            PRD-0004 — Module map <span class="status-pill status-done">accepted</span>
+          </div>
+          <div class="pc-desc">
+            9-bucket taxonomy. Icon-poster ↔ frontend ↔ backend ↔ Figma screen reconciliation.
+          </div>
+        </a>
+        <a href="../prd/0005-i18n-and-content.md" class="plan-card">
+          <div class="pc-title">
+            PRD-0005 — i18n &amp; content <span class="status-pill status-done">accepted</span>
+          </div>
+          <div class="pc-desc">
+            Turkish-first, English second. next-intl. Turkish routes, English code. Translation
+            policy.
+          </div>
+        </a>
+        <a href="../prd/0006-provider-integration-specs.md" class="plan-card">
+          <div class="pc-title">
+            PRD-0006 — Provider integrations <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            Adapter interfaces + Manual reference implementation for escrow/e-fatura/AI scan.
+            Real-provider specs deferred to ADRs 0027–0029.
+          </div>
+        </a>
+        <a href="../prd/0007-operations-and-support.md" class="plan-card">
+          <div class="pc-title">
+            PRD-0007 — Operations &amp; support
+            <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            SLA tiers, escalation path, on-call (honest about solo), KVKK request flow, incident
+            response, customer comms.
+          </div>
+        </a>
+        <a href="../prd/0008-pricing-engine.md" class="plan-card">
+          <div class="pc-title">
+            PRD-0008 — Pricing engine <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            Tiered + split + per-tenant override fee model. Schema deferred to M4. Default 1.5%+1.5%
+            with caps; fully customizable per-tenant.
+          </div>
+        </a>
+        <a href="../prd/0009-onboarding-and-verification.md" class="plan-card">
+          <div class="pc-title">
+            PRD-0009 — Onboarding &amp; verification
+            <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            3-stage pipeline: registration → verification (24h SLA) → activation + first-tender
+            wizard. Çevre Lisansı + K1 docs first-class.
+          </div>
+        </a>
+      </div>
 
-    <h4 style="margin-top:14px;font-size:14px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em">Categories — P1 (built or to build)</h4>
-    <div class="plan-grid">
-      <a href="../testing/categories/rls-isolation.md" class="plan-card">
-        <div class="pc-title">RLS isolation <span class="status-pill status-done">5/5 green</span></div>
-        <div class="pc-desc">Cross-tenant + intra-org role boundaries. bash + psql. The substrate.</div>
-      </a>
-      <a href="../testing/categories/migration-smoke.md" class="plan-card">
-        <div class="pc-title">Migration smoke <span class="status-pill status-draft">P1</span></div>
-        <div class="pc-desc">Fresh-db apply + idempotency check. Bash.</div>
-      </a>
-      <a href="../testing/categories/audit-chain.md" class="plan-card">
-        <div class="pc-title">Audit chain integrity <span class="status-pill status-draft">P1</span></div>
-        <div class="pc-desc">SHA-256 chain verification on audit_events + admin_audit_log. Pre-anchor gate.</div>
-      </a>
-      <a href="../testing/categories/api-unit.md" class="plan-card">
-        <div class="pc-title">API unit <span class="status-pill status-draft">P1</span></div>
-        <div class="pc-desc">Vitest, co-located. Owned by the specialist who wrote the code.</div>
-      </a>
-      <a href="../testing/categories/api-integration.md" class="plan-card">
-        <div class="pc-title">API integration <span class="status-pill status-draft">P1</span></div>
-        <div class="pc-desc">Vitest + real Postgres + real Hono. Idempotency, RLS, audit, outbox per endpoint.</div>
-      </a>
-      <a href="../testing/categories/event-flow.md" class="plan-card">
-        <div class="pc-title">Event flow <span class="status-pill status-draft">P1</span></div>
-        <div class="pc-desc">Outbox → relay → AppSync mock. Replay safety, ordering, FOR UPDATE SKIP LOCKED.</div>
-      </a>
-      <a href="../testing/categories/state-machine.md" class="plan-card">
-        <div class="pc-title">State machine <span class="status-pill status-draft">P1</span></div>
-        <div class="pc-desc">Step Functions Local. Escrow happy path + dispute + timeout + manual override.</div>
-      </a>
-      <a href="../testing/categories/auction-lifecycle.md" class="plan-card">
-        <div class="pc-title">Auction lifecycle E2E <span class="status-pill status-draft">P1</span></div>
-        <div class="pc-desc">The canonical demo: producer → tender → bid → close → winner → audit. Bash + curl.</div>
-      </a>
-      <a href="../testing/categories/frontend-component.md" class="plan-card">
-        <div class="pc-title">Frontend component <span class="status-pill status-draft">P1</span></div>
-        <div class="pc-desc">Vitest + React Testing Library + axe. Primitives, patterns, feature components.</div>
-      </a>
-      <a href="../testing/categories/frontend-e2e.md" class="plan-card">
-        <div class="pc-title">Frontend E2E <span class="status-pill status-draft">P1 minimal</span></div>
-        <div class="pc-desc">Playwright. 3 critical paths @critical. Full suite nightly.</div>
-      </a>
-      <a href="../testing/categories/contract.md" class="plan-card">
-        <div class="pc-title">Contract (OpenAPI ↔ Hono) <span class="status-pill status-draft">P1 light</span></div>
-        <div class="pc-desc">Snapshot-based breaking-change detection on generated OpenAPI spec.</div>
-      </a>
-      <a href="../testing/categories/security.md" class="plan-card">
-        <div class="pc-title">Security <span class="status-pill status-draft">P1 CI</span></div>
-        <div class="pc-desc">gitleaks, pnpm audit, OWASP ZAP, image scan. Hard fail on high severity.</div>
-      </a>
-      <a href="../testing/categories/i18n-a11y.md" class="plan-card">
-        <div class="pc-title">i18n + a11y <span class="status-pill status-draft">P1</span></div>
-        <div class="pc-desc">ESLint rules (no-literal-string, key existence) + axe in component + page tests.</div>
-      </a>
-      <a href="../testing/categories/compliance.md" class="plan-card">
-        <div class="pc-title">Compliance (KVKK / CSRD / ESPR / WSR) <span class="status-pill status-draft">P1 manual</span></div>
-        <div class="pc-desc">Checklist now, semi-automated P2. Auto-invoked on PII/money/audit/ESG triggers.</div>
-      </a>
-    </div>
+      <h3>Architecture Decision Records</h3>
 
-    <h4 style="margin-top:14px;font-size:14px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em">Categories — P2 (scaffolded, not yet running)</h4>
-    <div class="plan-grid">
-      <a href="../testing/categories/visual-regression.md" class="plan-card">
-        <div class="pc-title">Visual regression <span class="status-pill status-defer">P2</span></div>
-        <div class="pc-desc">Playwright snapshot diff. Doc + CI scaffold P1; nightly runs in P2.</div>
-      </a>
-      <a href="../testing/categories/performance.md" class="plan-card">
-        <div class="pc-title">Performance / load <span class="status-pill status-defer">P2</span></div>
-        <div class="pc-desc">k6 bid storm + escrow batch + AppSync subscriber load. Weekly cron when graduated.</div>
-      </a>
-    </div>
+      <h4
+        style="
+          margin-top: 18px;
+          font-size: 14px;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        "
+      >
+        Foundation
+      </h4>
+      <div class="plan-grid">
+        <a href="adr/0001-postgres-as-system-of-record.html" class="plan-card">
+          <div class="pc-title">
+            ADR-0001 — Postgres as System of Record
+            <span class="status-pill status-done">accepted</span>
+          </div>
+          <div class="pc-desc">
+            Postgres is the SoR. Everything else is derived. No second source-of-truth without an
+            ADR.
+          </div>
+        </a>
+        <a href="adr/0002-supabase-realtime-standalone.html" class="plan-card">
+          <div class="pc-title">
+            ADR-0002 — Supabase Realtime <span class="status-pill status-defer">historical</span>
+          </div>
+          <div class="pc-desc">
+            Standalone Realtime container for the POC. Superseded for production by ADR-0006.
+          </div>
+        </a>
+        <a href="adr/0003-rls-with-jwt-guc-pattern.html" class="plan-card">
+          <div class="pc-title">
+            ADR-0003 — RLS with JWT-via-GUC <span class="status-pill status-done">validated</span>
+          </div>
+          <div class="pc-desc">
+            Supabase's <code>auth.uid()</code> DX in vanilla Postgres. 21 policies green.
+          </div>
+        </a>
+        <a href="adr/0004-multi-agent-orchestration.html" class="plan-card">
+          <div class="pc-title">
+            ADR-0004 — Multi-agent orchestration
+            <span class="status-pill status-done">accepted</span>
+          </div>
+          <div class="pc-desc">Skills + memory graph for AI agents working in this repo.</div>
+        </a>
+      </div>
 
-    <div class="plan-grid" style="margin-top:14px">
-      <a href="../adr/0017-test-strategy.md" class="plan-card">
-        <div class="pc-title">ADR-0017 — Test strategy <span class="status-pill status-draft">accepted</span></div>
-        <div class="pc-desc">Hybrid pyramid, ownership map, coverage policy reasoning, P2/P3 deferral pattern.</div>
-      </a>
-      <a href="../testing/conventions.md" class="plan-card">
-        <div class="pc-title">Test conventions</div>
-        <div class="pc-desc">Naming, file layout, factory patterns, transaction rollback, polling instead of sleeping.</div>
-      </a>
-      <a href="../../tests/README.md" class="plan-card">
-        <div class="pc-title">Running tests locally</div>
-        <div class="pc-desc">Quick map of every category, prerequisites, watch mode, coverage commands.</div>
-      </a>
-      <a href="../runbook/ci-pipeline.md" class="plan-card">
-        <div class="pc-title">CI pipeline runbook</div>
-        <div class="pc-desc">GH Actions workflows, AWS OIDC trust, deploy targets, recovery playbook.</div>
-      </a>
-    </div>
+      <h4
+        style="
+          margin-top: 18px;
+          font-size: 14px;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        "
+      >
+        Identity &amp; access
+      </h4>
+      <div class="plan-grid">
+        <a href="../adr/0005-cognito-authentication.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0005 — Cognito authentication <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            Cognito issues identity; API re-signs session JWT with active_org_id. Unified login +
+            post-login org selection.
+          </div>
+        </a>
+        <a href="../adr/0014-internal-staff-rbac.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0014 — Internal staff RBAC <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            5 staff roles, app-layer RBAC, mandatory reason on every action, dual-audit
+            impersonation.
+          </div>
+        </a>
+        <a href="../adr/0015-admin-tooling-isolation.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0015 — Admin tooling isolation <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            AWS Client VPN + Private DNS (<code>admin.relowa.local</code>) + SAML via IAM Identity
+            Center. Three independent gates.
+          </div>
+        </a>
+      </div>
 
-    <hr class="divider">
+      <h4
+        style="
+          margin-top: 18px;
+          font-size: 14px;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        "
+      >
+        Business workflows
+      </h4>
+      <div class="plan-grid">
+        <a href="adr/0009-local-bidding-architecture.html" class="plan-card">
+          <div class="pc-title">
+            ADR-0009 — Local EventBridge bidding
+            <span class="status-pill status-done">accepted</span>
+          </div>
+          <div class="pc-desc">
+            Hono + EventBridge Scheduler + Lambda. Soft-close anti-sniping. Local-first via
+            LocalStack.
+          </div>
+        </a>
+        <a href="../adr/0010-carrier-sub-auction.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0010 — Carrier sub-auction <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            Second auction loop: recycler opens carrier ad, carriers bid, recycler picks winner.
+            Schema in M1.
+          </div>
+        </a>
+        <a href="../adr/0007-step-functions-escrow.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0007 — Step Functions escrow <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            Multi-day, multi-actor escrow state machine. Provider-agnostic adapter (Manual / Iyzico
+            / PayTR).
+          </div>
+        </a>
+      </div>
 
-    <h3>Concepts (memory graph)</h3>
-    <div class="plan-grid">
-      <a href="concepts/auth-uid-pattern.html" class="plan-card">
-        <div class="pc-title">auth.uid() pattern</div>
-        <div class="pc-desc">Supabase RLS DX in vanilla Postgres. 30 lines of SQL plus 5 lines of middleware.</div>
-      </a>
-      <a href="concepts/audit-hash-chain.html" class="plan-card">
-        <div class="pc-title">Audit hash chain</div>
-        <div class="pc-desc">SHA-256 chain on every audit row. Tampering detectable without trusting the operator.</div>
-      </a>
-      <a href="concepts/hash-anchoring.html" class="plan-card">
-        <div class="pc-title">Hash anchoring</div>
-        <div class="pc-desc">32-byte Merkle root on Arbitrum One. Independent verification with no trust in Relowa infra.</div>
-      </a>
-      <a href="concepts/idempotency.html" class="plan-card">
-        <div class="pc-title">Idempotency</div>
-        <div class="pc-desc">Every mutation accepts an Idempotency-Key. Replays return cached response. Discipline starts now.</div>
-      </a>
-      <a href="concepts/multi-tenancy.html" class="plan-card">
-        <div class="pc-title">Multi-tenancy</div>
-        <div class="pc-desc">org / user / role model. Why org_members over users.org_id. RLS cross-tenant enforcement.</div>
-      </a>
-      <a href="concepts/server-authoritative-state.html" class="plan-card">
-        <div class="pc-title">Server-authoritative state</div>
-        <div class="pc-desc">The server, not the client, decides when an auction closes. EventBridge Scheduler every 30s.</div>
-      </a>
-    </div>
+      <h4
+        style="
+          margin-top: 18px;
+          font-size: 14px;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        "
+      >
+        Realtime &amp; data
+      </h4>
+      <div class="plan-grid">
+        <a href="../adr/0006-outbox-pattern-for-appsync.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0006 — Outbox pattern for AppSync
+            <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            Transactional outbox + relay → AppSync subscriptions in prod, Supabase Realtime in dev.
+            Env-flagged.
+          </div>
+        </a>
+        <a href="adr/0008-arbitrum-hash-anchoring.html" class="plan-card">
+          <div class="pc-title">
+            ADR-0008 — Arbitrum hash anchoring <span class="status-pill status-done">accepted</span>
+          </div>
+          <div class="pc-desc">
+            Daily Merkle root → Arbitrum One. Regulatory timestamping for CSRD/ESPR/WSR.
+            ~$3.65/year.
+          </div>
+        </a>
+      </div>
 
-    <hr class="divider">
+      <h4
+        style="
+          margin-top: 18px;
+          font-size: 14px;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        "
+      >
+        Frontend &amp; infra
+      </h4>
+      <div class="plan-grid">
+        <a href="../adr/0011-ui-kit-design-tokens.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0011 — UI kit &amp; design tokens
+            <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            Canonical <code>#00E676</code> brand-500, sidebar <code>#0A2E1F</code>. Three-layer
+            component model. Lucide + duotone wrapper.
+          </div>
+        </a>
+        <a href="../adr/0012-frontend-app-architecture.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0012 — Frontend app architecture
+            <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            Two Next.js apps: <code>apps/web</code> (operator) + <code>apps/admin</code> (staff).
+            Hybrid SSR + Hono data layer.
+          </div>
+        </a>
+        <a href="../adr/0013-map-provider-abstraction.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0013 — Map provider abstraction
+            <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            Pluggable tile + routing. MapLibre/OSRM POC → AWS Location production. KVKK-aligned.
+          </div>
+        </a>
+      </div>
 
-    <h3>How to use this page</h3>
-    <ul style="color:var(--text-secondary);font-size:14px;line-height:1.7;margin-left:18px">
-      <li><strong>New session?</strong> Read HANDOFF.md first, then this page top-to-bottom, then the ADRs/PRDs relevant to your task.</li>
-      <li><strong>Planning a new module?</strong> Check the 9-bucket map (PRD-0004), find your bucket's ADRs, write a new ADR if the answer isn't there.</li>
-      <li><strong>Adding a new screen?</strong> Map it to a module bucket first, then to components in the component inventory. If the status codes don't exist, update status-taxonomy.md first.</li>
-      <li><strong>Status pill legend:</strong>
-        <span class="status-pill status-done">accepted / done</span>
-        <span class="status-pill status-draft">drafted</span>
-        <span class="status-pill status-planned">planned</span>
-        <span class="status-pill status-defer">historical / deferred</span>
-      </li>
-    </ul>
+      <h4
+        style="
+          margin-top: 18px;
+          font-size: 14px;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        "
+      >
+        Platform services
+      </h4>
+      <div class="plan-grid">
+        <a href="../adr/0018-notifications.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0018 — Notifications <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            Email (SES) + SMS (Netgsm/Iletimerkezi) + Web Push + in-app. ~30 templates, per-user
+            preferences, quiet hours, EU-resident throughout.
+          </div>
+        </a>
+        <a href="../adr/0019-file-storage.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0019 — File storage <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            5 S3 buckets (tender-photos, org-docs, e-fatura, audit-archive, public-assets).
+            Presigned URLs + ClamAV scan + Object Lock + KMS.
+          </div>
+        </a>
+        <a href="../adr/0020-observability.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0020 — Observability <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            Sentry EU (errors) + PostHog EU (analytics) + CloudWatch (infra). 30-event taxonomy, PII
+            scrubbed at source, KVKK-compliant.
+          </div>
+        </a>
+        <a href="../adr/0021-backup-and-dr.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0021 — Backup &amp; DR <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            RPO 15min / RTO 4h. Multi-AZ RDS + cross-region snapshots + S3 CRR. Quarterly restore
+            drills. Object Lock for legal evidence.
+          </div>
+        </a>
+        <a href="../adr/0022-rate-limiting-and-abuse.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0022 — Rate limiting <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            AWS WAF + Redis sliding window. Per-endpoint policies. CAPTCHA escalation. SMS abuse +
+            bid manipulation defenses.
+          </div>
+        </a>
+        <a href="../adr/0023-secrets-management.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0023 — Secrets management <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            AWS Secrets Manager + KMS. 30+ secret inventory, rotation cadences (30/90/180/365d),
+            dual-key JWT window, compromise runbooks.
+          </div>
+        </a>
+      </div>
 
-    <p style="color:var(--text-tertiary);font-size:12px;margin-top:24px">
-      Markdown sources for newly drafted documents live under <code>docs/adr/</code>, <code>docs/prd/</code>, and <code>docs/frontend/</code>.
-      The legacy <code>.html</code> versions in <code>_site/</code> are the previously-published wiki pages and will be regenerated on the next site build.
-    </p>
-  </main>
-</body>
+      <h4
+        style="
+          margin-top: 18px;
+          font-size: 14px;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        "
+      >
+        Reserved / future
+      </h4>
+      <div class="plan-grid">
+        <div class="plan-card disabled">
+          <div class="pc-title">
+            ADR-0024+ — TBD <span class="status-pill status-planned">reserved</span>
+          </div>
+          <div class="pc-desc">
+            Greyparrot adapter spec (ADR-0029), Iyzico adapter (ADR-0027), Nilvera adapter
+            (ADR-0028), Phase 2 IoT ingestion, mobile carrier driver app, RBAC time-bounded grants,
+            and other future plans surfaced by ADR future-plans sections.
+          </div>
+        </div>
+      </div>
+
+      <h3>Frontend Guides</h3>
+      <div class="plan-grid">
+        <a href="../frontend/component-inventory.md" class="plan-card">
+          <div class="pc-title">
+            Component inventory <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            Every Figma screen → which Layer 0/1/2 components compose it. Updated when Figma batches
+            change.
+          </div>
+        </a>
+        <a href="../frontend/status-taxonomy.md" class="plan-card">
+          <div class="pc-title">
+            Status taxonomy <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            Canonical status codes across DB enums, audit events, badges, and TR/EN copy.
+          </div>
+        </a>
+      </div>
+
+      <hr class="divider" />
+
+      <h3 id="agents">Agent Team (16 specialists)</h3>
+      <p style="color: var(--text-secondary); font-size: 13.5px; margin-bottom: 8px">
+        Source of truth: <a href="../adr/0016-agent-team-and-orchestration.md">ADR-0016</a>.
+        Canonical skill files in <code>.opencode/skills/</code>; mirrored to
+        <code>.claude/agents/</code>; sync gate via <code>pnpm agents:check</code>.
+        Plan-then-execute orchestration model with required-reading lists baked in.
+      </p>
+
+      <div class="module-strip">
+        <div class="module-tile">
+          <div class="mt-title">Lead <span class="status-pill status-draft">drafted</span></div>
+          <div class="mt-meta">lead-orchestrator</div>
+        </div>
+        <div class="module-tile">
+          <div class="mt-title">
+            Data &amp; RLS <span class="status-pill status-draft">4 agents</span>
+          </div>
+          <div class="mt-meta">
+            migration-author · db-operator · rls-test-runner · audit-trail-verifier
+          </div>
+        </div>
+        <div class="module-tile">
+          <div class="mt-title">
+            API &amp; Workflow <span class="status-pill status-draft">3 agents</span>
+          </div>
+          <div class="mt-meta">endpoint-writer · event-bridge-wiring · state-machine-author</div>
+        </div>
+        <div class="module-tile">
+          <div class="mt-title">
+            Frontend &amp; UI <span class="status-pill status-draft">4 agents</span>
+          </div>
+          <div class="mt-meta">
+            design-system-keeper · feature-component-builder · route-page-builder ·
+            realtime-debugger
+          </div>
+        </div>
+        <div class="module-tile">
+          <div class="mt-title">
+            Cross-cutting <span class="status-pill status-draft">3 agents</span>
+          </div>
+          <div class="mt-meta">tester · doc-keeper · compliance-specialist</div>
+        </div>
+        <div class="module-tile">
+          <div class="mt-title">DevOps <span class="status-pill status-draft">1 agent</span></div>
+          <div class="mt-meta">ci-cd-engineer</div>
+        </div>
+      </div>
+
+      <div class="plan-grid">
+        <a href="../agents/README.md" class="plan-card">
+          <div class="pc-title">Agents index + decision tree</div>
+          <div class="pc-desc">
+            "Which agent handles this?" — quick-pick decision tree, agent table, tiebreakers.
+          </div>
+        </a>
+        <a href="../agents/team-handbook.md" class="plan-card">
+          <div class="pc-title">Team handbook</div>
+          <div class="pc-desc">
+            Worked feature walkthroughs A–F (new table+endpoint+UI, event workflows, perf,
+            compliance, deploys).
+          </div>
+        </a>
+        <a href="../agents/sync-strategy.md" class="plan-card">
+          <div class="pc-title">Sync strategy</div>
+          <div class="pc-desc">
+            How <code>.opencode/skills/</code> and <code>.claude/agents/</code> stay byte-identical.
+            CI-enforced.
+          </div>
+        </a>
+        <a href="../adr/0016-agent-team-and-orchestration.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0016 — the constitution <span class="status-pill status-draft">accepted</span>
+          </div>
+          <div class="pc-desc">
+            Squad model, plan-then-execute orchestration, multi-runtime support, hand-off rules.
+          </div>
+        </a>
+      </div>
+
+      <hr class="divider" />
+
+      <h3 id="testing">Test Strategy</h3>
+      <p style="color: var(--text-secondary); font-size: 13.5px; margin-bottom: 8px">
+        Source of truth: <a href="../adr/0017-test-strategy.md">ADR-0017</a>. Hybrid pyramid (bash +
+        Vitest + Playwright), 16 categories, targeted coverage thresholds on critical paths only.
+      </p>
+
+      <h4
+        style="
+          margin-top: 14px;
+          font-size: 14px;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        "
+      >
+        Categories — P1 (built or to build)
+      </h4>
+      <div class="plan-grid">
+        <a href="../testing/categories/rls-isolation.md" class="plan-card">
+          <div class="pc-title">
+            RLS isolation <span class="status-pill status-done">5/5 green</span>
+          </div>
+          <div class="pc-desc">
+            Cross-tenant + intra-org role boundaries. bash + psql. The substrate.
+          </div>
+        </a>
+        <a href="../testing/categories/migration-smoke.md" class="plan-card">
+          <div class="pc-title">
+            Migration smoke <span class="status-pill status-draft">P1</span>
+          </div>
+          <div class="pc-desc">Fresh-db apply + idempotency check. Bash.</div>
+        </a>
+        <a href="../testing/categories/audit-chain.md" class="plan-card">
+          <div class="pc-title">
+            Audit chain integrity <span class="status-pill status-draft">P1</span>
+          </div>
+          <div class="pc-desc">
+            SHA-256 chain verification on audit_events + admin_audit_log. Pre-anchor gate.
+          </div>
+        </a>
+        <a href="../testing/categories/api-unit.md" class="plan-card">
+          <div class="pc-title">API unit <span class="status-pill status-draft">P1</span></div>
+          <div class="pc-desc">Vitest, co-located. Owned by the specialist who wrote the code.</div>
+        </a>
+        <a href="../testing/categories/api-integration.md" class="plan-card">
+          <div class="pc-title">
+            API integration <span class="status-pill status-draft">P1</span>
+          </div>
+          <div class="pc-desc">
+            Vitest + real Postgres + real Hono. Idempotency, RLS, audit, outbox per endpoint.
+          </div>
+        </a>
+        <a href="../testing/categories/event-flow.md" class="plan-card">
+          <div class="pc-title">Event flow <span class="status-pill status-draft">P1</span></div>
+          <div class="pc-desc">
+            Outbox → relay → AppSync mock. Replay safety, ordering, FOR UPDATE SKIP LOCKED.
+          </div>
+        </a>
+        <a href="../testing/categories/state-machine.md" class="plan-card">
+          <div class="pc-title">State machine <span class="status-pill status-draft">P1</span></div>
+          <div class="pc-desc">
+            Step Functions Local. Escrow happy path + dispute + timeout + manual override.
+          </div>
+        </a>
+        <a href="../testing/categories/auction-lifecycle.md" class="plan-card">
+          <div class="pc-title">
+            Auction lifecycle E2E <span class="status-pill status-draft">P1</span>
+          </div>
+          <div class="pc-desc">
+            The canonical demo: producer → tender → bid → close → winner → audit. Bash + curl.
+          </div>
+        </a>
+        <a href="../testing/categories/frontend-component.md" class="plan-card">
+          <div class="pc-title">
+            Frontend component <span class="status-pill status-draft">P1</span>
+          </div>
+          <div class="pc-desc">
+            Vitest + React Testing Library + axe. Primitives, patterns, feature components.
+          </div>
+        </a>
+        <a href="../testing/categories/frontend-e2e.md" class="plan-card">
+          <div class="pc-title">
+            Frontend E2E <span class="status-pill status-draft">P1 minimal</span>
+          </div>
+          <div class="pc-desc">Playwright. 3 critical paths @critical. Full suite nightly.</div>
+        </a>
+        <a href="../testing/categories/contract.md" class="plan-card">
+          <div class="pc-title">
+            Contract (OpenAPI ↔ Hono) <span class="status-pill status-draft">P1 light</span>
+          </div>
+          <div class="pc-desc">
+            Snapshot-based breaking-change detection on generated OpenAPI spec.
+          </div>
+        </a>
+        <a href="../testing/categories/security.md" class="plan-card">
+          <div class="pc-title">Security <span class="status-pill status-draft">P1 CI</span></div>
+          <div class="pc-desc">
+            gitleaks, pnpm audit, OWASP ZAP, image scan. Hard fail on high severity.
+          </div>
+        </a>
+        <a href="../testing/categories/i18n-a11y.md" class="plan-card">
+          <div class="pc-title">i18n + a11y <span class="status-pill status-draft">P1</span></div>
+          <div class="pc-desc">
+            ESLint rules (no-literal-string, key existence) + axe in component + page tests.
+          </div>
+        </a>
+        <a href="../testing/categories/compliance.md" class="plan-card">
+          <div class="pc-title">
+            Compliance (KVKK / CSRD / ESPR / WSR)
+            <span class="status-pill status-draft">P1 manual</span>
+          </div>
+          <div class="pc-desc">
+            Checklist now, semi-automated P2. Auto-invoked on PII/money/audit/ESG triggers.
+          </div>
+        </a>
+      </div>
+
+      <h4
+        style="
+          margin-top: 14px;
+          font-size: 14px;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        "
+      >
+        Categories — P2 (scaffolded, not yet running)
+      </h4>
+      <div class="plan-grid">
+        <a href="../testing/categories/visual-regression.md" class="plan-card">
+          <div class="pc-title">
+            Visual regression <span class="status-pill status-defer">P2</span>
+          </div>
+          <div class="pc-desc">
+            Playwright snapshot diff. Doc + CI scaffold P1; nightly runs in P2.
+          </div>
+        </a>
+        <a href="../testing/categories/performance.md" class="plan-card">
+          <div class="pc-title">
+            Performance / load <span class="status-pill status-defer">P2</span>
+          </div>
+          <div class="pc-desc">
+            k6 bid storm + escrow batch + AppSync subscriber load. Weekly cron when graduated.
+          </div>
+        </a>
+      </div>
+
+      <div class="plan-grid" style="margin-top: 14px">
+        <a href="../adr/0017-test-strategy.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0017 — Test strategy <span class="status-pill status-draft">accepted</span>
+          </div>
+          <div class="pc-desc">
+            Hybrid pyramid, ownership map, coverage policy reasoning, P2/P3 deferral pattern.
+          </div>
+        </a>
+        <a href="../testing/conventions.md" class="plan-card">
+          <div class="pc-title">Test conventions</div>
+          <div class="pc-desc">
+            Naming, file layout, factory patterns, transaction rollback, polling instead of
+            sleeping.
+          </div>
+        </a>
+        <a href="../../tests/README.md" class="plan-card">
+          <div class="pc-title">Running tests locally</div>
+          <div class="pc-desc">
+            Quick map of every category, prerequisites, watch mode, coverage commands.
+          </div>
+        </a>
+        <a href="../runbook/ci-pipeline.md" class="plan-card">
+          <div class="pc-title">CI pipeline runbook</div>
+          <div class="pc-desc">
+            GH Actions workflows, AWS OIDC trust, deploy targets, recovery playbook.
+          </div>
+        </a>
+      </div>
+
+      <hr class="divider" />
+
+      <h3>Concepts (memory graph)</h3>
+      <div class="plan-grid">
+        <a href="concepts/auth-uid-pattern.html" class="plan-card">
+          <div class="pc-title">auth.uid() pattern</div>
+          <div class="pc-desc">
+            Supabase RLS DX in vanilla Postgres. 30 lines of SQL plus 5 lines of middleware.
+          </div>
+        </a>
+        <a href="concepts/audit-hash-chain.html" class="plan-card">
+          <div class="pc-title">Audit hash chain</div>
+          <div class="pc-desc">
+            SHA-256 chain on every audit row. Tampering detectable without trusting the operator.
+          </div>
+        </a>
+        <a href="concepts/hash-anchoring.html" class="plan-card">
+          <div class="pc-title">Hash anchoring</div>
+          <div class="pc-desc">
+            32-byte Merkle root on Arbitrum One. Independent verification with no trust in Relowa
+            infra.
+          </div>
+        </a>
+        <a href="concepts/idempotency.html" class="plan-card">
+          <div class="pc-title">Idempotency</div>
+          <div class="pc-desc">
+            Every mutation accepts an Idempotency-Key. Replays return cached response. Discipline
+            starts now.
+          </div>
+        </a>
+        <a href="concepts/multi-tenancy.html" class="plan-card">
+          <div class="pc-title">Multi-tenancy</div>
+          <div class="pc-desc">
+            org / user / role model. Why org_members over users.org_id. RLS cross-tenant
+            enforcement.
+          </div>
+        </a>
+        <a href="concepts/server-authoritative-state.html" class="plan-card">
+          <div class="pc-title">Server-authoritative state</div>
+          <div class="pc-desc">
+            The server, not the client, decides when an auction closes. EventBridge Scheduler every
+            30s.
+          </div>
+        </a>
+      </div>
+
+      <hr class="divider" />
+
+      <h3>How to use this page</h3>
+      <ul
+        style="color: var(--text-secondary); font-size: 14px; line-height: 1.7; margin-left: 18px"
+      >
+        <li>
+          <strong>New session?</strong> Read HANDOFF.md first, then this page top-to-bottom, then
+          the ADRs/PRDs relevant to your task.
+        </li>
+        <li>
+          <strong>Planning a new module?</strong> Check the 9-bucket map (PRD-0004), find your
+          bucket's ADRs, write a new ADR if the answer isn't there.
+        </li>
+        <li>
+          <strong>Adding a new screen?</strong> Map it to a module bucket first, then to components
+          in the component inventory. If the status codes don't exist, update status-taxonomy.md
+          first.
+        </li>
+        <li>
+          <strong>Status pill legend:</strong>
+          <span class="status-pill status-done">accepted / done</span>
+          <span class="status-pill status-draft">drafted</span>
+          <span class="status-pill status-planned">planned</span>
+          <span class="status-pill status-defer">historical / deferred</span>
+        </li>
+      </ul>
+
+      <p style="color: var(--text-tertiary); font-size: 12px; margin-top: 24px">
+        Markdown sources for newly drafted documents live under <code>docs/adr/</code>,
+        <code>docs/prd/</code>, and <code>docs/frontend/</code>. The legacy
+        <code>.html</code> versions in <code>_site/</code> are the previously-published wiki pages
+        and will be regenerated on the next site build.
+      </p>
+    </main>
+  </body>
 </html>

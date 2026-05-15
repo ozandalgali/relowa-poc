@@ -1,106 +1,213 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ADR-0003 — RLS with the JWT-via-GUC Pattern</title>
-  <link rel="stylesheet" href="../style.css">
-</head>
-<body>
-  <aside class="sidebar">
-    <div class="sidebar-header"><h1 onclick="location.href='../index.html'">&#x1f3ed; Relowa POC</h1></div>
-    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">&#x25be;</span> ADRs</div>
-    <div class="sidebar-nav">
-      <a href="0001-postgres-as-system-of-record.html"><span class="page-icon">&#x1f4c4;</span>0001 — Postgres as SoR</a>
-      <a href="0002-supabase-realtime-standalone.html"><span class="page-icon">&#x1f4c4;</span>0002 — Realtime</a>
-      <a href="0003-rls-with-jwt-guc-pattern.html" class="active"><span class="page-icon">&#x1f4c4;</span>0003 — RLS JWT-via-GUC</a>
-      <a href="0004-multi-agent-orchestration.html"><span class="page-icon">&#x1f4c4;</span>0004 — Multi-Agent</a>
-      <a href="0008-arbitrum-hash-anchoring.html"><span class="page-icon">&#x1f4c4;</span>0008 — Arbitrum Anchoring</a>
-      <a href="0009-local-bidding-architecture.html"><span class="page-icon">&#x1f4c4;</span>0009 — Bidding Architecture</a>
-    </div>
-    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">&#x25be;</span> Concepts</div>
-    <div class="sidebar-nav">
-      <a href="../concepts/auth-uid-pattern.html"><span class="page-icon">&#x1f4a1;</span>auth.uid() Pattern</a>
-      <a href="../concepts/audit-hash-chain.html"><span class="page-icon">&#x1f4a1;</span>Audit Hash Chain</a>
-      <a href="../concepts/hash-anchoring.html"><span class="page-icon">&#x1f4a1;</span>Hash Anchoring</a>
-      <a href="../concepts/idempotency.html"><span class="page-icon">&#x1f4a1;</span>Idempotency</a>
-      <a href="../concepts/multi-tenancy.html"><span class="page-icon">&#x1f4a1;</span>Multi-tenancy</a>
-      <a href="../concepts/server-authoritative-state.html"><span class="page-icon">&#x1f4a1;</span>Server-Auth State</a>
-    </div>
-    <div class="sidebar-nav" style="margin-top:8px"><a href="../milestones.html"><span class="page-icon">&#x1f5d3;&#xfe0f;</span>Phase 1 Milestones</a></div>
-    <div class="sidebar-section" style="margin-top:12px">Design System</div>
-    <div class="sidebar-nav">
-      <a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
-    </div>
-    <div class="sidebar-footer">Relowa POC · v0.1</div>
-  </aside>
-  <main class="main">
-    <div class="page-cover adr"></div>
-    <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="0003-rls-with-jwt-guc-pattern.html">ADR-0003</a></div>
-    <h2 style="border:none;font-size:1.8rem;margin-top:8px">ADR-0003 — RLS with the JWT-via-GUC Pattern</h2>
-    <div class="properties">
-      <div class="prop-row"><span class="prop-label">Status</span><span class="prop-value"><span class="badge badge-validated">Accepted — POC Validated</span></span></div>
-      <div class="prop-row"><span class="prop-label">Date</span><span class="prop-value">2026-05-09</span></div>
-    </div>
-    <hr class="divider">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ADR-0003 — RLS with the JWT-via-GUC Pattern</title>
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 onclick="location.href = '../index.html'">&#x1f3ed; Relowa POC</h1>
+      </div>
+      <div
+        class="sidebar-section"
+        onclick="
+          this.classList.toggle('collapsed');
+          this.nextElementSibling.classList.toggle('collapsed');
+        "
+      >
+        <span class="toggle">&#x25be;</span> ADRs
+      </div>
+      <div class="sidebar-nav">
+        <a href="0001-postgres-as-system-of-record.html"
+          ><span class="page-icon">&#x1f4c4;</span>0001 — Postgres as SoR</a
+        >
+        <a href="0002-supabase-realtime-standalone.html"
+          ><span class="page-icon">&#x1f4c4;</span>0002 — Realtime</a
+        >
+        <a href="0003-rls-with-jwt-guc-pattern.html" class="active"
+          ><span class="page-icon">&#x1f4c4;</span>0003 — RLS JWT-via-GUC</a
+        >
+        <a href="0004-multi-agent-orchestration.html"
+          ><span class="page-icon">&#x1f4c4;</span>0004 — Multi-Agent</a
+        >
+        <a href="0008-arbitrum-hash-anchoring.html"
+          ><span class="page-icon">&#x1f4c4;</span>0008 — Arbitrum Anchoring</a
+        >
+        <a href="0009-local-bidding-architecture.html"
+          ><span class="page-icon">&#x1f4c4;</span>0009 — Bidding Architecture</a
+        >
+      </div>
+      <div
+        class="sidebar-section"
+        onclick="
+          this.classList.toggle('collapsed');
+          this.nextElementSibling.classList.toggle('collapsed');
+        "
+      >
+        <span class="toggle">&#x25be;</span> Concepts
+      </div>
+      <div class="sidebar-nav">
+        <a href="../concepts/auth-uid-pattern.html"
+          ><span class="page-icon">&#x1f4a1;</span>auth.uid() Pattern</a
+        >
+        <a href="../concepts/audit-hash-chain.html"
+          ><span class="page-icon">&#x1f4a1;</span>Audit Hash Chain</a
+        >
+        <a href="../concepts/hash-anchoring.html"
+          ><span class="page-icon">&#x1f4a1;</span>Hash Anchoring</a
+        >
+        <a href="../concepts/idempotency.html"
+          ><span class="page-icon">&#x1f4a1;</span>Idempotency</a
+        >
+        <a href="../concepts/multi-tenancy.html"
+          ><span class="page-icon">&#x1f4a1;</span>Multi-tenancy</a
+        >
+        <a href="../concepts/server-authoritative-state.html"
+          ><span class="page-icon">&#x1f4a1;</span>Server-Auth State</a
+        >
+      </div>
+      <div class="sidebar-nav" style="margin-top: 8px">
+        <a href="../milestones.html"
+          ><span class="page-icon">&#x1f5d3;&#xfe0f;</span>Phase 1 Milestones</a
+        >
+      </div>
+      <div class="sidebar-section" style="margin-top: 12px">Design System</div>
+      <div class="sidebar-nav">
+        <a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
+      </div>
+      <div class="sidebar-footer">Relowa POC · v0.1</div>
+    </aside>
+    <main class="main">
+      <div class="page-cover adr"></div>
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a> <span class="sep">/</span>
+        <a href="0003-rls-with-jwt-guc-pattern.html">ADR-0003</a>
+      </div>
+      <h2 style="border: none; font-size: 1.8rem; margin-top: 8px">
+        ADR-0003 — RLS with the JWT-via-GUC Pattern
+      </h2>
+      <div class="properties">
+        <div class="prop-row">
+          <span class="prop-label">Status</span
+          ><span class="prop-value"
+            ><span class="badge badge-validated">Accepted — POC Validated</span></span
+          >
+        </div>
+        <div class="prop-row">
+          <span class="prop-label">Date</span><span class="prop-value">2026-05-09</span>
+        </div>
+      </div>
+      <hr class="divider" />
 
-    <h3>Context</h3>
-    <p>Multi-tenant B2B SaaS requires strict cross-tenant isolation. Two common patterns exist:</p>
-    <ol>
-      <li><strong>Application-layer authorization</strong> — every query carries <code>WHERE org_id = $current_user.org_id</code>. Burden on developer; one missed <code>WHERE</code> clause leaks data; security review never ends.</li>
-      <li><strong>Database-layer authorization</strong> — Postgres RLS policies enforce isolation. Application bugs cannot escape the policy boundary.</li>
-    </ol>
-    <p>Supabase popularized pattern 2 by exposing <code>auth.uid()</code> in policies. The mechanism behind it is straightforward:</p>
-    <pre><code><span class="syn-kw">SELECT</span> <span class="syn-fn">set_config</span>(<span class="syn-str">'request.jwt.claims'</span>, <span class="syn-str">'{"sub":"550e8400-e29b-41d4-a716-446655440000","active_org_id":"..."}'</span>, <span class="syn-num">true</span>);</code></pre>
-    <p>The <code>auth.uid()</code> function reads from that GUC:</p>
-    <pre><code><span class="syn-kw">CREATE</span> <span class="syn-kw">FUNCTION</span> <span class="syn-fn">auth.uid</span>() <span class="syn-kw">RETURNS</span> <span class="syn-ty">uuid</span> <span class="syn-kw">AS</span> $$
+      <h3>Context</h3>
+      <p>
+        Multi-tenant B2B SaaS requires strict cross-tenant isolation. Two common patterns exist:
+      </p>
+      <ol>
+        <li>
+          <strong>Application-layer authorization</strong> — every query carries
+          <code>WHERE org_id = $current_user.org_id</code>. Burden on developer; one missed
+          <code>WHERE</code> clause leaks data; security review never ends.
+        </li>
+        <li>
+          <strong>Database-layer authorization</strong> — Postgres RLS policies enforce isolation.
+          Application bugs cannot escape the policy boundary.
+        </li>
+      </ol>
+      <p>
+        Supabase popularized pattern 2 by exposing <code>auth.uid()</code> in policies. The
+        mechanism behind it is straightforward:
+      </p>
+      <pre><code><span class="syn-kw">SELECT</span> <span class="syn-fn">set_config</span>(<span class="syn-str">'request.jwt.claims'</span>, <span class="syn-str">'{"sub":"550e8400-e29b-41d4-a716-446655440000","active_org_id":"..."}'</span>, <span class="syn-num">true</span>);</code></pre>
+      <p>The <code>auth.uid()</code> function reads from that GUC:</p>
+      <pre><code><span class="syn-kw">CREATE</span> <span class="syn-kw">FUNCTION</span> <span class="syn-fn">auth.uid</span>() <span class="syn-kw">RETURNS</span> <span class="syn-ty">uuid</span> <span class="syn-kw">AS</span> $$
   <span class="syn-kw">SELECT</span> (<span class="syn-fn">current_setting</span>(<span class="syn-str">'request.jwt.claims'</span>, <span class="syn-num">true</span>)::<span class="syn-ty">json</span>-&gt;&gt;<span class="syn-str">'sub'</span>)::<span class="syn-ty">uuid</span>
 $$ <span class="syn-kw">LANGUAGE</span> sql <span class="syn-kw">STABLE</span>;</code></pre>
-    <p>We can replicate this pattern in ~30 lines of SQL plus ~5 lines of Hono middleware.</p>
+      <p>We can replicate this pattern in ~30 lines of SQL plus ~5 lines of Hono middleware.</p>
 
-    <h3>Decision</h3>
-    <div class="callout callout-info">
-      <div class="callout-icon">&#x1f4a1;</div>
-      <div class="callout-content">
-        <p>We adopt the <strong>JWT-via-GUC pattern</strong> for RLS in this project, mirroring Supabase's <code>auth.*</code> API surface:</p>
-        <ul style="margin-top:8px">
-          <li><code>auth.uid()</code></li>
-          <li><code>auth.email()</code></li>
-          <li><code>auth.org_id()</code></li>
-          <li><code>auth.has_role()</code></li>
-          <li><code>auth.is_member()</code></li>
-          <li><code>auth.user_org_ids()</code></li>
-        </ul>
-        <p style="margin-top:8px">JWT claims are written to <code>request.jwt.claims</code> (a transaction-scoped GUC) at the start of every authenticated request by the Hono <code>rlsContext</code> middleware. RLS policies on every application table reference these helper functions.</p>
-        <p style="margin-top:8px"><strong>Important:</strong> Helper functions that read from <code>org_members</code> (e.g. <code>has_role</code>, <code>is_member</code>, <code>user_org_ids</code>) are marked <code>SECURITY DEFINER</code> with explicit <code>SET search_path = public, pg_temp</code> to bypass RLS recursion when the policies on <code>org_members</code> themselves invoke these helpers.</p>
+      <h3>Decision</h3>
+      <div class="callout callout-info">
+        <div class="callout-icon">&#x1f4a1;</div>
+        <div class="callout-content">
+          <p>
+            We adopt the <strong>JWT-via-GUC pattern</strong> for RLS in this project, mirroring
+            Supabase's <code>auth.*</code> API surface:
+          </p>
+          <ul style="margin-top: 8px">
+            <li><code>auth.uid()</code></li>
+            <li><code>auth.email()</code></li>
+            <li><code>auth.org_id()</code></li>
+            <li><code>auth.has_role()</code></li>
+            <li><code>auth.is_member()</code></li>
+            <li><code>auth.user_org_ids()</code></li>
+          </ul>
+          <p style="margin-top: 8px">
+            JWT claims are written to <code>request.jwt.claims</code> (a transaction-scoped GUC) at
+            the start of every authenticated request by the Hono <code>rlsContext</code> middleware.
+            RLS policies on every application table reference these helper functions.
+          </p>
+          <p style="margin-top: 8px">
+            <strong>Important:</strong> Helper functions that read from
+            <code>org_members</code> (e.g. <code>has_role</code>, <code>is_member</code>,
+            <code>user_org_ids</code>) are marked <code>SECURITY DEFINER</code> with explicit
+            <code>SET search_path = public, pg_temp</code> to bypass RLS recursion when the policies
+            on <code>org_members</code> themselves invoke these helpers.
+          </p>
+        </div>
       </div>
-    </div>
 
-    <h3>Consequences</h3>
-    <div class="decision-grid">
-      <div class="decision-card">
-        <div class="label pos">&#x25b2; Positive</div>
-        <ul>
-          <li>Authorization rules live in the database — uniform, auditable, immune to application bugs.</li>
-          <li>Same DX as Supabase: <code>auth.uid()</code> and friends behave identically to what Supabase users expect.</li>
-          <li>Drizzle queries are RLS-aware automatically — no special framework integration needed. The policy runs before the query returns rows.</li>
-          <li>Cross-tenant isolation tests can be written purely in SQL — no application stack to spin up.</li>
-        </ul>
+      <h3>Consequences</h3>
+      <div class="decision-grid">
+        <div class="decision-card">
+          <div class="label pos">&#x25b2; Positive</div>
+          <ul>
+            <li>
+              Authorization rules live in the database — uniform, auditable, immune to application
+              bugs.
+            </li>
+            <li>
+              Same DX as Supabase: <code>auth.uid()</code> and friends behave identically to what
+              Supabase users expect.
+            </li>
+            <li>
+              Drizzle queries are RLS-aware automatically — no special framework integration needed.
+              The policy runs before the query returns rows.
+            </li>
+            <li>
+              Cross-tenant isolation tests can be written purely in SQL — no application stack to
+              spin up.
+            </li>
+          </ul>
+        </div>
+        <div class="decision-card">
+          <div class="label neg">&#x25bc; Negative</div>
+          <ul>
+            <li>
+              <code>SECURITY DEFINER</code> is a sharp tool. Any helper function added must
+              explicitly set <code>search_path</code> or it becomes a privilege escalation surface.
+            </li>
+            <li>
+              The application database role (<code>app_user</code>) must be non-superuser. RLS is
+              silently bypassed for superuser connections.
+            </li>
+            <li>
+              Drizzle Kit doesn't generate RLS policies. We hand-write side-car SQL files in each
+              migration set.
+            </li>
+            <li>
+              Transaction-scoped GUC means authenticated operations must run inside a transaction.
+              Each request gets a fresh <code>set_config</code>.
+            </li>
+          </ul>
+        </div>
       </div>
-      <div class="decision-card">
-        <div class="label neg">&#x25bc; Negative</div>
-        <ul>
-          <li><code>SECURITY DEFINER</code> is a sharp tool. Any helper function added must explicitly set <code>search_path</code> or it becomes a privilege escalation surface.</li>
-          <li>The application database role (<code>app_user</code>) must be non-superuser. RLS is silently bypassed for superuser connections.</li>
-          <li>Drizzle Kit doesn't generate RLS policies. We hand-write side-car SQL files in each migration set.</li>
-          <li>Transaction-scoped GUC means authenticated operations must run inside a transaction. Each request gets a fresh <code>set_config</code>.</li>
-        </ul>
-      </div>
-    </div>
 
-    <h3>Patterns to Follow</h3>
-    <p>When adding a new table, always apply this sequence in the migration sidecar:</p>
-    <pre><code><span class="syn-cm">-- 1. Enable RLS on the table</span>
+      <h3>Patterns to Follow</h3>
+      <p>When adding a new table, always apply this sequence in the migration sidecar:</p>
+      <pre><code><span class="syn-cm">-- 1. Enable RLS on the table</span>
 <span class="syn-kw">ALTER TABLE</span> my_table <span class="syn-kw">ENABLE ROW LEVEL SECURITY</span>;
 
 <span class="syn-cm">-- 2. SELECT policy — users can see rows in their own org</span>
@@ -117,61 +224,78 @@ $$ <span class="syn-kw">LANGUAGE</span> sql <span class="syn-kw">STABLE</span>;<
 
 <span class="syn-cm">-- 5. DELETE policy — only add if deletion is genuinely allowed for this table.
 --    audit_events has NO delete policy. Never add one "just for migrations."</span></code></pre>
-    <p>Register each side-car in <code>RAW_SQL_FILES</code> inside <code>packages/db/src/migrate.ts</code> so the two-phase migration runner picks it up.</p>
+      <p>
+        Register each side-car in <code>RAW_SQL_FILES</code> inside
+        <code>packages/db/src/migrate.ts</code> so the two-phase migration runner picks it up.
+      </p>
 
-    <h3>Anti-Patterns</h3>
-    <div class="callout callout-danger">
-      <div class="callout-icon">&#x26a0;&#xfe0f;</div>
-      <div class="callout-content">
-        <p><strong>Never do any of these:</strong></p>
-        <ul style="margin-top:6px">
-          <li>Using <code>auth.uid()</code> in application code (e.g. <code>if (user.orgId !== row.orgId) throw</code>). That check belongs in a policy.</li>
-          <li>Bypassing RLS with <code>SET ROLE postgres</code> for "convenience" in application paths.</li>
-          <li>Using <code>auth.uid()</code> as a column default. It is request-scoped, not row-scoped — the default would capture the creating user at DDL time, not the current user.</li>
-          <li>Adding policies that self-reference the same table without <code>SECURITY DEFINER</code> indirection. This triggers infinite recursion in RLS evaluation.</li>
-        </ul>
+      <h3>Anti-Patterns</h3>
+      <div class="callout callout-danger">
+        <div class="callout-icon">&#x26a0;&#xfe0f;</div>
+        <div class="callout-content">
+          <p><strong>Never do any of these:</strong></p>
+          <ul style="margin-top: 6px">
+            <li>
+              Using <code>auth.uid()</code> in application code (e.g.
+              <code>if (user.orgId !== row.orgId) throw</code>). That check belongs in a policy.
+            </li>
+            <li>
+              Bypassing RLS with <code>SET ROLE postgres</code> for "convenience" in application
+              paths.
+            </li>
+            <li>
+              Using <code>auth.uid()</code> as a column default. It is request-scoped, not
+              row-scoped — the default would capture the creating user at DDL time, not the current
+              user.
+            </li>
+            <li>
+              Adding policies that self-reference the same table without
+              <code>SECURITY DEFINER</code> indirection. This triggers infinite recursion in RLS
+              evaluation.
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
 
-    <h3>Validation</h3>
-    <p>POC has <strong>21 RLS policies across 7 tables</strong>. All isolation tests pass:</p>
-    <table class="notion-table">
-      <thead>
-        <tr>
-          <th>Test</th>
-          <th>Result</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Acme admin sees own 3 tenders</td>
-          <td>&#x2713;</td>
-        </tr>
-        <tr>
-          <td>EkoMetal admin sees only published</td>
-          <td>&#x2713;</td>
-        </tr>
-        <tr>
-          <td>Carrier sees 0 (no policy grants access)</td>
-          <td>&#x2713;</td>
-        </tr>
-        <tr>
-          <td>Anonymous sees 0</td>
-          <td>&#x2713;</td>
-        </tr>
-        <tr>
-          <td>Cross-tenant INSERT denied</td>
-          <td>&#x2713;</td>
-        </tr>
-      </tbody>
-    </table>
+      <h3>Validation</h3>
+      <p>POC has <strong>21 RLS policies across 7 tables</strong>. All isolation tests pass:</p>
+      <table class="notion-table">
+        <thead>
+          <tr>
+            <th>Test</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Acme admin sees own 3 tenders</td>
+            <td>&#x2713;</td>
+          </tr>
+          <tr>
+            <td>EkoMetal admin sees only published</td>
+            <td>&#x2713;</td>
+          </tr>
+          <tr>
+            <td>Carrier sees 0 (no policy grants access)</td>
+            <td>&#x2713;</td>
+          </tr>
+          <tr>
+            <td>Anonymous sees 0</td>
+            <td>&#x2713;</td>
+          </tr>
+          <tr>
+            <td>Cross-tenant INSERT denied</td>
+            <td>&#x2713;</td>
+          </tr>
+        </tbody>
+      </table>
 
-    <div class="see-also">
-      <div class="heading">See Also</div>
-      <a href="0001-postgres-as-system-of-record.html">ADR-0001 — Postgres as SoR</a>
-      <a href="0002-supabase-realtime-standalone.html">ADR-0002 — Supabase Realtime</a>
-      <a href="../concepts/auth-uid-pattern.html">Concept — auth.uid() Pattern</a>
-    </div>
-  </main>
-</body>
+      <div class="see-also">
+        <div class="heading">See Also</div>
+        <a href="0001-postgres-as-system-of-record.html">ADR-0001 — Postgres as SoR</a>
+        <a href="0002-supabase-realtime-standalone.html">ADR-0002 — Supabase Realtime</a>
+        <a href="../concepts/auth-uid-pattern.html">Concept — auth.uid() Pattern</a>
+      </div>
+    </main>
+  </body>
 </html>

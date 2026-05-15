@@ -1,254 +1,562 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ADR-0008 — Arbitrum One for Daily Merkle Root Anchoring</title>
-  <link rel="stylesheet" href="../style.css">
-</head>
-<body>
-  <aside class="sidebar">
-    <div class="sidebar-header"><h1 onclick="location.href='../index.html'">🏭 Relowa POC</h1></div>
-    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> ADRs</div>
-    <div class="sidebar-nav">
-      <a href="0001-postgres-as-system-of-record.html"><span class="page-icon">📄</span>0001 — Postgres as SoR</a>
-      <a href="0002-supabase-realtime-standalone.html"><span class="page-icon">📄</span>0002 — Realtime</a>
-      <a href="0003-rls-with-jwt-guc-pattern.html"><span class="page-icon">📄</span>0003 — RLS JWT-via-GUC</a>
-      <a href="0004-multi-agent-orchestration.html"><span class="page-icon">📄</span>0004 — Multi-Agent</a>
-      <a href="0008-arbitrum-hash-anchoring.html" class="active"><span class="page-icon">📄</span>0008 — Arbitrum Anchoring</a>
-      <a href="0009-local-bidding-architecture.html"><span class="page-icon">📄</span>0009 — Bidding Architecture</a>
-    </div>
-    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> Concepts</div>
-    <div class="sidebar-nav">
-      <a href="../concepts/auth-uid-pattern.html"><span class="page-icon">💡</span>auth.uid() Pattern</a>
-      <a href="../concepts/audit-hash-chain.html"><span class="page-icon">💡</span>Audit Hash Chain</a>
-      <a href="../concepts/hash-anchoring.html"><span class="page-icon">💡</span>Hash Anchoring</a>
-      <a href="../concepts/idempotency.html"><span class="page-icon">💡</span>Idempotency</a>
-      <a href="../concepts/multi-tenancy.html"><span class="page-icon">💡</span>Multi-tenancy</a>
-      <a href="../concepts/server-authoritative-state.html"><span class="page-icon">💡</span>Server-Auth State</a>
-    </div>
-    <div class="sidebar-nav" style="margin-top:8px"><a href="../milestones.html"><span class="page-icon">🗓️</span>Phase 1 Milestones</a></div>
-    <div class="sidebar-section" style="margin-top:12px">Design System</div>
-    <div class="sidebar-nav">
-      <a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
-    </div>
-    <div class="sidebar-footer">Relowa POC · v0.1</div>
-  </aside>
-  <main class="main">
-    <div class="page-cover adr"></div>
-    <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="0008-arbitrum-hash-anchoring.html">ADR-0008</a></div>
-    <h2 style="border:none;font-size:1.8rem;margin-top:8px">ADR-0008 — Arbitrum One for Daily Merkle Root Anchoring</h2>
-    <div class="properties">
-      <div class="prop-row"><span class="prop-label">Status</span><span class="prop-value"><span class="badge badge-accepted">Accepted</span></span></div>
-      <div class="prop-row"><span class="prop-label">Date</span><span class="prop-value">2026-05-09</span></div>
-      <div class="prop-row"><span class="prop-label">Decision-makers</span><span class="prop-value">Ozan (lead)</span></div>
-    </div>
-    <hr class="divider">
-
-    <!-- ═══ THREE-LAYER AUDIT ARCHITECTURE DIAGRAM ═══ -->
-    <svg class="diagram" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <filter id="boxShadow"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.1"/></filter>
-      </defs>
-
-      <!-- Layer 1: Hash Chain -->
-      <rect x="30" y="20" width="540" height="70" rx="8" fill="#f0fdf4" stroke="#1a7d36" stroke-width="2" filter="url(#boxShadow)"/>
-      <text x="60" y="52" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="15" font-weight="700" fill="#1a7d36">Layer 1: Hash Chain (DB Trigger)</text>
-      <text x="60" y="72" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="11" fill="#4d7c5a">SHA-256 chaining on audit_events — each row links to predecessor</text>
-
-      <!-- Arrow 1 → 2 -->
-      <line x1="300" y1="95" x2="300" y2="115" stroke="#9b9a97" stroke-width="2"/>
-      <polygon points="294,111 300,121 306,111" fill="#9b9a97"/>
-
-      <!-- Layer 2: S3 WORM -->
-      <rect x="30" y="125" width="540" height="70" rx="8" fill="#eff6ff" stroke="#1a56c4" stroke-width="2" filter="url(#boxShadow)"/>
-      <text x="60" y="157" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="15" font-weight="700" fill="#1a56c4">Layer 2: S3 WORM Mirror (Object Lock)</text>
-      <text x="60" y="177" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="11" fill="#405e8a">Daily JSON-Lines export with S3 Object Lock — legal-evidence backstop</text>
-
-      <!-- Arrow 2 → 3 -->
-      <line x1="300" y1="200" x2="300" y2="220" stroke="#9b9a97" stroke-width="2"/>
-      <polygon points="294,216 300,226 306,216" fill="#9b9a97"/>
-
-      <!-- Layer 3: Arbitrum Anchor -->
-      <rect x="30" y="230" width="540" height="60" rx="8" fill="#f8f6ff" stroke="#6b4fbb" stroke-width="2" filter="url(#boxShadow)"/>
-      <text x="60" y="258" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="15" font-weight="700" fill="#6b4fbb">Layer 3: Arbitrum Anchor (Merkle Root)</text>
-      <text x="60" y="278" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="11" fill="#5a4499">Daily Merkle root published on-chain — trust-minimized timestamping</text>
-    </svg>
-
-    <!-- ═══ ANCHORING FLOW DIAGRAM ═══ -->
-    <svg class="diagram" viewBox="0 0 500 150" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <filter id="fShadow"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.08"/></filter>
-      </defs>
-
-      <!-- Lambda -->
-      <rect x="20" y="45" width="90" height="50" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5" filter="url(#fShadow)"/>
-      <text x="65" y="68" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="12" font-weight="600" fill="#e2e8f0">AWS Lambda</text>
-      <text x="65" y="84" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="9" fill="#94a3b8">Daily trigger</text>
-
-      <!-- Arrow 1 -->
-      <line x1="115" y1="70" x2="150" y2="70" stroke="#94a3b8" stroke-width="1.5"/>
-      <polygon points="145,66 155,70 145,74" fill="#94a3b8"/>
-
-      <!-- Merkle Tree -->
-      <rect x="160" y="45" width="100" height="50" rx="8" fill="#f0fdf4" stroke="#1a7d36" stroke-width="1.5" filter="url(#fShadow)"/>
-      <text x="210" y="68" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="12" font-weight="600" fill="#1a7d36">Merkle Tree</text>
-      <text x="210" y="84" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="9" fill="#4d7c5a">SHA-256 root</text>
-
-      <!-- Arrow 2 -->
-      <line x1="265" y1="70" x2="300" y2="70" stroke="#94a3b8" stroke-width="1.5"/>
-      <polygon points="295,66 305,70 295,74" fill="#94a3b8"/>
-
-      <!-- Arbitrum Contract -->
-      <rect x="310" y="45" width="110" height="50" rx="8" fill="#f8f6ff" stroke="#6b4fbb" stroke-width="1.5" filter="url(#fShadow)"/>
-      <text x="365" y="68" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="11" font-weight="600" fill="#6b4fbb">Anchor Contract</text>
-      <text x="365" y="84" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="9" fill="#5a4499">Arbitrum One</text>
-
-      <!-- Arrow 3 -->
-      <line x1="425" y1="70" x2="450" y2="70" stroke="#94a3b8" stroke-width="1.5"/>
-      <polygon points="445,66 455,70 445,74" fill="#94a3b8"/>
-
-      <!-- RootRecorded -->
-      <rect x="455" y="50" width="35" height="40" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1" filter="url(#fShadow)"/>
-      <text x="472" y="66" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="8" font-weight="600" fill="#92400e">Root</text>
-      <text x="472" y="79" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="7" fill="#92400e">Recorded</text>
-
-      <!-- Top label -->
-      <text x="250" y="22" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="11" font-weight="600" fill="#9b9a97" letter-spacing="0.06">DAILY ANCHORING FLOW</text>
-    </svg>
-
-    <h3>Context</h3>
-    <p>Relowa's audit architecture already has two tamper-detection layers:</p>
-    <ol>
-      <li><strong>Hash chain</strong> on <code>audit_events</code> — each row chains to its predecessor via SHA-256, detecting row deletion or modification.</li>
-      <li><strong>S3 WORM mirror</strong> — daily JSON-Lines export to S3 with Object Lock, providing a legal-evidence backstop independent of the database.</li>
-    </ol>
-    <p>Neither of these proves <strong>when</strong> a record was created in a way that an external auditor can independently verify without trusting our infrastructure. An adversarial scenario: we could backdate rows in the DB, recompute the hash chain forward, and upload a fake S3 mirror — an auditor with only our word couldn't tell.</p>
-    <p>We need a <strong>trust-minimized timestamp</strong>: a single 32-byte fingerprint published somewhere no single party controls, proving "at block height <em>H</em>, this exact set of records existed."</p>
-
-    <div class="callout callout-info">
-      <div class="callout-icon">🇪🇺</div>
-      <div class="callout-content">
-        <p><strong>Three EU regulations make this valuable:</strong></p>
-        <ul>
-          <li><strong>CSRD</strong> (Corporate Sustainability Reporting Directive) — verifiable supply-chain emissions data.</li>
-          <li><strong>ESPR</strong> (Ecodesign for Sustainable Products Regulation) — digital product passport with auditable provenance.</li>
-          <li><strong>WSR</strong> (Waste Shipment Regulation) — cross-border waste tracking with integrity guarantees.</li>
-        </ul>
-        <p style="margin-top:4px;">This is a <strong>compliance primitive</strong>, not a blockchain product. No tokens, no DeFi, no business logic on-chain.</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ADR-0008 — Arbitrum One for Daily Merkle Root Anchoring</title>
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 onclick="location.href = '../index.html'">🏭 Relowa POC</h1>
       </div>
-    </div>
-
-    <h3>Decision</h3>
-    <p>We anchor a daily Merkle root to <strong>Arbitrum One</strong> via a scheduled Lambda. Once per day:</p>
-    <ol>
-      <li>Compute a Merkle tree over <code>audit_events</code> rows from the last 24h.</li>
-      <li>Compute a Merkle tree over <code>material_recovery_certificates</code> from the last 24h.</li>
-      <li>Compute the combined Merkle root: <code>sha256(audit_root || cert_root)</code>.</li>
-      <li>Call the Anchor contract on Arbitrum One: <code>record(bytes32 root)</code>.</li>
-    </ol>
-    <p>Gas costs approximately <strong>$0.01/day</strong> (~$3.65/year).</p>
-
-    <h4>How Verification Works</h4>
-    <p>Any third party can independently verify:</p>
-    <ol>
-      <li>Obtain the Merkle root from the Arbitrum block explorer for a given date.</li>
-      <li>Request supporting <code>audit_events</code> rows from Relowa's API.</li>
-      <li>Recompute the Merkle root client-side.</li>
-      <li>If recomputed root matches on-chain root → records are authentic and existed at that block height.</li>
-    </ol>
-
-    <div class="callout callout-success">
-      <div class="callout-content">
-        <p><strong>Why not more than a Merkle root:</strong> Publishing individual event hashes on-chain would be ~100× more expensive and risk KVKK/GDPR issues. A single Merkle root has <strong>constant cost</strong> regardless of event volume, <strong>zero data exposure</strong> (root reveals nothing about underlying data), and is <strong>sufficient for all three EU regulations</strong>.</p>
+      <div
+        class="sidebar-section"
+        onclick="
+          this.classList.toggle('collapsed');
+          this.nextElementSibling.classList.toggle('collapsed');
+        "
+      >
+        <span class="toggle">▾</span> ADRs
       </div>
-    </div>
-
-    <h3>Consequences</h3>
-
-    <div class="decision-grid">
-      <div class="decision-card">
-        <div class="label pos">▲ Positive</div>
-        <ul>
-          <li>Third-party-verifiable timestamp without trusting Relowa's infrastructure.</li>
-          <li>Negligible cost (~$0.01/day ≈ $3.65/year).</li>
-          <li>EVM-compatible — standard tooling (<code>ethers.js</code>, <code>viem</code>).</li>
-          <li>Arbitrum One → Ethereum L1 security after 7-day challenge window.</li>
-          <li>Regulatory optionality for future EU requirements.</li>
-        </ul>
+      <div class="sidebar-nav">
+        <a href="0001-postgres-as-system-of-record.html"
+          ><span class="page-icon">📄</span>0001 — Postgres as SoR</a
+        >
+        <a href="0002-supabase-realtime-standalone.html"
+          ><span class="page-icon">📄</span>0002 — Realtime</a
+        >
+        <a href="0003-rls-with-jwt-guc-pattern.html"
+          ><span class="page-icon">📄</span>0003 — RLS JWT-via-GUC</a
+        >
+        <a href="0004-multi-agent-orchestration.html"
+          ><span class="page-icon">📄</span>0004 — Multi-Agent</a
+        >
+        <a href="0008-arbitrum-hash-anchoring.html" class="active"
+          ><span class="page-icon">📄</span>0008 — Arbitrum Anchoring</a
+        >
+        <a href="0009-local-bidding-architecture.html"
+          ><span class="page-icon">📄</span>0009 — Bidding Architecture</a
+        >
       </div>
-      <div class="decision-card">
-        <div class="label neg">▼ Negative</div>
-        <ul>
-          <li>New AWS Lambda + EventBridge Scheduler to maintain.</li>
-          <li>One-time contract deploy (minimal, single-function).</li>
-          <li>Operational dependency on anchor Lambda — mitigated by CloudWatch alarm.</li>
-        </ul>
+      <div
+        class="sidebar-section"
+        onclick="
+          this.classList.toggle('collapsed');
+          this.nextElementSibling.classList.toggle('collapsed');
+        "
+      >
+        <span class="toggle">▾</span> Concepts
       </div>
-    </div>
+      <div class="sidebar-nav">
+        <a href="../concepts/auth-uid-pattern.html"
+          ><span class="page-icon">💡</span>auth.uid() Pattern</a
+        >
+        <a href="../concepts/audit-hash-chain.html"
+          ><span class="page-icon">💡</span>Audit Hash Chain</a
+        >
+        <a href="../concepts/hash-anchoring.html"
+          ><span class="page-icon">💡</span>Hash Anchoring</a
+        >
+        <a href="../concepts/idempotency.html"><span class="page-icon">💡</span>Idempotency</a>
+        <a href="../concepts/multi-tenancy.html"><span class="page-icon">💡</span>Multi-tenancy</a>
+        <a href="../concepts/server-authoritative-state.html"
+          ><span class="page-icon">💡</span>Server-Auth State</a
+        >
+      </div>
+      <div class="sidebar-nav" style="margin-top: 8px">
+        <a href="../milestones.html"><span class="page-icon">🗓️</span>Phase 1 Milestones</a>
+      </div>
+      <div class="sidebar-section" style="margin-top: 12px">Design System</div>
+      <div class="sidebar-nav">
+        <a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
+      </div>
+      <div class="sidebar-footer">Relowa POC · v0.1</div>
+    </aside>
+    <main class="main">
+      <div class="page-cover adr"></div>
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a> <span class="sep">/</span>
+        <a href="0008-arbitrum-hash-anchoring.html">ADR-0008</a>
+      </div>
+      <h2 style="border: none; font-size: 1.8rem; margin-top: 8px">
+        ADR-0008 — Arbitrum One for Daily Merkle Root Anchoring
+      </h2>
+      <div class="properties">
+        <div class="prop-row">
+          <span class="prop-label">Status</span
+          ><span class="prop-value"><span class="badge badge-accepted">Accepted</span></span>
+        </div>
+        <div class="prop-row">
+          <span class="prop-label">Date</span><span class="prop-value">2026-05-09</span>
+        </div>
+        <div class="prop-row">
+          <span class="prop-label">Decision-makers</span><span class="prop-value">Ozan (lead)</span>
+        </div>
+      </div>
+      <hr class="divider" />
 
-    <h3>Alternatives Considered</h3>
+      <!-- ═══ THREE-LAYER AUDIT ARCHITECTURE DIAGRAM ═══ -->
+      <svg class="diagram" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="boxShadow">
+            <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.1" />
+          </filter>
+        </defs>
 
-    <table class="notion-table">
-      <thead>
-        <tr>
-          <th>Chain</th>
-          <th>Decision</th>
-          <th>Rationale</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Polygon PoS</td>
-          <td><span class="badge badge-rejected">Rejected</span></td>
-          <td>Centralized validator set, multi-sig bridge, reorg history.</td>
-        </tr>
-        <tr>
-          <td>Ethereum L1</td>
-          <td><span class="badge badge-rejected">Rejected</span></td>
-          <td>$1–5/day for a single 32-byte write is unreasonable.</td>
-        </tr>
-        <tr>
-          <td>Base</td>
-          <td><span class="badge badge-draft">Viable</span></td>
-          <td>Coinbase backing; Arbitrum has stronger decentralization track record.</td>
-        </tr>
-        <tr>
-          <td>Linea</td>
-          <td><span class="badge badge-draft">Viable</span></td>
-          <td>zkEVM finality; younger chain with less battle-testing.</td>
-        </tr>
-        <tr>
-          <td>Optimism</td>
-          <td><span class="badge badge-rejected">Rejected</span></td>
-          <td>Same tech as Base but weaker institutional brand.</td>
-        </tr>
-        <tr>
-          <td>Solana</td>
-          <td><span class="badge badge-rejected">Rejected</span></td>
-          <td>Non-EVM, incompatible with our toolchain.</td>
-        </tr>
-        <tr>
-          <td>Gnosis</td>
-          <td><span class="badge badge-rejected">Rejected</span></td>
-          <td>L1 sidechain, no Ethereum settlement.</td>
-        </tr>
-        <tr>
-          <td>Bitcoin OP_RETURN</td>
-          <td><span class="badge badge-rejected">Rejected</span></td>
-          <td>Better trust-root but pricier/slower, no EVM.</td>
-        </tr>
-        <tr style="background:#f0fdf4;">
-          <td><strong>Arbitrum One</strong></td>
-          <td><span class="badge badge-accepted">Selected</span></td>
-          <td>Leading optimistic rollup — strongest decentralization, lowest cost, EVM, Ethereum settlement.</td>
-        </tr>
-      </tbody>
-    </table>
+        <!-- Layer 1: Hash Chain -->
+        <rect
+          x="30"
+          y="20"
+          width="540"
+          height="70"
+          rx="8"
+          fill="#f0fdf4"
+          stroke="#1a7d36"
+          stroke-width="2"
+          filter="url(#boxShadow)"
+        />
+        <text
+          x="60"
+          y="52"
+          font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
+          font-size="15"
+          font-weight="700"
+          fill="#1a7d36"
+        >
+          Layer 1: Hash Chain (DB Trigger)
+        </text>
+        <text
+          x="60"
+          y="72"
+          font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
+          font-size="11"
+          fill="#4d7c5a"
+        >
+          SHA-256 chaining on audit_events — each row links to predecessor
+        </text>
 
-    <h3>The Anchor Contract</h3>
+        <!-- Arrow 1 → 2 -->
+        <line x1="300" y1="95" x2="300" y2="115" stroke="#9b9a97" stroke-width="2" />
+        <polygon points="294,111 300,121 306,111" fill="#9b9a97" />
 
-    <pre><code><span class="syn-cm">// SPDX-License-Identifier: Apache-2.0</span>
+        <!-- Layer 2: S3 WORM -->
+        <rect
+          x="30"
+          y="125"
+          width="540"
+          height="70"
+          rx="8"
+          fill="#eff6ff"
+          stroke="#1a56c4"
+          stroke-width="2"
+          filter="url(#boxShadow)"
+        />
+        <text
+          x="60"
+          y="157"
+          font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
+          font-size="15"
+          font-weight="700"
+          fill="#1a56c4"
+        >
+          Layer 2: S3 WORM Mirror (Object Lock)
+        </text>
+        <text
+          x="60"
+          y="177"
+          font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
+          font-size="11"
+          fill="#405e8a"
+        >
+          Daily JSON-Lines export with S3 Object Lock — legal-evidence backstop
+        </text>
+
+        <!-- Arrow 2 → 3 -->
+        <line x1="300" y1="200" x2="300" y2="220" stroke="#9b9a97" stroke-width="2" />
+        <polygon points="294,216 300,226 306,216" fill="#9b9a97" />
+
+        <!-- Layer 3: Arbitrum Anchor -->
+        <rect
+          x="30"
+          y="230"
+          width="540"
+          height="60"
+          rx="8"
+          fill="#f8f6ff"
+          stroke="#6b4fbb"
+          stroke-width="2"
+          filter="url(#boxShadow)"
+        />
+        <text
+          x="60"
+          y="258"
+          font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
+          font-size="15"
+          font-weight="700"
+          fill="#6b4fbb"
+        >
+          Layer 3: Arbitrum Anchor (Merkle Root)
+        </text>
+        <text
+          x="60"
+          y="278"
+          font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
+          font-size="11"
+          fill="#5a4499"
+        >
+          Daily Merkle root published on-chain — trust-minimized timestamping
+        </text>
+      </svg>
+
+      <!-- ═══ ANCHORING FLOW DIAGRAM ═══ -->
+      <svg class="diagram" viewBox="0 0 500 150" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="fShadow">
+            <feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.08" />
+          </filter>
+        </defs>
+
+        <!-- Lambda -->
+        <rect
+          x="20"
+          y="45"
+          width="90"
+          height="50"
+          rx="8"
+          fill="#1e293b"
+          stroke="#334155"
+          stroke-width="1.5"
+          filter="url(#fShadow)"
+        />
+        <text
+          x="65"
+          y="68"
+          text-anchor="middle"
+          font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
+          font-size="12"
+          font-weight="600"
+          fill="#e2e8f0"
+        >
+          AWS Lambda
+        </text>
+        <text
+          x="65"
+          y="84"
+          text-anchor="middle"
+          font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
+          font-size="9"
+          fill="#94a3b8"
+        >
+          Daily trigger
+        </text>
+
+        <!-- Arrow 1 -->
+        <line x1="115" y1="70" x2="150" y2="70" stroke="#94a3b8" stroke-width="1.5" />
+        <polygon points="145,66 155,70 145,74" fill="#94a3b8" />
+
+        <!-- Merkle Tree -->
+        <rect
+          x="160"
+          y="45"
+          width="100"
+          height="50"
+          rx="8"
+          fill="#f0fdf4"
+          stroke="#1a7d36"
+          stroke-width="1.5"
+          filter="url(#fShadow)"
+        />
+        <text
+          x="210"
+          y="68"
+          text-anchor="middle"
+          font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
+          font-size="12"
+          font-weight="600"
+          fill="#1a7d36"
+        >
+          Merkle Tree
+        </text>
+        <text
+          x="210"
+          y="84"
+          text-anchor="middle"
+          font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
+          font-size="9"
+          fill="#4d7c5a"
+        >
+          SHA-256 root
+        </text>
+
+        <!-- Arrow 2 -->
+        <line x1="265" y1="70" x2="300" y2="70" stroke="#94a3b8" stroke-width="1.5" />
+        <polygon points="295,66 305,70 295,74" fill="#94a3b8" />
+
+        <!-- Arbitrum Contract -->
+        <rect
+          x="310"
+          y="45"
+          width="110"
+          height="50"
+          rx="8"
+          fill="#f8f6ff"
+          stroke="#6b4fbb"
+          stroke-width="1.5"
+          filter="url(#fShadow)"
+        />
+        <text
+          x="365"
+          y="68"
+          text-anchor="middle"
+          font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
+          font-size="11"
+          font-weight="600"
+          fill="#6b4fbb"
+        >
+          Anchor Contract
+        </text>
+        <text
+          x="365"
+          y="84"
+          text-anchor="middle"
+          font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
+          font-size="9"
+          fill="#5a4499"
+        >
+          Arbitrum One
+        </text>
+
+        <!-- Arrow 3 -->
+        <line x1="425" y1="70" x2="450" y2="70" stroke="#94a3b8" stroke-width="1.5" />
+        <polygon points="445,66 455,70 445,74" fill="#94a3b8" />
+
+        <!-- RootRecorded -->
+        <rect
+          x="455"
+          y="50"
+          width="35"
+          height="40"
+          rx="6"
+          fill="#fef3c7"
+          stroke="#d97706"
+          stroke-width="1"
+          filter="url(#fShadow)"
+        />
+        <text
+          x="472"
+          y="66"
+          text-anchor="middle"
+          font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
+          font-size="8"
+          font-weight="600"
+          fill="#92400e"
+        >
+          Root
+        </text>
+        <text
+          x="472"
+          y="79"
+          text-anchor="middle"
+          font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
+          font-size="7"
+          fill="#92400e"
+        >
+          Recorded
+        </text>
+
+        <!-- Top label -->
+        <text
+          x="250"
+          y="22"
+          text-anchor="middle"
+          font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif"
+          font-size="11"
+          font-weight="600"
+          fill="#9b9a97"
+          letter-spacing="0.06"
+        >
+          DAILY ANCHORING FLOW
+        </text>
+      </svg>
+
+      <h3>Context</h3>
+      <p>Relowa's audit architecture already has two tamper-detection layers:</p>
+      <ol>
+        <li>
+          <strong>Hash chain</strong> on <code>audit_events</code> — each row chains to its
+          predecessor via SHA-256, detecting row deletion or modification.
+        </li>
+        <li>
+          <strong>S3 WORM mirror</strong> — daily JSON-Lines export to S3 with Object Lock,
+          providing a legal-evidence backstop independent of the database.
+        </li>
+      </ol>
+      <p>
+        Neither of these proves <strong>when</strong> a record was created in a way that an external
+        auditor can independently verify without trusting our infrastructure. An adversarial
+        scenario: we could backdate rows in the DB, recompute the hash chain forward, and upload a
+        fake S3 mirror — an auditor with only our word couldn't tell.
+      </p>
+      <p>
+        We need a <strong>trust-minimized timestamp</strong>: a single 32-byte fingerprint published
+        somewhere no single party controls, proving "at block height <em>H</em>, this exact set of
+        records existed."
+      </p>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">🇪🇺</div>
+        <div class="callout-content">
+          <p><strong>Three EU regulations make this valuable:</strong></p>
+          <ul>
+            <li>
+              <strong>CSRD</strong> (Corporate Sustainability Reporting Directive) — verifiable
+              supply-chain emissions data.
+            </li>
+            <li>
+              <strong>ESPR</strong> (Ecodesign for Sustainable Products Regulation) — digital
+              product passport with auditable provenance.
+            </li>
+            <li>
+              <strong>WSR</strong> (Waste Shipment Regulation) — cross-border waste tracking with
+              integrity guarantees.
+            </li>
+          </ul>
+          <p style="margin-top: 4px">
+            This is a <strong>compliance primitive</strong>, not a blockchain product. No tokens, no
+            DeFi, no business logic on-chain.
+          </p>
+        </div>
+      </div>
+
+      <h3>Decision</h3>
+      <p>
+        We anchor a daily Merkle root to <strong>Arbitrum One</strong> via a scheduled Lambda. Once
+        per day:
+      </p>
+      <ol>
+        <li>Compute a Merkle tree over <code>audit_events</code> rows from the last 24h.</li>
+        <li>
+          Compute a Merkle tree over <code>material_recovery_certificates</code> from the last 24h.
+        </li>
+        <li>Compute the combined Merkle root: <code>sha256(audit_root || cert_root)</code>.</li>
+        <li>Call the Anchor contract on Arbitrum One: <code>record(bytes32 root)</code>.</li>
+      </ol>
+      <p>Gas costs approximately <strong>$0.01/day</strong> (~$3.65/year).</p>
+
+      <h4>How Verification Works</h4>
+      <p>Any third party can independently verify:</p>
+      <ol>
+        <li>Obtain the Merkle root from the Arbitrum block explorer for a given date.</li>
+        <li>Request supporting <code>audit_events</code> rows from Relowa's API.</li>
+        <li>Recompute the Merkle root client-side.</li>
+        <li>
+          If recomputed root matches on-chain root → records are authentic and existed at that block
+          height.
+        </li>
+      </ol>
+
+      <div class="callout callout-success">
+        <div class="callout-content">
+          <p>
+            <strong>Why not more than a Merkle root:</strong> Publishing individual event hashes
+            on-chain would be ~100× more expensive and risk KVKK/GDPR issues. A single Merkle root
+            has <strong>constant cost</strong> regardless of event volume,
+            <strong>zero data exposure</strong> (root reveals nothing about underlying data), and is
+            <strong>sufficient for all three EU regulations</strong>.
+          </p>
+        </div>
+      </div>
+
+      <h3>Consequences</h3>
+
+      <div class="decision-grid">
+        <div class="decision-card">
+          <div class="label pos">▲ Positive</div>
+          <ul>
+            <li>Third-party-verifiable timestamp without trusting Relowa's infrastructure.</li>
+            <li>Negligible cost (~$0.01/day ≈ $3.65/year).</li>
+            <li>EVM-compatible — standard tooling (<code>ethers.js</code>, <code>viem</code>).</li>
+            <li>Arbitrum One → Ethereum L1 security after 7-day challenge window.</li>
+            <li>Regulatory optionality for future EU requirements.</li>
+          </ul>
+        </div>
+        <div class="decision-card">
+          <div class="label neg">▼ Negative</div>
+          <ul>
+            <li>New AWS Lambda + EventBridge Scheduler to maintain.</li>
+            <li>One-time contract deploy (minimal, single-function).</li>
+            <li>Operational dependency on anchor Lambda — mitigated by CloudWatch alarm.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Alternatives Considered</h3>
+
+      <table class="notion-table">
+        <thead>
+          <tr>
+            <th>Chain</th>
+            <th>Decision</th>
+            <th>Rationale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Polygon PoS</td>
+            <td><span class="badge badge-rejected">Rejected</span></td>
+            <td>Centralized validator set, multi-sig bridge, reorg history.</td>
+          </tr>
+          <tr>
+            <td>Ethereum L1</td>
+            <td><span class="badge badge-rejected">Rejected</span></td>
+            <td>$1–5/day for a single 32-byte write is unreasonable.</td>
+          </tr>
+          <tr>
+            <td>Base</td>
+            <td><span class="badge badge-draft">Viable</span></td>
+            <td>Coinbase backing; Arbitrum has stronger decentralization track record.</td>
+          </tr>
+          <tr>
+            <td>Linea</td>
+            <td><span class="badge badge-draft">Viable</span></td>
+            <td>zkEVM finality; younger chain with less battle-testing.</td>
+          </tr>
+          <tr>
+            <td>Optimism</td>
+            <td><span class="badge badge-rejected">Rejected</span></td>
+            <td>Same tech as Base but weaker institutional brand.</td>
+          </tr>
+          <tr>
+            <td>Solana</td>
+            <td><span class="badge badge-rejected">Rejected</span></td>
+            <td>Non-EVM, incompatible with our toolchain.</td>
+          </tr>
+          <tr>
+            <td>Gnosis</td>
+            <td><span class="badge badge-rejected">Rejected</span></td>
+            <td>L1 sidechain, no Ethereum settlement.</td>
+          </tr>
+          <tr>
+            <td>Bitcoin OP_RETURN</td>
+            <td><span class="badge badge-rejected">Rejected</span></td>
+            <td>Better trust-root but pricier/slower, no EVM.</td>
+          </tr>
+          <tr style="background: #f0fdf4">
+            <td><strong>Arbitrum One</strong></td>
+            <td><span class="badge badge-accepted">Selected</span></td>
+            <td>
+              Leading optimistic rollup — strongest decentralization, lowest cost, EVM, Ethereum
+              settlement.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>The Anchor Contract</h3>
+
+      <pre><code><span class="syn-cm">// SPDX-License-Identifier: Apache-2.0</span>
 <span class="syn-kw">pragma solidity</span> <span class="syn-num">^0.8.24</span>;
 
 <span class="syn-kw">contract</span> <span class="syn-fn">AuditAnchor</span> {
@@ -263,14 +571,18 @@
     }
 }</code></pre>
 
-    <p>Non-upgradeable. Single-function. Deployed once. No storage — emits events only. The events become part of Arbitrum's state, which settles to Ethereum L1 after a 7-day challenge window.</p>
+      <p>
+        Non-upgradeable. Single-function. Deployed once. No storage — emits events only. The events
+        become part of Arbitrum's state, which settles to Ethereum L1 after a 7-day challenge
+        window.
+      </p>
 
-    <div class="see-also">
-      <div class="heading">See Also</div>
-      <a href="0001-postgres-as-system-of-record.html">ADR-0001 — Postgres as SoR</a>
-      <a href="../concepts/audit-hash-chain.html">Audit Hash Chain</a>
-      <a href="../concepts/hash-anchoring.html">Hash Anchoring</a>
-    </div>
-  </main>
-</body>
+      <div class="see-also">
+        <div class="heading">See Also</div>
+        <a href="0001-postgres-as-system-of-record.html">ADR-0001 — Postgres as SoR</a>
+        <a href="../concepts/audit-hash-chain.html">Audit Hash Chain</a>
+        <a href="../concepts/hash-anchoring.html">Hash Anchoring</a>
+      </div>
+    </main>
+  </body>
 </html>

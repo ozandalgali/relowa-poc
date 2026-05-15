@@ -1,185 +1,302 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ADR-0004 — Multi-Agent Orchestration</title>
-  <link rel="stylesheet" href="../style.css">
-</head>
-<body>
-  <aside class="sidebar">
-    <div class="sidebar-header"><h1 onclick="location.href='../index.html'">🏭 Relowa POC</h1></div>
-    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> ADRs</div>
-    <div class="sidebar-nav">
-      <a href="0001-postgres-as-system-of-record.html"><span class="page-icon">📄</span>0001 — Postgres as SoR</a>
-      <a href="0002-supabase-realtime-standalone.html"><span class="page-icon">📄</span>0002 — Realtime</a>
-      <a href="0003-rls-with-jwt-guc-pattern.html"><span class="page-icon">📄</span>0003 — RLS JWT-via-GUC</a>
-      <a href="0004-multi-agent-orchestration.html" class="active"><span class="page-icon">📄</span>0004 — Multi-Agent</a>
-      <a href="0008-arbitrum-hash-anchoring.html"><span class="page-icon">📄</span>0008 — Arbitrum Anchoring</a>
-      <a href="0009-local-bidding-architecture.html"><span class="page-icon">📄</span>0009 — Bidding Architecture</a>
-    </div>
-    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> Concepts</div>
-    <div class="sidebar-nav">
-      <a href="../concepts/auth-uid-pattern.html"><span class="page-icon">💡</span>auth.uid() Pattern</a>
-      <a href="../concepts/audit-hash-chain.html"><span class="page-icon">💡</span>Audit Hash Chain</a>
-      <a href="../concepts/hash-anchoring.html"><span class="page-icon">💡</span>Hash Anchoring</a>
-      <a href="../concepts/idempotency.html"><span class="page-icon">💡</span>Idempotency</a>
-      <a href="../concepts/multi-tenancy.html"><span class="page-icon">💡</span>Multi-tenancy</a>
-      <a href="../concepts/server-authoritative-state.html"><span class="page-icon">💡</span>Server-Auth State</a>
-    </div>
-    <div class="sidebar-nav" style="margin-top:8px"><a href="../milestones.html"><span class="page-icon">🗓️</span>Phase 1 Milestones</a></div>
-    <div class="sidebar-section" style="margin-top:12px">Design System</div>
-    <div class="sidebar-nav">
-      <a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
-    </div>
-    <div class="sidebar-footer">Relowa POC · v0.1</div>
-  </aside>
-  <main class="main">
-    <div class="page-cover adr"></div>
-    <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="0004-multi-agent-orchestration.html">ADR-0004</a></div>
-    <h2 style="border:none;font-size:1.8rem;margin-top:8px">ADR-0004 — Multi-Agent Orchestration</h2>
-    <div class="properties">
-      <div class="prop-row"><span class="prop-label">Status</span><span class="prop-value"><span class="badge badge-accepted">Accepted</span></span></div>
-      <div class="prop-row"><span class="prop-label">Date</span><span class="prop-value">2026-05-09</span></div>
-    </div>
-    <hr class="divider">
-
-    <h3>Context</h3>
-    <p>Relowa is built collaboratively with AI agents (opencode, Claude Code, Cursor). A solo lead operating without a multi-agent workflow leaves significant leverage on the table:</p>
-    <ul>
-      <li>Different parts of the work benefit from different specializations — DB schema design, RLS policy authorship, integration testing, frontend work, documentation.</li>
-      <li>Without explicit roles, every session reinvents context, costs more tokens, and produces inconsistent quality.</li>
-      <li>Without a memory system, lessons learned in session 5 are forgotten in session 12.</li>
-    </ul>
-    <p>The goal is structured multi-agent workflow with specialist roles, consistent context, and compounding institutional knowledge.</p>
-
-    <h3>Decision</h3>
-    <p>We adopt a <strong>three-tier multi-agent orchestration model</strong>:</p>
-
-    <div class="callout callout-info">
-      <div class="callout-content">
-        <p><strong>Tier 1 — Lead session (orchestrator).</strong> Single human-facing session. Routes work to specialist sessions. Reads <code>AGENTS.md</code> + <code>CHANGELOG.md</code> at start of every session.</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ADR-0004 — Multi-Agent Orchestration</title>
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 onclick="location.href = '../index.html'">🏭 Relowa POC</h1>
       </div>
-    </div>
-
-    <div class="callout callout-info">
-      <div class="callout-content">
-        <p><strong>Tier 2 — Specialist skills.</strong> Defined as <code>.opencode/skills/*.md</code>. Each skill is a self-contained Markdown file describing when to invoke it, expected inputs/outputs, and constraints.</p>
+      <div
+        class="sidebar-section"
+        onclick="
+          this.classList.toggle('collapsed');
+          this.nextElementSibling.classList.toggle('collapsed');
+        "
+      >
+        <span class="toggle">▾</span> ADRs
       </div>
-    </div>
-
-    <div class="callout callout-info">
-      <div class="callout-content">
-        <p><strong>Tier 3 — Memory system.</strong> <code>docs/memory/</code> as an Obsidian knowledge graph. Cross-linked with wikilinks so agents and humans can traverse naturally.</p>
+      <div class="sidebar-nav">
+        <a href="0001-postgres-as-system-of-record.html"
+          ><span class="page-icon">📄</span>0001 — Postgres as SoR</a
+        >
+        <a href="0002-supabase-realtime-standalone.html"
+          ><span class="page-icon">📄</span>0002 — Realtime</a
+        >
+        <a href="0003-rls-with-jwt-guc-pattern.html"
+          ><span class="page-icon">📄</span>0003 — RLS JWT-via-GUC</a
+        >
+        <a href="0004-multi-agent-orchestration.html" class="active"
+          ><span class="page-icon">📄</span>0004 — Multi-Agent</a
+        >
+        <a href="0008-arbitrum-hash-anchoring.html"
+          ><span class="page-icon">📄</span>0008 — Arbitrum Anchoring</a
+        >
+        <a href="0009-local-bidding-architecture.html"
+          ><span class="page-icon">📄</span>0009 — Bidding Architecture</a
+        >
       </div>
-    </div>
-
-    <h4>Initial Specialist Skills</h4>
-
-    <table class="notion-table">
-      <thead>
-        <tr>
-          <th>Skill</th>
-          <th>Purpose</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><code>migration-author</code></td>
-          <td>Writes new Drizzle schema + raw SQL side-car migrations with RLS policies.</td>
-        </tr>
-        <tr>
-          <td><code>rls-test-runner</code></td>
-          <td>Executes the RLS isolation suite, reports failures with clear diffs.</td>
-        </tr>
-        <tr>
-          <td><code>audit-trail-verifier</code></td>
-          <td>Validates the audit hash chain integrity, surfaces tampering attempts.</td>
-        </tr>
-        <tr>
-          <td><code>endpoint-writer</code></td>
-          <td>Writes Hono API endpoints with idempotency middleware and JWT GUC setup.</td>
-        </tr>
-        <tr>
-          <td><code>realtime-debugger</code></td>
-          <td>Diagnoses Supabase Realtime / logical replication issues in dev and staging.</td>
-        </tr>
-        <tr>
-          <td><code>doc-keeper</code></td>
-          <td>Maintains the memory graph in <code>docs/memory/</code>, writes learned notes and micro-decisions.</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h4>Memory System Layout</h4>
-
-    <table class="notion-table">
-      <thead>
-        <tr>
-          <th>Directory</th>
-          <th>Contains</th>
-          <th>Lifespan</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><code>concepts/</code></td>
-          <td>Long-lived concept explainers (auth pattern, multi-tenancy, idempotency, hash chain)</td>
-          <td>Permanent</td>
-        </tr>
-        <tr>
-          <td><code>decisions/</code></td>
-          <td>Short notes capturing micro-decisions that don't merit full ADRs</td>
-          <td>Permanent</td>
-        </tr>
-        <tr>
-          <td><code>learned/</code></td>
-          <td>Gotchas, pitfalls, surprising failure modes encountered in development</td>
-          <td>Permanent (review quarterly)</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h3>Consequences</h3>
-
-    <div class="decision-grid">
-      <div class="decision-card">
-        <div class="label pos">▲ Positive</div>
-        <ul>
-          <li>Sessions get fresh context fast — read <code>AGENTS.md</code> + relevant skill file.</li>
-          <li>Lessons learned compound — <code>learned/</code> notes mean the same trap is sprung at most once.</li>
-          <li>Future sessions (or future contributors) inherit institutional knowledge without ceremony.</li>
-          <li>Skills can be reused across projects with minimal modification.</li>
-        </ul>
+      <div
+        class="sidebar-section"
+        onclick="
+          this.classList.toggle('collapsed');
+          this.nextElementSibling.classList.toggle('collapsed');
+        "
+      >
+        <span class="toggle">▾</span> Concepts
       </div>
-      <div class="decision-card">
-        <div class="label neg">▼ Negative</div>
-        <ul>
-          <li><strong>Documentation discipline cost.</strong> Mitigated by making PR reviews include relevant <code>learned/</code> or <code>decisions/</code> notes.</li>
-          <li><strong>Skills risk staleness.</strong> Mitigated by quarterly retro review of all skill files.</li>
-          <li><strong>Agents may misinterpret scope.</strong> Mitigated by explicit non-goals sections in each skill file.</li>
-        </ul>
+      <div class="sidebar-nav">
+        <a href="../concepts/auth-uid-pattern.html"
+          ><span class="page-icon">💡</span>auth.uid() Pattern</a
+        >
+        <a href="../concepts/audit-hash-chain.html"
+          ><span class="page-icon">💡</span>Audit Hash Chain</a
+        >
+        <a href="../concepts/hash-anchoring.html"
+          ><span class="page-icon">💡</span>Hash Anchoring</a
+        >
+        <a href="../concepts/idempotency.html"><span class="page-icon">💡</span>Idempotency</a>
+        <a href="../concepts/multi-tenancy.html"><span class="page-icon">💡</span>Multi-tenancy</a>
+        <a href="../concepts/server-authoritative-state.html"
+          ><span class="page-icon">💡</span>Server-Auth State</a
+        >
       </div>
-    </div>
+      <div class="sidebar-nav" style="margin-top: 8px">
+        <a href="../milestones.html"><span class="page-icon">🗓️</span>Phase 1 Milestones</a>
+      </div>
+      <div class="sidebar-section" style="margin-top: 12px">Design System</div>
+      <div class="sidebar-nav">
+        <a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
+      </div>
+      <div class="sidebar-footer">Relowa POC · v0.1</div>
+    </aside>
+    <main class="main">
+      <div class="page-cover adr"></div>
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a> <span class="sep">/</span>
+        <a href="0004-multi-agent-orchestration.html">ADR-0004</a>
+      </div>
+      <h2 style="border: none; font-size: 1.8rem; margin-top: 8px">
+        ADR-0004 — Multi-Agent Orchestration
+      </h2>
+      <div class="properties">
+        <div class="prop-row">
+          <span class="prop-label">Status</span
+          ><span class="prop-value"><span class="badge badge-accepted">Accepted</span></span>
+        </div>
+        <div class="prop-row">
+          <span class="prop-label">Date</span><span class="prop-value">2026-05-09</span>
+        </div>
+      </div>
+      <hr class="divider" />
 
-    <h3>How Agents Interact With This System</h3>
+      <h3>Context</h3>
+      <p>
+        Relowa is built collaboratively with AI agents (opencode, Claude Code, Cursor). A solo lead
+        operating without a multi-agent workflow leaves significant leverage on the table:
+      </p>
+      <ul>
+        <li>
+          Different parts of the work benefit from different specializations — DB schema design, RLS
+          policy authorship, integration testing, frontend work, documentation.
+        </li>
+        <li>
+          Without explicit roles, every session reinvents context, costs more tokens, and produces
+          inconsistent quality.
+        </li>
+        <li>Without a memory system, lessons learned in session 5 are forgotten in session 12.</li>
+      </ul>
+      <p>
+        The goal is structured multi-agent workflow with specialist roles, consistent context, and
+        compounding institutional knowledge.
+      </p>
 
-    <ol>
-      <li><strong>Start of session:</strong> read <code>AGENTS.md</code>, scan <code>CHANGELOG.md</code> <code>[Unreleased]</code>, and scan recent <code>learned/</code> notes for relevant gotchas.</li>
-      <li><strong>Matching a skill:</strong> when asked to do work that fits a skill, load the skill file into context and follow its directives.</li>
-      <li><strong>Discovering a gotcha:</strong> write a <code>learned/</code> note immediately — before continuing the work — so the lesson isn't lost.</li>
-      <li><strong>Making a decision:</strong> if non-trivial and architectural, write a full ADR. If small and scoped, write a <code>decisions/</code> note.</li>
-      <li><strong>End of session:</strong> update <code>CHANGELOG.md</code> under <code>[Unreleased]</code> with what changed and why.</li>
-    </ol>
+      <h3>Decision</h3>
+      <p>We adopt a <strong>three-tier multi-agent orchestration model</strong>:</p>
 
-    <h3>Validation</h3>
-    <p>This ADR is the foundational record for multi-agent collaboration. The skill files in <code>.opencode/skills/</code> and the memory directory in <code>docs/memory/</code> are its operational manifestation. Compliance is measured by PR review — every PR should reference either a skill invocation or a memory note.</p>
+      <div class="callout callout-info">
+        <div class="callout-content">
+          <p>
+            <strong>Tier 1 — Lead session (orchestrator).</strong> Single human-facing session.
+            Routes work to specialist sessions. Reads <code>AGENTS.md</code> +
+            <code>CHANGELOG.md</code> at start of every session.
+          </p>
+        </div>
+      </div>
 
-    <div class="see-also">
-      <div class="heading">See Also</div>
-      <a href="0001-postgres-as-system-of-record.html">ADR-0001 — Postgres as SoR</a>
-      <a href="../concepts/multi-tenancy.html">Multi-tenancy</a>
-    </div>
-  </main>
-</body>
+      <div class="callout callout-info">
+        <div class="callout-content">
+          <p>
+            <strong>Tier 2 — Specialist skills.</strong> Defined as
+            <code>.opencode/skills/*.md</code>. Each skill is a self-contained Markdown file
+            describing when to invoke it, expected inputs/outputs, and constraints.
+          </p>
+        </div>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-content">
+          <p>
+            <strong>Tier 3 — Memory system.</strong> <code>docs/memory/</code> as an Obsidian
+            knowledge graph. Cross-linked with wikilinks so agents and humans can traverse
+            naturally.
+          </p>
+        </div>
+      </div>
+
+      <h4>Initial Specialist Skills</h4>
+
+      <table class="notion-table">
+        <thead>
+          <tr>
+            <th>Skill</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>migration-author</code></td>
+            <td>Writes new Drizzle schema + raw SQL side-car migrations with RLS policies.</td>
+          </tr>
+          <tr>
+            <td><code>rls-test-runner</code></td>
+            <td>Executes the RLS isolation suite, reports failures with clear diffs.</td>
+          </tr>
+          <tr>
+            <td><code>audit-trail-verifier</code></td>
+            <td>Validates the audit hash chain integrity, surfaces tampering attempts.</td>
+          </tr>
+          <tr>
+            <td><code>endpoint-writer</code></td>
+            <td>Writes Hono API endpoints with idempotency middleware and JWT GUC setup.</td>
+          </tr>
+          <tr>
+            <td><code>realtime-debugger</code></td>
+            <td>Diagnoses Supabase Realtime / logical replication issues in dev and staging.</td>
+          </tr>
+          <tr>
+            <td><code>doc-keeper</code></td>
+            <td>
+              Maintains the memory graph in <code>docs/memory/</code>, writes learned notes and
+              micro-decisions.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Memory System Layout</h4>
+
+      <table class="notion-table">
+        <thead>
+          <tr>
+            <th>Directory</th>
+            <th>Contains</th>
+            <th>Lifespan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>concepts/</code></td>
+            <td>
+              Long-lived concept explainers (auth pattern, multi-tenancy, idempotency, hash chain)
+            </td>
+            <td>Permanent</td>
+          </tr>
+          <tr>
+            <td><code>decisions/</code></td>
+            <td>Short notes capturing micro-decisions that don't merit full ADRs</td>
+            <td>Permanent</td>
+          </tr>
+          <tr>
+            <td><code>learned/</code></td>
+            <td>Gotchas, pitfalls, surprising failure modes encountered in development</td>
+            <td>Permanent (review quarterly)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Consequences</h3>
+
+      <div class="decision-grid">
+        <div class="decision-card">
+          <div class="label pos">▲ Positive</div>
+          <ul>
+            <li>
+              Sessions get fresh context fast — read <code>AGENTS.md</code> + relevant skill file.
+            </li>
+            <li>
+              Lessons learned compound — <code>learned/</code> notes mean the same trap is sprung at
+              most once.
+            </li>
+            <li>
+              Future sessions (or future contributors) inherit institutional knowledge without
+              ceremony.
+            </li>
+            <li>Skills can be reused across projects with minimal modification.</li>
+          </ul>
+        </div>
+        <div class="decision-card">
+          <div class="label neg">▼ Negative</div>
+          <ul>
+            <li>
+              <strong>Documentation discipline cost.</strong> Mitigated by making PR reviews include
+              relevant <code>learned/</code> or <code>decisions/</code> notes.
+            </li>
+            <li>
+              <strong>Skills risk staleness.</strong> Mitigated by quarterly retro review of all
+              skill files.
+            </li>
+            <li>
+              <strong>Agents may misinterpret scope.</strong> Mitigated by explicit non-goals
+              sections in each skill file.
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>How Agents Interact With This System</h3>
+
+      <ol>
+        <li>
+          <strong>Start of session:</strong> read <code>AGENTS.md</code>, scan
+          <code>CHANGELOG.md</code> <code>[Unreleased]</code>, and scan recent
+          <code>learned/</code> notes for relevant gotchas.
+        </li>
+        <li>
+          <strong>Matching a skill:</strong> when asked to do work that fits a skill, load the skill
+          file into context and follow its directives.
+        </li>
+        <li>
+          <strong>Discovering a gotcha:</strong> write a <code>learned/</code> note immediately —
+          before continuing the work — so the lesson isn't lost.
+        </li>
+        <li>
+          <strong>Making a decision:</strong> if non-trivial and architectural, write a full ADR. If
+          small and scoped, write a <code>decisions/</code> note.
+        </li>
+        <li>
+          <strong>End of session:</strong> update <code>CHANGELOG.md</code> under
+          <code>[Unreleased]</code> with what changed and why.
+        </li>
+      </ol>
+
+      <h3>Validation</h3>
+      <p>
+        This ADR is the foundational record for multi-agent collaboration. The skill files in
+        <code>.opencode/skills/</code> and the memory directory in <code>docs/memory/</code> are its
+        operational manifestation. Compliance is measured by PR review — every PR should reference
+        either a skill invocation or a memory note.
+      </p>
+
+      <div class="see-also">
+        <div class="heading">See Also</div>
+        <a href="0001-postgres-as-system-of-record.html">ADR-0001 — Postgres as SoR</a>
+        <a href="../concepts/multi-tenancy.html">Multi-tenancy</a>
+      </div>
+    </main>
+  </body>
 </html>

@@ -1,103 +1,117 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Radii — Relowa DS</title>
-  <link rel="stylesheet" href="../colors_and_type.css">
-  <style>
-    body {
-      padding: 24px;
-      background: var(--surface);
-      font-family: var(--font-sans);
-      color: var(--foreground);
-    }
-    h2 {
-      font-size: var(--text-h3);
-      font-weight: var(--weight-semibold);
-      margin: 0 0 8px;
-    }
-    .eyebrow {
-      font-family: var(--font-mono);
-      font-size: var(--text-caption);
-      font-weight: var(--weight-medium);
-      color: var(--foreground-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 32px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 32px 24px;
-      max-width: 500px;
-    }
-    .box-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 12px;
-    }
-    .box {
-      width: 100px;
-      height: 100px;
-      background: var(--green-100);
-      border: 2px solid var(--green-500);
-      transition: transform var(--transition-base);
-    }
-    .box:hover { transform: scale(1.05); }
-    .caption {
-      font-family: var(--font-mono);
-      font-size: var(--text-body-sm);
-      font-weight: var(--weight-medium);
-      color: var(--foreground-muted);
-    }
-    .caption .token {
-      color: var(--foreground);
-      font-weight: var(--weight-semibold);
-    }
-    .caption .px {
-      color: var(--foreground-subtle);
-    }
-    .r-xs  { border-radius: var(--radius-xs); }
-    .r-sm  { border-radius: var(--radius-sm); }
-    .r-md  { border-radius: var(--radius-md); }
-    .r-lg  { border-radius: var(--radius-lg); }
-    .r-xl  { border-radius: var(--radius-xl); }
-    .r-full { border-radius: var(--radius-full); }
-  </style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Radii — Relowa DS</title>
+    <link rel="stylesheet" href="../colors_and_type.css" />
+    <style>
+      body {
+        padding: 24px;
+        background: var(--surface);
+        font-family: var(--font-sans);
+        color: var(--foreground);
+      }
+      h2 {
+        font-size: var(--text-h3);
+        font-weight: var(--weight-semibold);
+        margin: 0 0 8px;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: var(--text-caption);
+        font-weight: var(--weight-medium);
+        color: var(--foreground-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 32px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 32px 24px;
+        max-width: 500px;
+      }
+      .box-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .box {
+        width: 100px;
+        height: 100px;
+        background: var(--green-100);
+        border: 2px solid var(--green-500);
+        transition: transform var(--transition-base);
+      }
+      .box:hover {
+        transform: scale(1.05);
+      }
+      .caption {
+        font-family: var(--font-mono);
+        font-size: var(--text-body-sm);
+        font-weight: var(--weight-medium);
+        color: var(--foreground-muted);
+      }
+      .caption .token {
+        color: var(--foreground);
+        font-weight: var(--weight-semibold);
+      }
+      .caption .px {
+        color: var(--foreground-subtle);
+      }
+      .r-xs {
+        border-radius: var(--radius-xs);
+      }
+      .r-sm {
+        border-radius: var(--radius-sm);
+      }
+      .r-md {
+        border-radius: var(--radius-md);
+      }
+      .r-lg {
+        border-radius: var(--radius-lg);
+      }
+      .r-xl {
+        border-radius: var(--radius-xl);
+      }
+      .r-full {
+        border-radius: var(--radius-full);
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Corner Radii</h2>
+    <p class="eyebrow">6 steps &middot; radius-xs &ndash; radius-full</p>
 
-<h2>Corner Radii</h2>
-<p class="eyebrow">6 steps &middot; radius-xs &ndash; radius-full</p>
-
-<div class="grid">
-  <div class="box-wrap">
-    <div class="box r-xs"></div>
-    <div class="caption"><span class="token">radius-xs</span> <span class="px">4px</span></div>
-  </div>
-  <div class="box-wrap">
-    <div class="box r-sm"></div>
-    <div class="caption"><span class="token">radius-sm</span> <span class="px">6px</span></div>
-  </div>
-  <div class="box-wrap">
-    <div class="box r-md"></div>
-    <div class="caption"><span class="token">radius-md</span> <span class="px">8px</span></div>
-  </div>
-  <div class="box-wrap">
-    <div class="box r-lg"></div>
-    <div class="caption"><span class="token">radius-lg</span> <span class="px">12px</span></div>
-  </div>
-  <div class="box-wrap">
-    <div class="box r-xl"></div>
-    <div class="caption"><span class="token">radius-xl</span> <span class="px">16px</span></div>
-  </div>
-  <div class="box-wrap">
-    <div class="box r-full"></div>
-    <div class="caption"><span class="token">radius-full</span> <span class="px">999px</span></div>
-  </div>
-</div>
-
-</body>
+    <div class="grid">
+      <div class="box-wrap">
+        <div class="box r-xs"></div>
+        <div class="caption"><span class="token">radius-xs</span> <span class="px">4px</span></div>
+      </div>
+      <div class="box-wrap">
+        <div class="box r-sm"></div>
+        <div class="caption"><span class="token">radius-sm</span> <span class="px">6px</span></div>
+      </div>
+      <div class="box-wrap">
+        <div class="box r-md"></div>
+        <div class="caption"><span class="token">radius-md</span> <span class="px">8px</span></div>
+      </div>
+      <div class="box-wrap">
+        <div class="box r-lg"></div>
+        <div class="caption"><span class="token">radius-lg</span> <span class="px">12px</span></div>
+      </div>
+      <div class="box-wrap">
+        <div class="box r-xl"></div>
+        <div class="caption"><span class="token">radius-xl</span> <span class="px">16px</span></div>
+      </div>
+      <div class="box-wrap">
+        <div class="box r-full"></div>
+        <div class="caption">
+          <span class="token">radius-full</span> <span class="px">999px</span>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>

@@ -1,0 +1,35 @@
+name: lint
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: TypeScript typecheck
+        run: pnpm typecheck
+
+      - name: Prettier format check
+        run: pnpm format:check
+
+      - name: Agent sync check
+        run: pnpm agents:check
+
+      - name: Secret scan (gitleaks)
+        uses: gitleaks/gitleaks-action@v2

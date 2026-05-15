@@ -34,17 +34,9 @@ import { sql } from "drizzle-orm";
 // Enums
 // ============================================================
 
-export const orgTypeEnum = pgEnum("org_type", [
-  "producer",
-  "recycler",
-  "carrier",
-]);
+export const orgTypeEnum = pgEnum("org_type", ["producer", "recycler", "carrier"]);
 
-export const orgRoleEnum = pgEnum("org_role", [
-  "admin",
-  "operations",
-  "accounting",
-]);
+export const orgRoleEnum = pgEnum("org_role", ["admin", "operations", "accounting"]);
 
 export const tenderStatusEnum = pgEnum("tender_status", [
   "draft",
@@ -78,14 +70,10 @@ export const users = pgTable(
     email: text("email").notNull(),
     passwordHash: text("password_hash").notNull(),
     fullName: text("full_name"),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [uniqueIndex("users_email_idx").on(t.email)]
+  (t) => [uniqueIndex("users_email_idx").on(t.email)],
 );
 
 export const organizations = pgTable(
@@ -97,14 +85,12 @@ export const organizations = pgTable(
     vergiNo: varchar("vergi_no", { length: 20 }),
     address: text("address"),
     region: text("region"), // e.g. "Kocaeli", used for matching
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
     index("organizations_type_idx").on(t.type),
     index("organizations_region_idx").on(t.region),
-  ]
+  ],
 );
 
 export const orgMembers = pgTable(
@@ -117,15 +103,10 @@ export const orgMembers = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     role: orgRoleEnum("role").notNull(),
-    invitedAt: timestamp("invited_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    invitedAt: timestamp("invited_at", { withTimezone: true }).notNull().defaultNow(),
     acceptedAt: timestamp("accepted_at", { withTimezone: true }),
   },
-  (t) => [
-    primaryKey({ columns: [t.orgId, t.userId] }),
-    index("org_members_user_idx").on(t.userId),
-  ]
+  (t) => [primaryKey({ columns: [t.orgId, t.userId] }), index("org_members_user_idx").on(t.userId)],
 );
 
 // ============================================================
@@ -152,19 +133,15 @@ export const tenders = pgTable(
     closesAt: timestamp("closes_at", { withTimezone: true }),
     closedAt: timestamp("closed_at", { withTimezone: true }),
     winnerBidId: uuid("winner_bid_id"),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
     index("tenders_org_idx").on(t.orgId),
     index("tenders_status_idx").on(t.status),
     index("tenders_material_region_idx").on(t.materialType, t.pickupRegion),
     index("tenders_closes_at_idx").on(t.closesAt),
-  ]
+  ],
 );
 
 export const bids = pgTable(
@@ -183,14 +160,9 @@ export const bids = pgTable(
     pricePerTon: numeric("price_per_ton", { precision: 14, scale: 2 }).notNull(),
     includesShipping: boolean("includes_shipping").notNull().default(false),
     notes: text("notes"),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [
-    index("bids_tender_idx").on(t.tenderId),
-    index("bids_bidder_org_idx").on(t.bidderOrgId),
-  ]
+  (t) => [index("bids_tender_idx").on(t.tenderId), index("bids_bidder_org_idx").on(t.bidderOrgId)],
 );
 
 // ============================================================
@@ -206,18 +178,18 @@ export const auditEvents = pgTable(
     action: text("action").notNull(), // e.g. "tender.created", "bid.placed"
     entityType: text("entity_type").notNull(),
     entityId: uuid("entity_id"),
-    payload: jsonb("payload").notNull().default(sql`'{}'::jsonb`),
+    payload: jsonb("payload")
+      .notNull()
+      .default(sql`'{}'::jsonb`),
     prevHash: text("prev_hash"),
     hash: text("hash").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
     index("audit_events_org_idx").on(t.orgId),
     index("audit_events_entity_idx").on(t.entityType, t.entityId),
     index("audit_events_created_idx").on(t.createdAt),
-  ]
+  ],
 );
 
 export const idempotencyKeys = pgTable(
@@ -228,13 +200,11 @@ export const idempotencyKeys = pgTable(
     requestHash: text("request_hash").notNull(),
     statusCode: integer("status_code").notNull(),
     responseBody: jsonb("response_body").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   },
   (t) => [
     primaryKey({ columns: [t.key, t.orgId] }),
     index("idempotency_expires_idx").on(t.expiresAt),
-  ]
+  ],
 );

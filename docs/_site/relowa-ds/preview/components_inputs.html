@@ -1,216 +1,249 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Form Inputs — Relowa DS</title>
-  <link rel="stylesheet" href="../colors_and_type.css">
-  <style>
-    body {
-      padding: 40px;
-      background: var(--background);
-      font-family: var(--font-sans);
-      color: var(--foreground);
-    }
-    h2 {
-      font-size: var(--text-h2);
-      font-weight: var(--weight-bold);
-      margin: 0 0 4px;
-    }
-    .eyebrow {
-      font-family: var(--font-mono);
-      font-size: 10.5px;
-      font-weight: var(--weight-medium);
-      color: var(--foreground-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 32px;
-    }
-    .section {
-      margin-bottom: 40px;
-      max-width: 480px;
-    }
-    .section-label {
-      font-family: var(--font-mono);
-      font-size: 10.5px;
-      font-weight: var(--weight-semibold);
-      color: var(--foreground-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 16px;
-    }
-    .field {
-      margin-bottom: 20px;
-    }
-    .field-label {
-      display: block;
-      font-size: 14px;
-      font-weight: var(--weight-medium);
-      margin-bottom: 6px;
-      color: var(--foreground);
-    }
-    .input {
-      display: block;
-      width: 100%;
-      font-family: var(--font-sans);
-      font-size: 14px;
-      background: var(--input-bg);
-      color: var(--foreground);
-      border: none;
-      border-radius: var(--radius-md);
-      padding: 12px 16px;
-      outline: none;
-      transition: box-shadow var(--transition-fast);
-    }
-    .input::placeholder { color: var(--foreground-subtle); }
-    .input:focus {
-      box-shadow: 0 0 0 3px var(--input-focus-ring), inset 0 0 0 1px var(--accent);
-    }
-    .input-disabled {
-      opacity: 0.4;
-    }
-    .input-error {
-      box-shadow: 0 0 0 3px rgba(239,68,68,0.15), inset 0 0 0 1px var(--danger);
-    }
-    .field-error {
-      font-size: 12px;
-      color: var(--danger);
-      margin-top: 6px;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Form Inputs — Relowa DS</title>
+    <link rel="stylesheet" href="../colors_and_type.css" />
+    <style>
+      body {
+        padding: 40px;
+        background: var(--background);
+        font-family: var(--font-sans);
+        color: var(--foreground);
+      }
+      h2 {
+        font-size: var(--text-h2);
+        font-weight: var(--weight-bold);
+        margin: 0 0 4px;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        font-weight: var(--weight-medium);
+        color: var(--foreground-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 32px;
+      }
+      .section {
+        margin-bottom: 40px;
+        max-width: 480px;
+      }
+      .section-label {
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        font-weight: var(--weight-semibold);
+        color: var(--foreground-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 16px;
+      }
+      .field {
+        margin-bottom: 20px;
+      }
+      .field-label {
+        display: block;
+        font-size: 14px;
+        font-weight: var(--weight-medium);
+        margin-bottom: 6px;
+        color: var(--foreground);
+      }
+      .input {
+        display: block;
+        width: 100%;
+        font-family: var(--font-sans);
+        font-size: 14px;
+        background: var(--input-bg);
+        color: var(--foreground);
+        border: none;
+        border-radius: var(--radius-md);
+        padding: 12px 16px;
+        outline: none;
+        transition: box-shadow var(--transition-fast);
+      }
+      .input::placeholder {
+        color: var(--foreground-subtle);
+      }
+      .input:focus {
+        box-shadow:
+          0 0 0 3px var(--input-focus-ring),
+          inset 0 0 0 1px var(--accent);
+      }
+      .input-disabled {
+        opacity: 0.4;
+      }
+      .input-error {
+        box-shadow:
+          0 0 0 3px rgba(239, 68, 68, 0.15),
+          inset 0 0 0 1px var(--danger);
+      }
+      .field-error {
+        font-size: 12px;
+        color: var(--danger);
+        margin-top: 6px;
+      }
 
-    .select-wrap {
-      position: relative;
-    }
-    .select-wrap select {
-      appearance: none;
-      width: 100%;
-      font-family: var(--font-sans);
-      font-size: 14px;
-      background: var(--input-bg);
-      color: var(--foreground);
-      border: none;
-      border-radius: var(--radius-md);
-      padding: 12px 40px 12px 16px;
-      outline: none;
-      cursor: pointer;
-      transition: box-shadow var(--transition-fast);
-    }
-    .select-wrap select:focus {
-      box-shadow: 0 0 0 3px var(--input-focus-ring), inset 0 0 0 1px var(--accent);
-    }
-    .select-chevron {
-      position: absolute;
-      right: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      pointer-events: none;
-      color: var(--foreground-subtle);
-    }
+      .select-wrap {
+        position: relative;
+      }
+      .select-wrap select {
+        appearance: none;
+        width: 100%;
+        font-family: var(--font-sans);
+        font-size: 14px;
+        background: var(--input-bg);
+        color: var(--foreground);
+        border: none;
+        border-radius: var(--radius-md);
+        padding: 12px 40px 12px 16px;
+        outline: none;
+        cursor: pointer;
+        transition: box-shadow var(--transition-fast);
+      }
+      .select-wrap select:focus {
+        box-shadow:
+          0 0 0 3px var(--input-focus-ring),
+          inset 0 0 0 1px var(--accent);
+      }
+      .select-chevron {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: var(--foreground-subtle);
+      }
 
-    .input-wrap {
-      position: relative;
-    }
-    .input-icon {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--foreground-subtle);
-      pointer-events: none;
-    }
-    .input-wrap .input { padding-left: 42px; }
+      .input-wrap {
+        position: relative;
+      }
+      .input-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--foreground-subtle);
+        pointer-events: none;
+      }
+      .input-wrap .input {
+        padding-left: 42px;
+      }
 
-    .textarea {
-      resize: vertical;
-      min-height: 120px;
-    }
+      .textarea {
+        resize: vertical;
+        min-height: 120px;
+      }
 
-    .specimen-row {
-      display: flex;
-      gap: 24px;
-      flex-wrap: wrap;
-    }
-    .specimen {
-      flex: 1;
-      min-width: 200px;
-    }
-  </style>
-</head>
-<body>
+      .specimen-row {
+        display: flex;
+        gap: 24px;
+        flex-wrap: wrap;
+      }
+      .specimen {
+        flex: 1;
+        min-width: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Form Inputs</h2>
+    <p class="eyebrow">Text &middot; Select &middot; Search &middot; Textarea &middot; States</p>
 
-<h2>Form Inputs</h2>
-<p class="eyebrow">Text &middot; Select &middot; Search &middot; Textarea &middot; States</p>
-
-<!-- Row 1: Text inputs -->
-<div class="section">
-  <div class="section-label">Text Inputs</div>
-  <div class="specimen-row">
-    <div class="specimen">
-      <label class="field-label">Şirket Adı</label>
-      <input class="input" type="text" placeholder="Örn: Esko Geri Dönüşüm A.Ş.">
+    <!-- Row 1: Text inputs -->
+    <div class="section">
+      <div class="section-label">Text Inputs</div>
+      <div class="specimen-row">
+        <div class="specimen">
+          <label class="field-label">Şirket Adı</label>
+          <input class="input" type="text" placeholder="Örn: Esko Geri Dönüşüm A.Ş." />
+        </div>
+        <div class="specimen">
+          <label class="field-label">Şirket Adı (Focus)</label>
+          <input class="input" type="text" value="Esko Geri Dönüşüm" />
+        </div>
+      </div>
+      <div class="specimen-row" style="margin-top: 20px">
+        <div class="specimen">
+          <label class="field-label">Şirket Adı (Disabled)</label>
+          <input class="input input-disabled" type="text" value="Esko Geri Dönüşüm A.Ş." disabled />
+        </div>
+        <div class="specimen">
+          <label class="field-label">Şirket Adı (Error)</label>
+          <input class="input input-error" type="text" placeholder="Şirket adı giriniz" />
+          <div class="field-error">Bu alan zorunludur</div>
+        </div>
+      </div>
     </div>
-    <div class="specimen">
-      <label class="field-label">Şirket Adı (Focus)</label>
-      <input class="input" type="text" value="Esko Geri Dönüşüm">
-    </div>
-  </div>
-  <div class="specimen-row" style="margin-top:20px">
-    <div class="specimen">
-      <label class="field-label">Şirket Adı (Disabled)</label>
-      <input class="input input-disabled" type="text" value="Esko Geri Dönüşüm A.Ş." disabled>
-    </div>
-    <div class="specimen">
-      <label class="field-label">Şirket Adı (Error)</label>
-      <input class="input input-error" type="text" placeholder="Şirket adı giriniz">
-      <div class="field-error">Bu alan zorunludur</div>
-    </div>
-  </div>
-</div>
 
-<!-- Row 2: Select -->
-<div class="section">
-  <div class="section-label">Select</div>
-  <div class="field">
-    <label class="field-label">Atık Tipi</label>
-    <div class="select-wrap">
-      <select>
-        <option value="" disabled selected>Atık türünü seçin</option>
-        <option>Plastik (PET)</option>
-        <option>Plastik (HDPE)</option>
-        <option>Kağıt</option>
-        <option>Metal (Alüminyum)</option>
-        <option>Cam</option>
-        <option>Organik Atık</option>
-      </select>
-      <span class="select-chevron">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3,6 8,11 13,6"/></svg>
-      </span>
+    <!-- Row 2: Select -->
+    <div class="section">
+      <div class="section-label">Select</div>
+      <div class="field">
+        <label class="field-label">Atık Tipi</label>
+        <div class="select-wrap">
+          <select>
+            <option value="" disabled selected>Atık türünü seçin</option>
+            <option>Plastik (PET)</option>
+            <option>Plastik (HDPE)</option>
+            <option>Kağıt</option>
+            <option>Metal (Alüminyum)</option>
+            <option>Cam</option>
+            <option>Organik Atık</option>
+          </select>
+          <span class="select-chevron">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <polyline points="3,6 8,11 13,6" />
+            </svg>
+          </span>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- Row 3: Search -->
-<div class="section">
-  <div class="section-label">Search</div>
-  <div class="field">
-    <label class="field-label">İhale Ara</label>
-    <div class="input-wrap">
-      <span class="input-icon">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><line x1="11" y1="11" x2="14" y2="14"/></svg>
-      </span>
-      <input class="input" type="text" placeholder="İhale ara...">
+    <!-- Row 3: Search -->
+    <div class="section">
+      <div class="section-label">Search</div>
+      <div class="field">
+        <label class="field-label">İhale Ara</label>
+        <div class="input-wrap">
+          <span class="input-icon">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <circle cx="7" cy="7" r="4.5" />
+              <line x1="11" y1="11" x2="14" y2="14" />
+            </svg>
+          </span>
+          <input class="input" type="text" placeholder="İhale ara..." />
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- Row 4: Textarea -->
-<div class="section">
-  <div class="section-label">Textarea</div>
-  <div class="field">
-    <label class="field-label">Açıklama</label>
-    <textarea class="input textarea" rows="4" placeholder="İhale detaylarını açıklayın..."></textarea>
-  </div>
-</div>
-
-</body>
+    <!-- Row 4: Textarea -->
+    <div class="section">
+      <div class="section-label">Textarea</div>
+      <div class="field">
+        <label class="field-label">Açıklama</label>
+        <textarea
+          class="input textarea"
+          rows="4"
+          placeholder="İhale detaylarını açıklayın..."
+        ></textarea>
+      </div>
+    </div>
+  </body>
 </html>

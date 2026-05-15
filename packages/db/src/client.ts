@@ -11,8 +11,7 @@ import postgres from "postgres";
 import * as schema from "./schema.js";
 
 const connectionString =
-  process.env.DATABASE_URL ??
-  "postgres://relowa:dev_password_change_me@localhost:5432/relowa";
+  process.env.DATABASE_URL ?? "postgres://relowa:dev_password_change_me@localhost:5432/relowa";
 
 const queryClient = postgres(connectionString, {
   max: 10,

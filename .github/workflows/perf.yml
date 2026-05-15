@@ -1,0 +1,15 @@
+name: perf
+
+on:
+  schedule:
+    - cron: "0 4 * * 6" # 04:00 UTC Saturday
+  workflow_dispatch:
+
+jobs:
+  perf:
+    # Inert P2 — activate when k6 scenarios graduate
+    if: false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "k6 performance tests — not yet active"

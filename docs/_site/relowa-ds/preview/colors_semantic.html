@@ -1,173 +1,177 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Semantic Colors — Relowa DS</title>
-  <link rel="stylesheet" href="../colors_and_type.css">
-  <style>
-    body {
-      padding: 24px;
-      background: var(--surface);
-      font-family: var(--font-sans);
-      color: var(--foreground);
-    }
-    h2 {
-      font-size: var(--text-h3);
-      font-weight: var(--weight-semibold);
-      margin: 0 0 8px;
-    }
-    .eyebrow {
-      font-family: var(--font-mono);
-      font-size: var(--text-caption);
-      font-weight: var(--weight-medium);
-      color: var(--foreground-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 24px;
-    }
-    .families {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
-    }
-    .family-header {
-      font-size: var(--text-body);
-      font-weight: var(--weight-semibold);
-      color: var(--foreground-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid var(--border);
-    }
-    .swatches {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .swatch {
-      border-radius: var(--radius-md);
-      padding: 14px 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: transform var(--transition-base);
-    }
-    .swatch:hover { transform: translateX(4px); }
-    .swatch-name {
-      font-family: var(--font-mono);
-      font-size: var(--text-body-sm);
-      font-weight: var(--weight-medium);
-      opacity: 0.8;
-    }
-    .swatch-hex {
-      font-family: var(--font-mono);
-      font-size: var(--text-body-sm);
-      font-weight: var(--weight-semibold);
-    }
-    .light { color: var(--neutral-900); }
-    .dark  { color: var(--neutral-0); }
-  </style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Semantic Colors — Relowa DS</title>
+    <link rel="stylesheet" href="../colors_and_type.css" />
+    <style>
+      body {
+        padding: 24px;
+        background: var(--surface);
+        font-family: var(--font-sans);
+        color: var(--foreground);
+      }
+      h2 {
+        font-size: var(--text-h3);
+        font-weight: var(--weight-semibold);
+        margin: 0 0 8px;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: var(--text-caption);
+        font-weight: var(--weight-medium);
+        color: var(--foreground-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 24px;
+      }
+      .families {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+      }
+      .family-header {
+        font-size: var(--text-body);
+        font-weight: var(--weight-semibold);
+        color: var(--foreground-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--border);
+      }
+      .swatches {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .swatch {
+        border-radius: var(--radius-md);
+        padding: 14px 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: transform var(--transition-base);
+      }
+      .swatch:hover {
+        transform: translateX(4px);
+      }
+      .swatch-name {
+        font-family: var(--font-mono);
+        font-size: var(--text-body-sm);
+        font-weight: var(--weight-medium);
+        opacity: 0.8;
+      }
+      .swatch-hex {
+        font-family: var(--font-mono);
+        font-size: var(--text-body-sm);
+        font-weight: var(--weight-semibold);
+      }
+      .light {
+        color: var(--neutral-900);
+      }
+      .dark {
+        color: var(--neutral-0);
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Semantic Colors</h2>
+    <p class="eyebrow">Status Signals &middot; 4 families &middot; 4 steps each</p>
 
-<h2>Semantic Colors</h2>
-<p class="eyebrow">Status Signals &middot; 4 families &middot; 4 steps each</p>
+    <div class="families">
+      <!-- Success -->
+      <div>
+        <div class="family-header">Success</div>
+        <div class="swatches">
+          <div class="swatch light" style="background: var(--success-50)">
+            <span class="swatch-name">success-50</span>
+            <span class="swatch-hex">#ECFDF5</span>
+          </div>
+          <div class="swatch light" style="background: var(--success-100)">
+            <span class="swatch-name">success-100</span>
+            <span class="swatch-hex">#D1FAE5</span>
+          </div>
+          <div class="swatch dark" style="background: var(--success-500)">
+            <span class="swatch-name">success-500</span>
+            <span class="swatch-hex">#10B981</span>
+          </div>
+          <div class="swatch dark" style="background: var(--success-700)">
+            <span class="swatch-name">success-700</span>
+            <span class="swatch-hex">#047857</span>
+          </div>
+        </div>
+      </div>
 
-<div class="families">
-  <!-- Success -->
-  <div>
-    <div class="family-header">Success</div>
-    <div class="swatches">
-      <div class="swatch light" style="background: var(--success-50)">
-        <span class="swatch-name">success-50</span>
-        <span class="swatch-hex">#ECFDF5</span>
+      <!-- Warning -->
+      <div>
+        <div class="family-header">Warning</div>
+        <div class="swatches">
+          <div class="swatch light" style="background: var(--warning-50)">
+            <span class="swatch-name">warning-50</span>
+            <span class="swatch-hex">#FFFBEB</span>
+          </div>
+          <div class="swatch light" style="background: var(--warning-100)">
+            <span class="swatch-name">warning-100</span>
+            <span class="swatch-hex">#FEF3C7</span>
+          </div>
+          <div class="swatch dark" style="background: var(--warning-500)">
+            <span class="swatch-name">warning-500</span>
+            <span class="swatch-hex">#F59E0B</span>
+          </div>
+          <div class="swatch dark" style="background: var(--warning-700)">
+            <span class="swatch-name">warning-700</span>
+            <span class="swatch-hex">#B45309</span>
+          </div>
+        </div>
       </div>
-      <div class="swatch light" style="background: var(--success-100)">
-        <span class="swatch-name">success-100</span>
-        <span class="swatch-hex">#D1FAE5</span>
+
+      <!-- Danger -->
+      <div>
+        <div class="family-header">Danger</div>
+        <div class="swatches">
+          <div class="swatch light" style="background: var(--danger-50)">
+            <span class="swatch-name">danger-50</span>
+            <span class="swatch-hex">#FEF2F2</span>
+          </div>
+          <div class="swatch light" style="background: var(--danger-100)">
+            <span class="swatch-name">danger-100</span>
+            <span class="swatch-hex">#FEE2E2</span>
+          </div>
+          <div class="swatch dark" style="background: var(--danger-500)">
+            <span class="swatch-name">danger-500</span>
+            <span class="swatch-hex">#EF4444</span>
+          </div>
+          <div class="swatch dark" style="background: var(--danger-700)">
+            <span class="swatch-name">danger-700</span>
+            <span class="swatch-hex">#B91C1C</span>
+          </div>
+        </div>
       </div>
-      <div class="swatch dark" style="background: var(--success-500)">
-        <span class="swatch-name">success-500</span>
-        <span class="swatch-hex">#10B981</span>
-      </div>
-      <div class="swatch dark" style="background: var(--success-700)">
-        <span class="swatch-name">success-700</span>
-        <span class="swatch-hex">#047857</span>
+
+      <!-- Info -->
+      <div>
+        <div class="family-header">Info</div>
+        <div class="swatches">
+          <div class="swatch light" style="background: var(--info-50)">
+            <span class="swatch-name">info-50</span>
+            <span class="swatch-hex">#EFF6FF</span>
+          </div>
+          <div class="swatch light" style="background: var(--info-100)">
+            <span class="swatch-name">info-100</span>
+            <span class="swatch-hex">#DBEAFE</span>
+          </div>
+          <div class="swatch dark" style="background: var(--info-500)">
+            <span class="swatch-name">info-500</span>
+            <span class="swatch-hex">#3B82F6</span>
+          </div>
+          <div class="swatch dark" style="background: var(--info-700)">
+            <span class="swatch-name">info-700</span>
+            <span class="swatch-hex">#1D4ED8</span>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-
-  <!-- Warning -->
-  <div>
-    <div class="family-header">Warning</div>
-    <div class="swatches">
-      <div class="swatch light" style="background: var(--warning-50)">
-        <span class="swatch-name">warning-50</span>
-        <span class="swatch-hex">#FFFBEB</span>
-      </div>
-      <div class="swatch light" style="background: var(--warning-100)">
-        <span class="swatch-name">warning-100</span>
-        <span class="swatch-hex">#FEF3C7</span>
-      </div>
-      <div class="swatch dark" style="background: var(--warning-500)">
-        <span class="swatch-name">warning-500</span>
-        <span class="swatch-hex">#F59E0B</span>
-      </div>
-      <div class="swatch dark" style="background: var(--warning-700)">
-        <span class="swatch-name">warning-700</span>
-        <span class="swatch-hex">#B45309</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Danger -->
-  <div>
-    <div class="family-header">Danger</div>
-    <div class="swatches">
-      <div class="swatch light" style="background: var(--danger-50)">
-        <span class="swatch-name">danger-50</span>
-        <span class="swatch-hex">#FEF2F2</span>
-      </div>
-      <div class="swatch light" style="background: var(--danger-100)">
-        <span class="swatch-name">danger-100</span>
-        <span class="swatch-hex">#FEE2E2</span>
-      </div>
-      <div class="swatch dark" style="background: var(--danger-500)">
-        <span class="swatch-name">danger-500</span>
-        <span class="swatch-hex">#EF4444</span>
-      </div>
-      <div class="swatch dark" style="background: var(--danger-700)">
-        <span class="swatch-name">danger-700</span>
-        <span class="swatch-hex">#B91C1C</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Info -->
-  <div>
-    <div class="family-header">Info</div>
-    <div class="swatches">
-      <div class="swatch light" style="background: var(--info-50)">
-        <span class="swatch-name">info-50</span>
-        <span class="swatch-hex">#EFF6FF</span>
-      </div>
-      <div class="swatch light" style="background: var(--info-100)">
-        <span class="swatch-name">info-100</span>
-        <span class="swatch-hex">#DBEAFE</span>
-      </div>
-      <div class="swatch dark" style="background: var(--info-500)">
-        <span class="swatch-name">info-500</span>
-        <span class="swatch-hex">#3B82F6</span>
-      </div>
-      <div class="swatch dark" style="background: var(--info-700)">
-        <span class="swatch-name">info-700</span>
-        <span class="swatch-hex">#1D4ED8</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-</body>
+  </body>
 </html>

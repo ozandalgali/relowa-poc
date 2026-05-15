@@ -1,0 +1,24 @@
+name: deploy-prod
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Commit SHA on main to deploy"
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    # Inert until production environment is ready
+    if: false
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://app.relowa.com
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Production deploy — not yet active"

@@ -1,136 +1,247 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ADR-0002 — Supabase Realtime Standalone</title>
-  <link rel="stylesheet" href="../style.css">
-</head>
-<body>
-  <aside class="sidebar">
-    <div class="sidebar-header"><h1 onclick="location.href='../index.html'">&#x1f3ed; Relowa POC</h1></div>
-    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">&#x25be;</span> ADRs</div>
-    <div class="sidebar-nav">
-      <a href="0001-postgres-as-system-of-record.html"><span class="page-icon">&#x1f4c4;</span>0001 — Postgres as SoR</a>
-      <a href="0002-supabase-realtime-standalone.html" class="active"><span class="page-icon">&#x1f4c4;</span>0002 — Realtime</a>
-      <a href="0003-rls-with-jwt-guc-pattern.html"><span class="page-icon">&#x1f4c4;</span>0003 — RLS JWT-via-GUC</a>
-      <a href="0004-multi-agent-orchestration.html"><span class="page-icon">&#x1f4c4;</span>0004 — Multi-Agent</a>
-      <a href="0008-arbitrum-hash-anchoring.html"><span class="page-icon">&#x1f4c4;</span>0008 — Arbitrum Anchoring</a>
-      <a href="0009-local-bidding-architecture.html"><span class="page-icon">&#x1f4c4;</span>0009 — Bidding Architecture</a>
-    </div>
-    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">&#x25be;</span> Concepts</div>
-    <div class="sidebar-nav">
-      <a href="../concepts/auth-uid-pattern.html"><span class="page-icon">&#x1f4a1;</span>auth.uid() Pattern</a>
-      <a href="../concepts/audit-hash-chain.html"><span class="page-icon">&#x1f4a1;</span>Audit Hash Chain</a>
-      <a href="../concepts/hash-anchoring.html"><span class="page-icon">&#x1f4a1;</span>Hash Anchoring</a>
-      <a href="../concepts/idempotency.html"><span class="page-icon">&#x1f4a1;</span>Idempotency</a>
-      <a href="../concepts/multi-tenancy.html"><span class="page-icon">&#x1f4a1;</span>Multi-tenancy</a>
-      <a href="../concepts/server-authoritative-state.html"><span class="page-icon">&#x1f4a1;</span>Server-Auth State</a>
-    </div>
-    <div class="sidebar-nav" style="margin-top:8px"><a href="../milestones.html"><span class="page-icon">&#x1f5d3;&#xfe0f;</span>Phase 1 Milestones</a></div>
-    <div class="sidebar-section" style="margin-top:12px">Design System</div>
-    <div class="sidebar-nav">
-      <a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
-    </div>
-    <div class="sidebar-footer">Relowa POC · v0.1</div>
-  </aside>
-  <main class="main">
-    <div class="page-cover adr"></div>
-    <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="0002-supabase-realtime-standalone.html">ADR-0002</a></div>
-    <h2 style="border:none;font-size:1.8rem;margin-top:8px">ADR-0002 — Supabase Realtime Standalone</h2>
-    <div class="properties">
-      <div class="prop-row"><span class="prop-label">Status</span><span class="prop-value"><span class="badge badge-validated">Accepted — POC Validated</span></span></div>
-      <div class="prop-row"><span class="prop-label">Date</span><span class="prop-value">2026-05-09</span></div>
-    </div>
-    <hr class="divider">
-
-    <h3>Context</h3>
-    <p>Relowa's UI requires live updates for several core flows:</p>
-    <ul>
-      <li>Auction countdowns and live bids</li>
-      <li>Tender list updates as new tenders publish</li>
-      <li>Audit-log live tail for admin dashboards</li>
-      <li>(Phase 2) Live carrier GPS positions for logistics tracking</li>
-    </ul>
-    <p>We need a real-time push mechanism with these properties:</p>
-    <ul>
-      <li><strong>Postgres CDC integration</strong> — writes through any path (Drizzle, raw SQL, <code>pg_cron</code>) automatically reach subscribers.</li>
-      <li><strong>Self-hostable in EU region</strong> — KVKK compliance is non-negotiable for Turkish waste operators.</li>
-      <li><strong>React-friendly client SDK</strong> — our frontend runs Next.js + React.</li>
-      <li><strong>Operationally acceptable</strong> for a solo lead — no multi-node Kafka cluster.</li>
-    </ul>
-
-    <h3>Decision</h3>
-    <div class="callout callout-info">
-      <div class="callout-icon">&#x1f4a1;</div>
-      <div class="callout-content">
-        <p>We will run <strong>only</strong> the <code>supabase/realtime</code> Docker image, standalone, pointed at our own Postgres. <strong>No other Supabase component is used.</strong> Auth, REST, Storage, Studio — none of them. We hand-roll those (Drizzle for DB access, Hono for REST, S3 + presigned URLs for storage, Drizzle Studio / TablePlus / Adminer for inspection).</p>
-        <p style="margin-top:8px">Frontend uses <code>@supabase/realtime-js</code> directly. <strong>We do NOT install <code>@supabase/supabase-js</code></strong> — that would pull in the full Supabase ecosystem and defeat the purpose.</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ADR-0002 — Supabase Realtime Standalone</title>
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 onclick="location.href = '../index.html'">&#x1f3ed; Relowa POC</h1>
       </div>
-    </div>
-
-    <h3>Consequences</h3>
-    <div class="decision-grid">
-      <div class="decision-card">
-        <div class="label pos">&#x25b2; Positive</div>
-        <ul>
-          <li>Same developer experience as Supabase Cloud realtime: <code>channel('tenders').on('postgres_changes', ...)</code>.</li>
-          <li>Hits Postgres logical replication directly — no manual event publication layer needed.</li>
-          <li>Self-hosted in our VPC; KVKK-clean — no data passes through a US-controlled managed service.</li>
-          <li>Operational cost is one stateless Fargate task at ~$15/month. No multi-node cluster overhead.</li>
-        </ul>
+      <div
+        class="sidebar-section"
+        onclick="
+          this.classList.toggle('collapsed');
+          this.nextElementSibling.classList.toggle('collapsed');
+        "
+      >
+        <span class="toggle">&#x25be;</span> ADRs
       </div>
-      <div class="decision-card">
-        <div class="label neg">&#x25bc; Negative</div>
-        <ul>
-          <li>One more container to operate. (Mitigation: Fargate auto-restarts; the image is widely deployed and battle-tested.)</li>
-          <li><code>DB_ENC_KEY</code> quirks — must be exactly 16 ASCII characters for AES-128-ECB. Documented in <code>docs/memory/learned/realtime-aes-key-length.md</code>.</li>
-          <li>Tight coupling to Supabase's image release cadence. (Mitigation: pinned to v2.30.34; we evaluate changelog before bumping.)</li>
-        </ul>
+      <div class="sidebar-nav">
+        <a href="0001-postgres-as-system-of-record.html"
+          ><span class="page-icon">&#x1f4c4;</span>0001 — Postgres as SoR</a
+        >
+        <a href="0002-supabase-realtime-standalone.html" class="active"
+          ><span class="page-icon">&#x1f4c4;</span>0002 — Realtime</a
+        >
+        <a href="0003-rls-with-jwt-guc-pattern.html"
+          ><span class="page-icon">&#x1f4c4;</span>0003 — RLS JWT-via-GUC</a
+        >
+        <a href="0004-multi-agent-orchestration.html"
+          ><span class="page-icon">&#x1f4c4;</span>0004 — Multi-Agent</a
+        >
+        <a href="0008-arbitrum-hash-anchoring.html"
+          ><span class="page-icon">&#x1f4c4;</span>0008 — Arbitrum Anchoring</a
+        >
+        <a href="0009-local-bidding-architecture.html"
+          ><span class="page-icon">&#x1f4c4;</span>0009 — Bidding Architecture</a
+        >
       </div>
-    </div>
-
-    <h3>Alternatives Considered</h3>
-    <table class="notion-table">
-      <thead>
-        <tr>
-          <th>Alternative</th>
-          <th>Verdict</th>
-          <th>Reason</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>AWS AppSync subscriptions</strong></td>
-          <td>Rejected</td>
-          <td>Managed and KVKK-friendly, but requires us to publish events explicitly — no CDC. More operational work, more GraphQL lock-in.</td>
-        </tr>
-        <tr>
-          <td><strong>Pusher / Ably</strong></td>
-          <td>Rejected</td>
-          <td>Best DX of any managed option, but third-party data residency adds KVKK paperwork and per-connection cost grows quickly at scale.</td>
-        </tr>
-        <tr>
-          <td><strong>Postgres LISTEN/NOTIFY</strong></td>
-          <td>Rejected</td>
-          <td>Zero additional infrastructure, but 8KB payload limit per notification and no built-in multi-server scaling. Acceptable for POC, insufficient for Phase 1.</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h3>Validation</h3>
-    <div class="callout callout-success">
-      <div class="callout-icon">&#x2705;</div>
-      <div class="callout-content">
-        <p>POC seeded the publication with <code>tenders</code>, <code>bids</code>, <code>audit_events</code>. Logical replication slot is active. Container is healthy and listening on port 4000. The Realtime health endpoint returns 200: <code>curl -I http://localhost:4000/api/tenants/realtime-dev/health</code>. End-to-end client subscription test in <code>apps/web/</code> is in progress.</p>
+      <div
+        class="sidebar-section"
+        onclick="
+          this.classList.toggle('collapsed');
+          this.nextElementSibling.classList.toggle('collapsed');
+        "
+      >
+        <span class="toggle">&#x25be;</span> Concepts
       </div>
-    </div>
+      <div class="sidebar-nav">
+        <a href="../concepts/auth-uid-pattern.html"
+          ><span class="page-icon">&#x1f4a1;</span>auth.uid() Pattern</a
+        >
+        <a href="../concepts/audit-hash-chain.html"
+          ><span class="page-icon">&#x1f4a1;</span>Audit Hash Chain</a
+        >
+        <a href="../concepts/hash-anchoring.html"
+          ><span class="page-icon">&#x1f4a1;</span>Hash Anchoring</a
+        >
+        <a href="../concepts/idempotency.html"
+          ><span class="page-icon">&#x1f4a1;</span>Idempotency</a
+        >
+        <a href="../concepts/multi-tenancy.html"
+          ><span class="page-icon">&#x1f4a1;</span>Multi-tenancy</a
+        >
+        <a href="../concepts/server-authoritative-state.html"
+          ><span class="page-icon">&#x1f4a1;</span>Server-Auth State</a
+        >
+      </div>
+      <div class="sidebar-nav" style="margin-top: 8px">
+        <a href="../milestones.html"
+          ><span class="page-icon">&#x1f5d3;&#xfe0f;</span>Phase 1 Milestones</a
+        >
+      </div>
+      <div class="sidebar-section" style="margin-top: 12px">Design System</div>
+      <div class="sidebar-nav">
+        <a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
+      </div>
+      <div class="sidebar-footer">Relowa POC · v0.1</div>
+    </aside>
+    <main class="main">
+      <div class="page-cover adr"></div>
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a> <span class="sep">/</span>
+        <a href="0002-supabase-realtime-standalone.html">ADR-0002</a>
+      </div>
+      <h2 style="border: none; font-size: 1.8rem; margin-top: 8px">
+        ADR-0002 — Supabase Realtime Standalone
+      </h2>
+      <div class="properties">
+        <div class="prop-row">
+          <span class="prop-label">Status</span
+          ><span class="prop-value"
+            ><span class="badge badge-validated">Accepted — POC Validated</span></span
+          >
+        </div>
+        <div class="prop-row">
+          <span class="prop-label">Date</span><span class="prop-value">2026-05-09</span>
+        </div>
+      </div>
+      <hr class="divider" />
 
-    <div class="see-also">
-      <div class="heading">See Also</div>
-      <a href="0001-postgres-as-system-of-record.html">ADR-0001 — Postgres as SoR</a>
-      <a href="0003-rls-with-jwt-guc-pattern.html">ADR-0003 — RLS JWT-via-GUC</a>
-    </div>
-  </main>
-</body>
+      <h3>Context</h3>
+      <p>Relowa's UI requires live updates for several core flows:</p>
+      <ul>
+        <li>Auction countdowns and live bids</li>
+        <li>Tender list updates as new tenders publish</li>
+        <li>Audit-log live tail for admin dashboards</li>
+        <li>(Phase 2) Live carrier GPS positions for logistics tracking</li>
+      </ul>
+      <p>We need a real-time push mechanism with these properties:</p>
+      <ul>
+        <li>
+          <strong>Postgres CDC integration</strong> — writes through any path (Drizzle, raw SQL,
+          <code>pg_cron</code>) automatically reach subscribers.
+        </li>
+        <li>
+          <strong>Self-hostable in EU region</strong> — KVKK compliance is non-negotiable for
+          Turkish waste operators.
+        </li>
+        <li><strong>React-friendly client SDK</strong> — our frontend runs Next.js + React.</li>
+        <li>
+          <strong>Operationally acceptable</strong> for a solo lead — no multi-node Kafka cluster.
+        </li>
+      </ul>
+
+      <h3>Decision</h3>
+      <div class="callout callout-info">
+        <div class="callout-icon">&#x1f4a1;</div>
+        <div class="callout-content">
+          <p>
+            We will run <strong>only</strong> the <code>supabase/realtime</code> Docker image,
+            standalone, pointed at our own Postgres.
+            <strong>No other Supabase component is used.</strong> Auth, REST, Storage, Studio — none
+            of them. We hand-roll those (Drizzle for DB access, Hono for REST, S3 + presigned URLs
+            for storage, Drizzle Studio / TablePlus / Adminer for inspection).
+          </p>
+          <p style="margin-top: 8px">
+            Frontend uses <code>@supabase/realtime-js</code> directly.
+            <strong>We do NOT install <code>@supabase/supabase-js</code></strong> — that would pull
+            in the full Supabase ecosystem and defeat the purpose.
+          </p>
+        </div>
+      </div>
+
+      <h3>Consequences</h3>
+      <div class="decision-grid">
+        <div class="decision-card">
+          <div class="label pos">&#x25b2; Positive</div>
+          <ul>
+            <li>
+              Same developer experience as Supabase Cloud realtime:
+              <code>channel('tenders').on('postgres_changes', ...)</code>.
+            </li>
+            <li>
+              Hits Postgres logical replication directly — no manual event publication layer needed.
+            </li>
+            <li>
+              Self-hosted in our VPC; KVKK-clean — no data passes through a US-controlled managed
+              service.
+            </li>
+            <li>
+              Operational cost is one stateless Fargate task at ~$15/month. No multi-node cluster
+              overhead.
+            </li>
+          </ul>
+        </div>
+        <div class="decision-card">
+          <div class="label neg">&#x25bc; Negative</div>
+          <ul>
+            <li>
+              One more container to operate. (Mitigation: Fargate auto-restarts; the image is widely
+              deployed and battle-tested.)
+            </li>
+            <li>
+              <code>DB_ENC_KEY</code> quirks — must be exactly 16 ASCII characters for AES-128-ECB.
+              Documented in <code>docs/memory/learned/realtime-aes-key-length.md</code>.
+            </li>
+            <li>
+              Tight coupling to Supabase's image release cadence. (Mitigation: pinned to v2.30.34;
+              we evaluate changelog before bumping.)
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Alternatives Considered</h3>
+      <table class="notion-table">
+        <thead>
+          <tr>
+            <th>Alternative</th>
+            <th>Verdict</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>AWS AppSync subscriptions</strong></td>
+            <td>Rejected</td>
+            <td>
+              Managed and KVKK-friendly, but requires us to publish events explicitly — no CDC. More
+              operational work, more GraphQL lock-in.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Pusher / Ably</strong></td>
+            <td>Rejected</td>
+            <td>
+              Best DX of any managed option, but third-party data residency adds KVKK paperwork and
+              per-connection cost grows quickly at scale.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Postgres LISTEN/NOTIFY</strong></td>
+            <td>Rejected</td>
+            <td>
+              Zero additional infrastructure, but 8KB payload limit per notification and no built-in
+              multi-server scaling. Acceptable for POC, insufficient for Phase 1.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Validation</h3>
+      <div class="callout callout-success">
+        <div class="callout-icon">&#x2705;</div>
+        <div class="callout-content">
+          <p>
+            POC seeded the publication with <code>tenders</code>, <code>bids</code>,
+            <code>audit_events</code>. Logical replication slot is active. Container is healthy and
+            listening on port 4000. The Realtime health endpoint returns 200:
+            <code>curl -I http://localhost:4000/api/tenants/realtime-dev/health</code>. End-to-end
+            client subscription test in <code>apps/web/</code> is in progress.
+          </p>
+        </div>
+      </div>
+
+      <div class="see-also">
+        <div class="heading">See Also</div>
+        <a href="0001-postgres-as-system-of-record.html">ADR-0001 — Postgres as SoR</a>
+        <a href="0003-rls-with-jwt-guc-pattern.html">ADR-0003 — RLS JWT-via-GUC</a>
+      </div>
+    </main>
+  </body>
 </html>

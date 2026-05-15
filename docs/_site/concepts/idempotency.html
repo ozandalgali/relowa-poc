@@ -1,166 +1,224 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Idempotency — Relowa Docs</title>
-  <link rel="stylesheet" href="../style.css">
-</head>
-<body>
-  <aside class="sidebar">
-    <div class="sidebar-header"><h1 onclick="location.href='../index.html'">🏭 Relowa POC</h1></div>
-    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> ADRs</div>
-    <div class="sidebar-nav">
-      <a href="../adr/0001-postgres-as-system-of-record.html"><span class="page-icon">📄</span>0001 — Postgres as SoR</a>
-      <a href="../adr/0002-supabase-realtime-standalone.html"><span class="page-icon">📄</span>0002 — Realtime</a>
-      <a href="../adr/0003-rls-with-jwt-guc-pattern.html"><span class="page-icon">📄</span>0003 — RLS JWT-via-GUC</a>
-      <a href="../adr/0004-multi-agent-orchestration.html"><span class="page-icon">📄</span>0004 — Multi-Agent</a>
-      <a href="../adr/0008-arbitrum-hash-anchoring.html"><span class="page-icon">📄</span>0008 — Arbitrum Anchoring</a>
-      <a href="../adr/0009-local-bidding-architecture.html"><span class="page-icon">📄</span>0009 — Bidding Architecture</a>
-    </div>
-    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> Concepts</div>
-    <div class="sidebar-nav">
-      <a href="auth-uid-pattern.html"><span class="page-icon">💡</span>auth.uid() Pattern</a>
-      <a href="audit-hash-chain.html"><span class="page-icon">💡</span>Audit Hash Chain</a>
-      <a href="hash-anchoring.html"><span class="page-icon">💡</span>Hash Anchoring</a>
-      <a href="idempotency.html" class="active"><span class="page-icon">💡</span>Idempotency</a>
-      <a href="multi-tenancy.html"><span class="page-icon">💡</span>Multi-tenancy</a>
-      <a href="server-authoritative-state.html"><span class="page-icon">💡</span>Server-Auth State</a>
-    </div>
-    <div class="sidebar-nav" style="margin-top:8px"><a href="../milestones.html"><span class="page-icon">🗓️</span>Phase 1 Milestones</a></div>
-    <div class="sidebar-section" style="margin-top:12px">Design System</div>
-    <div class="sidebar-nav">
-      <a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
-    </div>
-    <div class="sidebar-footer">Relowa POC · v0.1</div>
-  </aside>
-  <main class="main">
-    <div class="page-cover concept"></div>
-    <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="../index.html">Concepts</a> <span class="sep">/</span> Idempotency</div>
-    <h2 style="border:none;font-size:1.8rem;margin-top:8px">Idempotency</h2>
-    <div class="properties">
-      <div class="prop-row"><span class="prop-label">Type</span><span class="prop-value"><span class="badge badge-concept">Concept</span></span></div>
-    </div>
-    <hr class="divider">
-
-    <p style="font-size:1.05rem;color:#6b6966">
-      Why every mutation endpoint accepts an <code>Idempotency-Key</code>, and what happens if one doesn&rsquo;t.
-    </p>
-
-    <!-- The setup -->
-    <h3>The setup</h3>
-    <div class="callout callout-warning">
-      <span class="callout-icon">⚠️</span>
-      <div class="callout-content">
-        <p>Distributed systems have two facts that conflict:</p>
-        <ol style="margin:10px 0 0 20px;">
-          <li><strong>Networks are unreliable.</strong> Clients retry.</li>
-          <li><strong>Mutation endpoints have side effects.</strong> Re-running them double-charges, double-emails, double-sends.</li>
-        </ol>
-        <p style="margin-top:10px;">The naïve approach — &ldquo;we&rsquo;ll be careful with retries&rdquo; — fails. A user clicks <strong>Submit</strong>, their phone signal drops, the request did succeed but the response never arrived, the app helpfully resubmits, and now there are two tenders.</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Idempotency — Relowa Docs</title>
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 onclick="location.href = '../index.html'">🏭 Relowa POC</h1>
       </div>
-    </div>
-
-    <!-- The pattern -->
-    <h3>The pattern</h3>
-    <p>Every mutation endpoint accepts a header:</p>
-    <pre><code>Idempotency-Key: &lt;client-generated UUID&gt;</code></pre>
-
-    <p>Server logic:</p>
-    <ol>
-      <li>Look up <code>(org_id, key)</code> in <code>idempotency_keys</code>.</li>
-      <li>If found <strong>and</strong> request hash matches → return the cached response.</li>
-      <li>If found <strong>but</strong> request hash differs → return <strong>409 Conflict</strong>.</li>
-      <li>Otherwise → execute the handler, cache the response, return it.</li>
-    </ol>
-
-    <!-- Idempotency keys table schema -->
-    <h3>The <code>idempotency_keys</code> table</h3>
-    <table class="notion-table">
-      <thead>
-        <tr>
-          <th>Column</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><code>key</code></td>
-          <td><code>text</code></td>
-          <td>Client-generated UUID, scoped per org</td>
-        </tr>
-        <tr>
-          <td><code>org_id</code></td>
-          <td><code>uuid</code></td>
-          <td>Owning organisation — co-primary key</td>
-        </tr>
-        <tr>
-          <td><code>request_hash</code></td>
-          <td><code>text</code></td>
-          <td>SHA-256 of the request body</td>
-        </tr>
-        <tr>
-          <td><code>status_code</code></td>
-          <td><code>int</code></td>
-          <td>Cached HTTP status from the original response</td>
-        </tr>
-        <tr>
-          <td><code>response_body</code></td>
-          <td><code>jsonb</code></td>
-          <td>Cached response payload</td>
-        </tr>
-        <tr>
-          <td><code>created_at</code></td>
-          <td><code>timestamptz</code></td>
-          <td>When the key was first seen</td>
-        </tr>
-        <tr>
-          <td><code>expires_at</code></td>
-          <td><code>timestamptz</code></td>
-          <td>24 hours after creation — pruned by scheduled job</td>
-        </tr>
-      </tbody>
-    </table>
-    <p style="font-size:13px;color:#9b9a97;">PRIMARY KEY: <code>(key, org_id)</code></p>
-
-    <!-- Why scoped to org -->
-    <h3>Why scoped to org</h3>
-    <p>Two reasons:</p>
-    <ol>
-      <li>
-        <strong>Keys are user-generated</strong> — collisions across tenants are likely. Without the <code>org_id</code> scope,
-        Org A writing <code>Idempotency-Key: a1b2c3</code> would collide with Org B&rsquo;s same key,
-        returning Org A&rsquo;s cached response to Org B. That&rsquo;s a privacy breach.
-      </li>
-      <li>
-        <strong>Cross-tenant idempotency cache leaks</strong> are themselves a data isolation bug.
-        RLS protects rows from being read across tenants; the idempotency table must follow the same discipline.
-      </li>
-    </ol>
-
-    <!-- Where it matters most -->
-    <h3>Where it matters most</h3>
-    <div class="callout callout-danger">
-      <span class="callout-icon">🔴</span>
-      <div class="callout-content">
-        <p><strong>Phase 1:</strong> tender creation, bid placement.</p>
-        <p style="margin-top:8px;">
-          <strong>Phase 2: Escrow funding webhooks.</strong> This is where idempotency goes from &ldquo;good practice&rdquo;
-          to <strong>non-negotiable</strong>. Iyzico&rsquo;s webhook can fire the same payment notification multiple times.
-          Without idempotency, you mark the auction funded twice, possibly release escrow twice.
-          <strong>Disaster.</strong>
-        </p>
-        <p style="margin-bottom:0;">Build the discipline now so it&rsquo;s reflexive when escrow lands.</p>
+      <div
+        class="sidebar-section"
+        onclick="
+          this.classList.toggle('collapsed');
+          this.nextElementSibling.classList.toggle('collapsed');
+        "
+      >
+        <span class="toggle">▾</span> ADRs
       </div>
-    </div>
+      <div class="sidebar-nav">
+        <a href="../adr/0001-postgres-as-system-of-record.html"
+          ><span class="page-icon">📄</span>0001 — Postgres as SoR</a
+        >
+        <a href="../adr/0002-supabase-realtime-standalone.html"
+          ><span class="page-icon">📄</span>0002 — Realtime</a
+        >
+        <a href="../adr/0003-rls-with-jwt-guc-pattern.html"
+          ><span class="page-icon">📄</span>0003 — RLS JWT-via-GUC</a
+        >
+        <a href="../adr/0004-multi-agent-orchestration.html"
+          ><span class="page-icon">📄</span>0004 — Multi-Agent</a
+        >
+        <a href="../adr/0008-arbitrum-hash-anchoring.html"
+          ><span class="page-icon">📄</span>0008 — Arbitrum Anchoring</a
+        >
+        <a href="../adr/0009-local-bidding-architecture.html"
+          ><span class="page-icon">📄</span>0009 — Bidding Architecture</a
+        >
+      </div>
+      <div
+        class="sidebar-section"
+        onclick="
+          this.classList.toggle('collapsed');
+          this.nextElementSibling.classList.toggle('collapsed');
+        "
+      >
+        <span class="toggle">▾</span> Concepts
+      </div>
+      <div class="sidebar-nav">
+        <a href="auth-uid-pattern.html"><span class="page-icon">💡</span>auth.uid() Pattern</a>
+        <a href="audit-hash-chain.html"><span class="page-icon">💡</span>Audit Hash Chain</a>
+        <a href="hash-anchoring.html"><span class="page-icon">💡</span>Hash Anchoring</a>
+        <a href="idempotency.html" class="active"><span class="page-icon">💡</span>Idempotency</a>
+        <a href="multi-tenancy.html"><span class="page-icon">💡</span>Multi-tenancy</a>
+        <a href="server-authoritative-state.html"
+          ><span class="page-icon">💡</span>Server-Auth State</a
+        >
+      </div>
+      <div class="sidebar-nav" style="margin-top: 8px">
+        <a href="../milestones.html"><span class="page-icon">🗓️</span>Phase 1 Milestones</a>
+      </div>
+      <div class="sidebar-section" style="margin-top: 12px">Design System</div>
+      <div class="sidebar-nav">
+        <a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
+      </div>
+      <div class="sidebar-footer">Relowa POC · v0.1</div>
+    </aside>
+    <main class="main">
+      <div class="page-cover concept"></div>
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a> <span class="sep">/</span>
+        <a href="../index.html">Concepts</a> <span class="sep">/</span> Idempotency
+      </div>
+      <h2 style="border: none; font-size: 1.8rem; margin-top: 8px">Idempotency</h2>
+      <div class="properties">
+        <div class="prop-row">
+          <span class="prop-label">Type</span
+          ><span class="prop-value"><span class="badge badge-concept">Concept</span></span>
+        </div>
+      </div>
+      <hr class="divider" />
 
-    <!-- Implementation contract -->
-    <h3>Implementation contract</h3>
-    <p>Hono middleware that extracts the <code>Idempotency-Key</code> header, hashes the request body,
-    checks the cache table, and either returns a cached response, 409 Conflict, or executes the handler:</p>
+      <p style="font-size: 1.05rem; color: #6b6966">
+        Why every mutation endpoint accepts an <code>Idempotency-Key</code>, and what happens if one
+        doesn&rsquo;t.
+      </p>
 
-<pre><code><span class="syn-kw">export</span> <span class="syn-kw">const</span> <span class="syn-fn">idempotency</span> = <span class="syn-fn">createMiddleware</span>(<span class="syn-kw">async</span> (c, next) => {
+      <!-- The setup -->
+      <h3>The setup</h3>
+      <div class="callout callout-warning">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-content">
+          <p>Distributed systems have two facts that conflict:</p>
+          <ol style="margin: 10px 0 0 20px">
+            <li><strong>Networks are unreliable.</strong> Clients retry.</li>
+            <li>
+              <strong>Mutation endpoints have side effects.</strong> Re-running them double-charges,
+              double-emails, double-sends.
+            </li>
+          </ol>
+          <p style="margin-top: 10px">
+            The naïve approach — &ldquo;we&rsquo;ll be careful with retries&rdquo; — fails. A user
+            clicks <strong>Submit</strong>, their phone signal drops, the request did succeed but
+            the response never arrived, the app helpfully resubmits, and now there are two tenders.
+          </p>
+        </div>
+      </div>
+
+      <!-- The pattern -->
+      <h3>The pattern</h3>
+      <p>Every mutation endpoint accepts a header:</p>
+      <pre><code>Idempotency-Key: &lt;client-generated UUID&gt;</code></pre>
+
+      <p>Server logic:</p>
+      <ol>
+        <li>Look up <code>(org_id, key)</code> in <code>idempotency_keys</code>.</li>
+        <li>If found <strong>and</strong> request hash matches → return the cached response.</li>
+        <li>
+          If found <strong>but</strong> request hash differs → return <strong>409 Conflict</strong>.
+        </li>
+        <li>Otherwise → execute the handler, cache the response, return it.</li>
+      </ol>
+
+      <!-- Idempotency keys table schema -->
+      <h3>The <code>idempotency_keys</code> table</h3>
+      <table class="notion-table">
+        <thead>
+          <tr>
+            <th>Column</th>
+            <th>Type</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>key</code></td>
+            <td><code>text</code></td>
+            <td>Client-generated UUID, scoped per org</td>
+          </tr>
+          <tr>
+            <td><code>org_id</code></td>
+            <td><code>uuid</code></td>
+            <td>Owning organisation — co-primary key</td>
+          </tr>
+          <tr>
+            <td><code>request_hash</code></td>
+            <td><code>text</code></td>
+            <td>SHA-256 of the request body</td>
+          </tr>
+          <tr>
+            <td><code>status_code</code></td>
+            <td><code>int</code></td>
+            <td>Cached HTTP status from the original response</td>
+          </tr>
+          <tr>
+            <td><code>response_body</code></td>
+            <td><code>jsonb</code></td>
+            <td>Cached response payload</td>
+          </tr>
+          <tr>
+            <td><code>created_at</code></td>
+            <td><code>timestamptz</code></td>
+            <td>When the key was first seen</td>
+          </tr>
+          <tr>
+            <td><code>expires_at</code></td>
+            <td><code>timestamptz</code></td>
+            <td>24 hours after creation — pruned by scheduled job</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size: 13px; color: #9b9a97">PRIMARY KEY: <code>(key, org_id)</code></p>
+
+      <!-- Why scoped to org -->
+      <h3>Why scoped to org</h3>
+      <p>Two reasons:</p>
+      <ol>
+        <li>
+          <strong>Keys are user-generated</strong> — collisions across tenants are likely. Without
+          the <code>org_id</code> scope, Org A writing <code>Idempotency-Key: a1b2c3</code> would
+          collide with Org B&rsquo;s same key, returning Org A&rsquo;s cached response to Org B.
+          That&rsquo;s a privacy breach.
+        </li>
+        <li>
+          <strong>Cross-tenant idempotency cache leaks</strong> are themselves a data isolation bug.
+          RLS protects rows from being read across tenants; the idempotency table must follow the
+          same discipline.
+        </li>
+      </ol>
+
+      <!-- Where it matters most -->
+      <h3>Where it matters most</h3>
+      <div class="callout callout-danger">
+        <span class="callout-icon">🔴</span>
+        <div class="callout-content">
+          <p><strong>Phase 1:</strong> tender creation, bid placement.</p>
+          <p style="margin-top: 8px">
+            <strong>Phase 2: Escrow funding webhooks.</strong> This is where idempotency goes from
+            &ldquo;good practice&rdquo; to <strong>non-negotiable</strong>. Iyzico&rsquo;s webhook
+            can fire the same payment notification multiple times. Without idempotency, you mark the
+            auction funded twice, possibly release escrow twice.
+            <strong>Disaster.</strong>
+          </p>
+          <p style="margin-bottom: 0">
+            Build the discipline now so it&rsquo;s reflexive when escrow lands.
+          </p>
+        </div>
+      </div>
+
+      <!-- Implementation contract -->
+      <h3>Implementation contract</h3>
+      <p>
+        Hono middleware that extracts the <code>Idempotency-Key</code> header, hashes the request
+        body, checks the cache table, and either returns a cached response, 409 Conflict, or
+        executes the handler:
+      </p>
+
+      <pre><code><span class="syn-kw">export</span> <span class="syn-kw">const</span> <span class="syn-fn">idempotency</span> = <span class="syn-fn">createMiddleware</span>(<span class="syn-kw">async</span> (c, next) => {
   <span class="syn-kw">const</span> key = c.req.header(<span class="syn-str">'Idempotency-Key'</span>);
   <span class="syn-kw">const</span> orgId = c.get(<span class="syn-str">'orgId'</span>);
   <span class="syn-kw">if</span> (!key || !orgId) {
@@ -184,26 +242,39 @@
   <span class="syn-cm">// Capture response and write to idempotency_keys here</span>
 });</code></pre>
 
-    <!-- Anti-patterns -->
-    <h3>Anti-patterns</h3>
-    <div class="callout callout-danger">
-      <span class="callout-icon">🚫</span>
-      <div class="callout-content">
-        <ul style="margin:0;padding-left:20px;">
-          <li><strong>Selective implementation</strong> — adding idempotency to &ldquo;only payment endpoints.&rdquo; The pattern is uniform or it&rsquo;s nothing.</li>
-          <li><strong>Hashing the response body, not the request body</strong> — defeats conflict detection. If the same key arrives with different request content, you must 409, not silently re-serve.</li>
-          <li><strong>Storing responses forever</strong> — pollutes the table. 24-hour TTL is enough for network-retry windows.</li>
-          <li><strong>Sequential or timestamp-based keys</strong> — clients must generate UUIDs. Anything less is predictable collision-prone.</li>
-        </ul>
+      <!-- Anti-patterns -->
+      <h3>Anti-patterns</h3>
+      <div class="callout callout-danger">
+        <span class="callout-icon">🚫</span>
+        <div class="callout-content">
+          <ul style="margin: 0; padding-left: 20px">
+            <li>
+              <strong>Selective implementation</strong> — adding idempotency to &ldquo;only payment
+              endpoints.&rdquo; The pattern is uniform or it&rsquo;s nothing.
+            </li>
+            <li>
+              <strong>Hashing the response body, not the request body</strong> — defeats conflict
+              detection. If the same key arrives with different request content, you must 409, not
+              silently re-serve.
+            </li>
+            <li>
+              <strong>Storing responses forever</strong> — pollutes the table. 24-hour TTL is enough
+              for network-retry windows.
+            </li>
+            <li>
+              <strong>Sequential or timestamp-based keys</strong> — clients must generate UUIDs.
+              Anything less is predictable collision-prone.
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
 
-    <!-- See also -->
-    <div class="see-also">
-      <div class="heading">See Also</div>
-      <a href="server-authoritative-state.html">Server-Authoritative State</a>
-      <a href="audit-hash-chain.html">Audit Hash Chain</a>
-    </div>
-  </main>
-</body>
+      <!-- See also -->
+      <div class="see-also">
+        <div class="heading">See Also</div>
+        <a href="server-authoritative-state.html">Server-Authoritative State</a>
+        <a href="audit-hash-chain.html">Audit Hash Chain</a>
+      </div>
+    </main>
+  </body>
 </html>

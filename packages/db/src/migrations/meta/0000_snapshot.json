@@ -225,12 +225,8 @@
           "name": "bids_tender_id_tenders_id_fk",
           "tableFrom": "bids",
           "tableTo": "tenders",
-          "columnsFrom": [
-            "tender_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tender_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -238,12 +234,8 @@
           "name": "bids_bidder_org_id_organizations_id_fk",
           "tableFrom": "bids",
           "tableTo": "organizations",
-          "columnsFrom": [
-            "bidder_org_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["bidder_org_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -251,12 +243,8 @@
           "name": "bids_bidder_user_id_users_id_fk",
           "tableFrom": "bids",
           "tableTo": "users",
-          "columnsFrom": [
-            "bidder_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["bidder_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -336,10 +324,7 @@
       "compositePrimaryKeys": {
         "idempotency_keys_key_org_id_pk": {
           "name": "idempotency_keys_key_org_id_pk",
-          "columns": [
-            "key",
-            "org_id"
-          ]
+          "columns": ["key", "org_id"]
         }
       },
       "uniqueConstraints": {},
@@ -406,12 +391,8 @@
           "name": "org_members_org_id_organizations_id_fk",
           "tableFrom": "org_members",
           "tableTo": "organizations",
-          "columnsFrom": [
-            "org_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["org_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -419,12 +400,8 @@
           "name": "org_members_user_id_users_id_fk",
           "tableFrom": "org_members",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -432,10 +409,7 @@
       "compositePrimaryKeys": {
         "org_members_org_id_user_id_pk": {
           "name": "org_members_org_id_user_id_pk",
-          "columns": [
-            "org_id",
-            "user_id"
-          ]
+          "columns": ["org_id", "user_id"]
         }
       },
       "uniqueConstraints": {},
@@ -706,12 +680,8 @@
           "name": "tenders_org_id_organizations_id_fk",
           "tableFrom": "tenders",
           "tableTo": "organizations",
-          "columnsFrom": [
-            "org_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["org_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -719,12 +689,8 @@
           "name": "tenders_created_by_user_id_users_id_fk",
           "tableFrom": "tenders",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -808,32 +774,17 @@
     "public.material_type": {
       "name": "material_type",
       "schema": "public",
-      "values": [
-        "metal_scrap",
-        "plastic",
-        "paper",
-        "electronic",
-        "chemical",
-        "other"
-      ]
+      "values": ["metal_scrap", "plastic", "paper", "electronic", "chemical", "other"]
     },
     "public.org_role": {
       "name": "org_role",
       "schema": "public",
-      "values": [
-        "admin",
-        "operations",
-        "accounting"
-      ]
+      "values": ["admin", "operations", "accounting"]
     },
     "public.org_type": {
       "name": "org_type",
       "schema": "public",
-      "values": [
-        "producer",
-        "recycler",
-        "carrier"
-      ]
+      "values": ["producer", "recycler", "carrier"]
     },
     "public.tender_status": {
       "name": "tender_status",

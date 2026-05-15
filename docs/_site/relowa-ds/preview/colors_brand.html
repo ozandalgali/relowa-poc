@@ -1,108 +1,116 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Brand Green — Relowa DS</title>
-  <link rel="stylesheet" href="../colors_and_type.css">
-  <style>
-    body {
-      padding: 24px;
-      background: var(--surface);
-      font-family: var(--font-sans);
-      color: var(--foreground);
-    }
-    h2 {
-      font-size: var(--text-h3);
-      font-weight: var(--weight-semibold);
-      margin: 0 0 8px;
-    }
-    .eyebrow {
-      font-family: var(--font-mono);
-      font-size: var(--text-caption);
-      font-weight: var(--weight-medium);
-      color: var(--foreground-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 24px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 12px;
-    }
-    .swatch {
-      border-radius: var(--radius-lg);
-      padding: 20px 16px 16px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      min-height: 140px;
-      transition: transform var(--transition-base);
-    }
-    .swatch:hover { transform: translateY(-2px); }
-    .swatch-name {
-      font-family: var(--font-mono);
-      font-size: var(--text-body-sm);
-      font-weight: var(--weight-medium);
-      opacity: 0.75;
-      margin-bottom: 4px;
-    }
-    .swatch-hex {
-      font-family: var(--font-mono);
-      font-size: var(--text-body);
-      font-weight: var(--weight-semibold);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .star { color: var(--green-500); opacity: 1; font-size: var(--text-body); }
-    .light { color: var(--neutral-900); }
-    .dark  { color: var(--neutral-0); }
-  </style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brand Green — Relowa DS</title>
+    <link rel="stylesheet" href="../colors_and_type.css" />
+    <style>
+      body {
+        padding: 24px;
+        background: var(--surface);
+        font-family: var(--font-sans);
+        color: var(--foreground);
+      }
+      h2 {
+        font-size: var(--text-h3);
+        font-weight: var(--weight-semibold);
+        margin: 0 0 8px;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: var(--text-caption);
+        font-weight: var(--weight-medium);
+        color: var(--foreground-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 24px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 12px;
+      }
+      .swatch {
+        border-radius: var(--radius-lg);
+        padding: 20px 16px 16px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        min-height: 140px;
+        transition: transform var(--transition-base);
+      }
+      .swatch:hover {
+        transform: translateY(-2px);
+      }
+      .swatch-name {
+        font-family: var(--font-mono);
+        font-size: var(--text-body-sm);
+        font-weight: var(--weight-medium);
+        opacity: 0.75;
+        margin-bottom: 4px;
+      }
+      .swatch-hex {
+        font-family: var(--font-mono);
+        font-size: var(--text-body);
+        font-weight: var(--weight-semibold);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .star {
+        color: var(--green-500);
+        opacity: 1;
+        font-size: var(--text-body);
+      }
+      .light {
+        color: var(--neutral-900);
+      }
+      .dark {
+        color: var(--neutral-0);
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Brand Green</h2>
+    <p class="eyebrow">Green Palette &middot; 6 swatches &middot; Primary: green-800</p>
 
-<h2>Brand Green</h2>
-<p class="eyebrow">Green Palette &middot; 6 swatches &middot; Primary: green-800</p>
+    <div class="grid">
+      <!-- green-50 -->
+      <div class="swatch light" style="background: var(--green-50)">
+        <span class="swatch-name">green-50</span>
+        <span class="swatch-hex">#E8FBF0</span>
+      </div>
 
-<div class="grid">
-  <!-- green-50 -->
-  <div class="swatch light" style="background: var(--green-50)">
-    <span class="swatch-name">green-50</span>
-    <span class="swatch-hex">#E8FBF0</span>
-  </div>
+      <!-- green-100 -->
+      <div class="swatch light" style="background: var(--green-100)">
+        <span class="swatch-name">green-100</span>
+        <span class="swatch-hex">#D1FAE5</span>
+      </div>
 
-  <!-- green-100 -->
-  <div class="swatch light" style="background: var(--green-100)">
-    <span class="swatch-name">green-100</span>
-    <span class="swatch-hex">#D1FAE5</span>
-  </div>
+      <!-- green-200 -->
+      <div class="swatch light" style="background: var(--green-200)">
+        <span class="swatch-name">green-200</span>
+        <span class="swatch-hex">#A7F5CE</span>
+      </div>
 
-  <!-- green-200 -->
-  <div class="swatch light" style="background: var(--green-200)">
-    <span class="swatch-name">green-200</span>
-    <span class="swatch-hex">#A7F5CE</span>
-  </div>
+      <!-- green-500 -->
+      <div class="swatch dark" style="background: var(--green-500)">
+        <span class="swatch-name">green-500</span>
+        <span class="swatch-hex">#00E676</span>
+      </div>
 
-  <!-- green-500 -->
-  <div class="swatch dark" style="background: var(--green-500)">
-    <span class="swatch-name">green-500</span>
-    <span class="swatch-hex">#00E676</span>
-  </div>
+      <!-- green-700 -->
+      <div class="swatch dark" style="background: var(--green-700)">
+        <span class="swatch-name">green-700</span>
+        <span class="swatch-hex">#009B46</span>
+      </div>
 
-  <!-- green-700 -->
-  <div class="swatch dark" style="background: var(--green-700)">
-    <span class="swatch-name">green-700</span>
-    <span class="swatch-hex">#009B46</span>
-  </div>
-
-  <!-- green-800 ★ primary -->
-  <div class="swatch dark" style="background: var(--green-800)">
-    <span class="swatch-name"><span class="star">★</span> green-800</span>
-    <span class="swatch-hex">#0A2E1C</span>
-  </div>
-</div>
-
-</body>
+      <!-- green-800 ★ primary -->
+      <div class="swatch dark" style="background: var(--green-800)">
+        <span class="swatch-name"><span class="star">★</span> green-800</span>
+        <span class="swatch-hex">#0A2E1C</span>
+      </div>
+    </div>
+  </body>
 </html>

@@ -1,123 +1,214 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hash Anchoring</title>
-  <link rel="stylesheet" href="../style.css">
-</head>
-<body>
-  <aside class="sidebar">
-    <div class="sidebar-header"><h1 onclick="location.href='../index.html'">🏭 Relowa POC</h1></div>
-    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> ADRs</div>
-    <div class="sidebar-nav">
-      <a href="../adr/0001-postgres-as-system-of-record.html"><span class="page-icon">📄</span>0001 — Postgres as SoR</a>
-      <a href="../adr/0002-supabase-realtime-standalone.html"><span class="page-icon">📄</span>0002 — Realtime</a>
-      <a href="../adr/0003-rls-with-jwt-guc-pattern.html"><span class="page-icon">📄</span>0003 — RLS JWT-via-GUC</a>
-      <a href="../adr/0004-multi-agent-orchestration.html"><span class="page-icon">📄</span>0004 — Multi-Agent</a>
-      <a href="../adr/0008-arbitrum-hash-anchoring.html"><span class="page-icon">📄</span>0008 — Arbitrum Anchoring</a>
-      <a href="../adr/0009-local-bidding-architecture.html"><span class="page-icon">📄</span>0009 — Bidding Architecture</a>
-    </div>
-    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> Concepts</div>
-    <div class="sidebar-nav">
-      <a href="auth-uid-pattern.html"><span class="page-icon">💡</span>auth.uid() Pattern</a>
-      <a href="audit-hash-chain.html"><span class="page-icon">💡</span>Audit Hash Chain</a>
-      <a href="hash-anchoring.html" class="active"><span class="page-icon">💡</span>Hash Anchoring</a>
-      <a href="idempotency.html"><span class="page-icon">💡</span>Idempotency</a>
-      <a href="multi-tenancy.html"><span class="page-icon">💡</span>Multi-tenancy</a>
-      <a href="server-authoritative-state.html"><span class="page-icon">💡</span>Server-Auth State</a>
-    </div>
-    <div class="sidebar-nav" style="margin-top:8px"><a href="../milestones.html"><span class="page-icon">🗓️</span>Phase 1 Milestones</a></div>
-    <div class="sidebar-section" style="margin-top:12px">Design System</div>
-    <div class="sidebar-nav">
-      <a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
-    </div>
-    <div class="sidebar-footer">Relowa POC · v0.1</div>
-  </aside>
-  <main class="main">
-    <div class="page-cover concept"></div>
-    <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="../index.html">Concepts</a> <span class="sep">/</span> Hash Anchoring</div>
-    <h2 style="border:none;font-size:1.8rem;margin-top:8px">Hash Anchoring on Arbitrum One</h2>
-    <div class="properties">
-      <div class="prop-row"><span class="prop-label">Type</span><span class="prop-value"><span class="badge badge-concept">Concept</span></span></div>
-    </div>
-    <hr class="divider">
-
-    <div class="callout callout-info">
-      <div class="callout-icon">💡</div>
-      <div class="callout-content">
-        <p>Why we publish a 32-byte Merkle root to an L2 every day, and how an auditor verifies it independently.</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hash Anchoring</title>
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 onclick="location.href = '../index.html'">🏭 Relowa POC</h1>
       </div>
-    </div>
-
-    <h3>What this is</h3>
-
-    <div class="callout callout-info">
-      <div class="callout-icon">📋</div>
-      <div class="callout-content">
-        <p>Hash anchoring is a <strong>compliance primitive</strong>, not a blockchain product. A daily Lambda computes a Merkle root from 24 hours of audit data → calls an Arbitrum One smart contract → stores the root on-chain. This proves, cryptographically and timestamped, that "at block height H, this exact dataset existed" — without revealing any of the data itself.</p>
-        <p style="margin-top:8px">An auditor gets the raw data from us. They recompute the Merkle root independently. If it matches the on-chain root, they know that the data they hold is the <em>same</em> data that existed at that point in time — not a later fabrication.</p>
+      <div
+        class="sidebar-section"
+        onclick="
+          this.classList.toggle('collapsed');
+          this.nextElementSibling.classList.toggle('collapsed');
+        "
+      >
+        <span class="toggle">▾</span> ADRs
       </div>
-    </div>
+      <div class="sidebar-nav">
+        <a href="../adr/0001-postgres-as-system-of-record.html"
+          ><span class="page-icon">📄</span>0001 — Postgres as SoR</a
+        >
+        <a href="../adr/0002-supabase-realtime-standalone.html"
+          ><span class="page-icon">📄</span>0002 — Realtime</a
+        >
+        <a href="../adr/0003-rls-with-jwt-guc-pattern.html"
+          ><span class="page-icon">📄</span>0003 — RLS JWT-via-GUC</a
+        >
+        <a href="../adr/0004-multi-agent-orchestration.html"
+          ><span class="page-icon">📄</span>0004 — Multi-Agent</a
+        >
+        <a href="../adr/0008-arbitrum-hash-anchoring.html"
+          ><span class="page-icon">📄</span>0008 — Arbitrum Anchoring</a
+        >
+        <a href="../adr/0009-local-bidding-architecture.html"
+          ><span class="page-icon">📄</span>0009 — Bidding Architecture</a
+        >
+      </div>
+      <div
+        class="sidebar-section"
+        onclick="
+          this.classList.toggle('collapsed');
+          this.nextElementSibling.classList.toggle('collapsed');
+        "
+      >
+        <span class="toggle">▾</span> Concepts
+      </div>
+      <div class="sidebar-nav">
+        <a href="auth-uid-pattern.html"><span class="page-icon">💡</span>auth.uid() Pattern</a>
+        <a href="audit-hash-chain.html"><span class="page-icon">💡</span>Audit Hash Chain</a>
+        <a href="hash-anchoring.html" class="active"
+          ><span class="page-icon">💡</span>Hash Anchoring</a
+        >
+        <a href="idempotency.html"><span class="page-icon">💡</span>Idempotency</a>
+        <a href="multi-tenancy.html"><span class="page-icon">💡</span>Multi-tenancy</a>
+        <a href="server-authoritative-state.html"
+          ><span class="page-icon">💡</span>Server-Auth State</a
+        >
+      </div>
+      <div class="sidebar-nav" style="margin-top: 8px">
+        <a href="../milestones.html"><span class="page-icon">🗓️</span>Phase 1 Milestones</a>
+      </div>
+      <div class="sidebar-section" style="margin-top: 12px">Design System</div>
+      <div class="sidebar-nav">
+        <a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
+      </div>
+      <div class="sidebar-footer">Relowa POC · v0.1</div>
+    </aside>
+    <main class="main">
+      <div class="page-cover concept"></div>
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a> <span class="sep">/</span>
+        <a href="../index.html">Concepts</a> <span class="sep">/</span> Hash Anchoring
+      </div>
+      <h2 style="border: none; font-size: 1.8rem; margin-top: 8px">
+        Hash Anchoring on Arbitrum One
+      </h2>
+      <div class="properties">
+        <div class="prop-row">
+          <span class="prop-label">Type</span
+          ><span class="prop-value"><span class="badge badge-concept">Concept</span></span>
+        </div>
+      </div>
+      <hr class="divider" />
 
-    <h3>Three layers of audit protection</h3>
+      <div class="callout callout-info">
+        <div class="callout-icon">💡</div>
+        <div class="callout-content">
+          <p>
+            Why we publish a 32-byte Merkle root to an L2 every day, and how an auditor verifies it
+            independently.
+          </p>
+        </div>
+      </div>
 
-    <table class="notion-table">
-      <thead>
-        <tr><th>Layer</th><th>Protects against</th><th>Trust model</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>DB hash chain</strong></td>
-          <td>Retroactive row insertion/deletion/modification</td>
-          <td>Trust the DB operator. SHA-256 makes tampering detectable within seconds.</td>
-        </tr>
-        <tr>
-          <td><strong>S3 WORM mirror</strong></td>
-          <td>DB operator collusion (operator + DBA alter rows and recompute hash chain)</td>
-          <td>Trust AWS Object Lock enforcement. Data cannot be deleted or modified after write.</td>
-        </tr>
-        <tr>
-          <td><strong>Arbitrum anchoring</strong></td>
-          <td>AWS + Relowa collusion (S3 object modified, WORM lock bypassed via root account)</td>
-          <td>Trust the Ethereum L1 consensus. A single honest Arbitrum validator makes forgery economically impossible.</td>
-        </tr>
-      </tbody>
-    </table>
+      <h3>What this is</h3>
 
-    <h3>How it works — Anchoring</h3>
+      <div class="callout callout-info">
+        <div class="callout-icon">📋</div>
+        <div class="callout-content">
+          <p>
+            Hash anchoring is a <strong>compliance primitive</strong>, not a blockchain product. A
+            daily Lambda computes a Merkle root from 24 hours of audit data → calls an Arbitrum One
+            smart contract → stores the root on-chain. This proves, cryptographically and
+            timestamped, that "at block height H, this exact dataset existed" — without revealing
+            any of the data itself.
+          </p>
+          <p style="margin-top: 8px">
+            An auditor gets the raw data from us. They recompute the Merkle root independently. If
+            it matches the on-chain root, they know that the data they hold is the
+            <em>same</em> data that existed at that point in time — not a later fabrication.
+          </p>
+        </div>
+      </div>
 
-    <p>Every 24 hours, an EventBridge Scheduler triggers a Lambda. Here's what it does:</p>
+      <h3>Three layers of audit protection</h3>
 
-    <ol>
-      <li>Queries <code>audit_events</code> and <code>certificates</code> for the past 24 hours (UTC midnight to midnight).</li>
-      <li>For each row, computes a Merkle leaf: <code>sha256(id|org_id|user_id|action|...|prev_hash)</code>.</li>
-      <li>Builds a Merkle tree from all leaves of that day.</li>
-      <li>Extracts the 32-byte Merkle root.</li>
-      <li>Loads the Arbitrum contract ABI and a funded wallet from Secrets Manager.</li>
-      <li>Calls <code>contract.anchorRoot(date, merkleRoot)</code> on Arbitrum One.</li>
-      <li>Logs the transaction hash, block number, and Merkle root to the <code>anchor_log</code> table.</li>
-    </ol>
+      <table class="notion-table">
+        <thead>
+          <tr>
+            <th>Layer</th>
+            <th>Protects against</th>
+            <th>Trust model</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>DB hash chain</strong></td>
+            <td>Retroactive row insertion/deletion/modification</td>
+            <td>Trust the DB operator. SHA-256 makes tampering detectable within seconds.</td>
+          </tr>
+          <tr>
+            <td><strong>S3 WORM mirror</strong></td>
+            <td>DB operator collusion (operator + DBA alter rows and recompute hash chain)</td>
+            <td>
+              Trust AWS Object Lock enforcement. Data cannot be deleted or modified after write.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Arbitrum anchoring</strong></td>
+            <td>
+              AWS + Relowa collusion (S3 object modified, WORM lock bypassed via root account)
+            </td>
+            <td>
+              Trust the Ethereum L1 consensus. A single honest Arbitrum validator makes forgery
+              economically impossible.
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-    <h3>How it works — Verification</h3>
+      <h3>How it works — Anchoring</h3>
 
-    <p>An auditor (or our own compliance team) can independently verify any day's data:</p>
+      <p>Every 24 hours, an EventBridge Scheduler triggers a Lambda. Here's what it does:</p>
 
-    <ol>
-      <li>Request the raw audit data for date D from Relowa.</li>
-      <li>Recompute the Merkle tree from the data using the same leaf construction algorithm (published in the ADR).</li>
-      <li>Compare the resulting root against the on-chain value at <code>contract.getRoot(date)</code>.</li>
-      <li>If they match: the data is authentic and existed at the time of the on-chain transaction.</li>
-      <li>If they don't match: the data was altered after anchoring, or the wrong dataset was provided.</li>
-    </ol>
+      <ol>
+        <li>
+          Queries <code>audit_events</code> and <code>certificates</code> for the past 24 hours (UTC
+          midnight to midnight).
+        </li>
+        <li>
+          For each row, computes a Merkle leaf:
+          <code>sha256(id|org_id|user_id|action|...|prev_hash)</code>.
+        </li>
+        <li>Builds a Merkle tree from all leaves of that day.</li>
+        <li>Extracts the 32-byte Merkle root.</li>
+        <li>Loads the Arbitrum contract ABI and a funded wallet from Secrets Manager.</li>
+        <li>Calls <code>contract.anchorRoot(date, merkleRoot)</code> on Arbitrum One.</li>
+        <li>
+          Logs the transaction hash, block number, and Merkle root to the
+          <code>anchor_log</code> table.
+        </li>
+      </ol>
 
-    <p>The auditor needs zero blockchain knowledge — they can use a block explorer to read the stored root, or we can provide it with a Merkle proof.</p>
+      <h3>How it works — Verification</h3>
 
-    <h3>What goes into Merkle leaves</h3>
+      <p>An auditor (or our own compliance team) can independently verify any day's data:</p>
 
-    <p>Each leaf is a deterministic SHA-256 hash of a single row's fields, pipe-delimited:</p>
+      <ol>
+        <li>Request the raw audit data for date D from Relowa.</li>
+        <li>
+          Recompute the Merkle tree from the data using the same leaf construction algorithm
+          (published in the ADR).
+        </li>
+        <li>
+          Compare the resulting root against the on-chain value at
+          <code>contract.getRoot(date)</code>.
+        </li>
+        <li>
+          If they match: the data is authentic and existed at the time of the on-chain transaction.
+        </li>
+        <li>
+          If they don't match: the data was altered after anchoring, or the wrong dataset was
+          provided.
+        </li>
+      </ol>
 
-    <pre><code><span class="syn-cm">-- audit_events leaf</span>
+      <p>
+        The auditor needs zero blockchain knowledge — they can use a block explorer to read the
+        stored root, or we can provide it with a Merkle proof.
+      </p>
+
+      <h3>What goes into Merkle leaves</h3>
+
+      <p>Each leaf is a deterministic SHA-256 hash of a single row's fields, pipe-delimited:</p>
+
+      <pre><code><span class="syn-cm">-- audit_events leaf</span>
 <span class="syn-fn">sha256</span>(
   id || <span class="syn-str">'|'</span> || org_id || <span class="syn-str">'|'</span> || user_id || <span class="syn-str">'|'</span> ||
   action || <span class="syn-str">'|'</span> || resource_type || <span class="syn-str">'|'</span> ||
@@ -132,92 +223,189 @@
   issued_at || <span class="syn-str">'|'</span> || prev_hash
 )</code></pre>
 
-    <p>The two trees are computed separately, then their roots are hashed together to produce a single daily root. This means an auditor can verify just audit data, just certificate data, or both.</p>
+      <p>
+        The two trees are computed separately, then their roots are hashed together to produce a
+        single daily root. This means an auditor can verify just audit data, just certificate data,
+        or both.
+      </p>
 
-    <h3>Why Arbitrum One</h3>
+      <h3>Why Arbitrum One</h3>
 
-    <table class="notion-table">
-      <thead>
-        <tr><th>Factor</th><th>Why it matters</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>L2 on Ethereum</td><td>Inherits Ethereum's security. Data availability and fraud proofs are guaranteed by L1 validators. No need to trust a sidechain's validator set.</td></tr>
-        <tr><td>EVM-compatible</td><td>The anchoring contract is a simple Solidity mapping: <code>mapping(uint256 => bytes32) public roots;</code>. No new language, no new tooling, no new attack surface.</td></tr>
-        <tr><td>~$0.01 per day</td><td>Even at 100× gas spikes, anchoring 32 bytes once per day costs under a dollar. This is a compliance checkbox, not a profit center — the cost must be negligible.</td></tr>
-        <tr><td>No single-company sequencer</td><td>Arbitrum has a decentralized validator set with a permissionless challenge period. A single malicious sequencer cannot forge a root without being challenged and slashed.</td></tr>
-      </tbody>
-    </table>
+      <table class="notion-table">
+        <thead>
+          <tr>
+            <th>Factor</th>
+            <th>Why it matters</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>L2 on Ethereum</td>
+            <td>
+              Inherits Ethereum's security. Data availability and fraud proofs are guaranteed by L1
+              validators. No need to trust a sidechain's validator set.
+            </td>
+          </tr>
+          <tr>
+            <td>EVM-compatible</td>
+            <td>
+              The anchoring contract is a simple Solidity mapping:
+              <code>mapping(uint256 => bytes32) public roots;</code>. No new language, no new
+              tooling, no new attack surface.
+            </td>
+          </tr>
+          <tr>
+            <td>~$0.01 per day</td>
+            <td>
+              Even at 100× gas spikes, anchoring 32 bytes once per day costs under a dollar. This is
+              a compliance checkbox, not a profit center — the cost must be negligible.
+            </td>
+          </tr>
+          <tr>
+            <td>No single-company sequencer</td>
+            <td>
+              Arbitrum has a decentralized validator set with a permissionless challenge period. A
+              single malicious sequencer cannot forge a root without being challenged and slashed.
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-    <h3>What we intentionally DON'T do</h3>
+      <h3>What we intentionally DON'T do</h3>
 
-    <div class="callout callout-warning">
-      <div class="callout-icon">🛑</div>
-      <div class="callout-content">
-        <ul style="margin:0;padding-left:18px">
-          <li style="margin:6px 0"><strong>No ZK proofs.</strong> Merkle trees achieve the same "prove inclusion without revealing data" property with far less complexity. ZK would add a compiler toolchain, a proving circuit, and months of audit overhead for zero additional compliance benefit.</li>
-          <li style="margin:6px 0"><strong>No per-event anchoring.</strong> We batch 24 hours. Per-event would require a transaction for every tender, bid, and certificate — thousands of dollars per day in gas.</li>
-          <li style="margin:6px 0"><strong>No tokens.</strong> There is no RELOWA token, no staking, no governance token. This is infrastructure, not a tokenomics project.</li>
-          <li style="margin:6px 0"><strong>No data on-chain.</strong> The contract stores a 32-byte hash, not the data. The data lives in our Postgres DB and S3. The chain is a trust anchor, not a data store.</li>
-          <li style="margin:6px 0"><strong>No client wallets.</strong> End users never interact with Arbitrum. They never see a transaction, sign a message, or hold ETH. The anchoring is purely server-side.</li>
-        </ul>
+      <div class="callout callout-warning">
+        <div class="callout-icon">🛑</div>
+        <div class="callout-content">
+          <ul style="margin: 0; padding-left: 18px">
+            <li style="margin: 6px 0">
+              <strong>No ZK proofs.</strong> Merkle trees achieve the same "prove inclusion without
+              revealing data" property with far less complexity. ZK would add a compiler toolchain,
+              a proving circuit, and months of audit overhead for zero additional compliance
+              benefit.
+            </li>
+            <li style="margin: 6px 0">
+              <strong>No per-event anchoring.</strong> We batch 24 hours. Per-event would require a
+              transaction for every tender, bid, and certificate — thousands of dollars per day in
+              gas.
+            </li>
+            <li style="margin: 6px 0">
+              <strong>No tokens.</strong> There is no RELOWA token, no staking, no governance token.
+              This is infrastructure, not a tokenomics project.
+            </li>
+            <li style="margin: 6px 0">
+              <strong>No data on-chain.</strong> The contract stores a 32-byte hash, not the data.
+              The data lives in our Postgres DB and S3. The chain is a trust anchor, not a data
+              store.
+            </li>
+            <li style="margin: 6px 0">
+              <strong>No client wallets.</strong> End users never interact with Arbitrum. They never
+              see a transaction, sign a message, or hold ETH. The anchoring is purely server-side.
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
 
-    <h3>ESG verification flow</h3>
+      <h3>ESG verification flow</h3>
 
-    <div class="callout callout-success">
-      <div class="callout-icon">✅</div>
-      <div class="callout-content">
-        <strong>End-to-end CSRD auditor scenario</strong>
-        <p style="margin-top:8px">A third-party auditor is verifying a producer's 2025 carbon offset claims for CSRD compliance. Here's the full flow:</p>
-        <ol style="margin:8px 0 0 18px">
-          <li style="margin:4px 0">Auditor requests <em>"all waste certificates for Org X in 2025."</em></li>
-          <li style="margin:4px 0">Relowa exports the certificate rows + the <code>anchor_log</code> entries for each day those certificates were anchored.</li>
-          <li style="margin:4px 0">Auditor recomputes each day's Merkle tree from the raw certificate data.</li>
-          <li style="margin:4px 0">Auditor checks the computed root against the on-chain root (via Arbiscan or an RPC call).</li>
-          <li style="margin:4px 0">Auditor verifies that the on-chain transaction timestamp is within the reporting period.</li>
-          <li style="margin:4px 0">Auditor traces the hash chain backward from the last certificate to the first, confirming no gaps.</li>
-          <li style="margin:4px 0">Auditor signs off: <em>"Certificate data for Org X in 2025 is cryptographically verified as authentic and tamper-free."</em></li>
-        </ol>
+      <div class="callout callout-success">
+        <div class="callout-icon">✅</div>
+        <div class="callout-content">
+          <strong>End-to-end CSRD auditor scenario</strong>
+          <p style="margin-top: 8px">
+            A third-party auditor is verifying a producer's 2025 carbon offset claims for CSRD
+            compliance. Here's the full flow:
+          </p>
+          <ol style="margin: 8px 0 0 18px">
+            <li style="margin: 4px 0">
+              Auditor requests <em>"all waste certificates for Org X in 2025."</em>
+            </li>
+            <li style="margin: 4px 0">
+              Relowa exports the certificate rows + the <code>anchor_log</code> entries for each day
+              those certificates were anchored.
+            </li>
+            <li style="margin: 4px 0">
+              Auditor recomputes each day's Merkle tree from the raw certificate data.
+            </li>
+            <li style="margin: 4px 0">
+              Auditor checks the computed root against the on-chain root (via Arbiscan or an RPC
+              call).
+            </li>
+            <li style="margin: 4px 0">
+              Auditor verifies that the on-chain transaction timestamp is within the reporting
+              period.
+            </li>
+            <li style="margin: 4px 0">
+              Auditor traces the hash chain backward from the last certificate to the first,
+              confirming no gaps.
+            </li>
+            <li style="margin: 4px 0">
+              Auditor signs off:
+              <em
+                >"Certificate data for Org X in 2025 is cryptographically verified as authentic and
+                tamper-free."</em
+              >
+            </li>
+          </ol>
+        </div>
       </div>
-    </div>
 
-    <h3>Operational notes</h3>
+      <h3>Operational notes</h3>
 
-    <table class="notion-table">
-      <thead>
-        <tr><th>Component</th><th>Details</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>Trigger</strong></td>
-          <td>EventBridge Scheduler — cron at 00:05 UTC daily. 5-minute buffer ensures all of yesterday's events are committed.</td>
-        </tr>
-        <tr>
-          <td><strong>Failure alert</strong></td>
-          <td>CloudWatch alarm on Lambda error rate > 0, or missing <code>anchor_log</code> row for today's date. If anchoring fails, we have a ~24-hour window to retry before the day's data is no longer "yesterday."</td>
-        </tr>
-        <tr>
-          <td><strong>anchor_log table</strong></td>
-          <td>Records: <code>(date, merkle_root, tx_hash, block_number, anchored_at)</code>. This table itself is part of the audit hash chain — the anchoring action is itself an auditable event.</td>
-        </tr>
-        <tr>
-          <td><strong>Wallet management</strong></td>
-          <td>The Arbitrum wallet private key lives in AWS Secrets Manager. The Lambda's execution role has <code>secretsmanager:GetSecretValue</code> scoped to that specific secret. No .env files, no hardcoded keys.</td>
-        </tr>
-        <tr>
-          <td><strong>Gas strategy</strong></td>
-          <td>No priority fees. The transaction can be included in any block within the 24-hour window. If gas exceeds a threshold, the Lambda retries with exponential backoff.</td>
-        </tr>
-      </tbody>
-    </table>
+      <table class="notion-table">
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Trigger</strong></td>
+            <td>
+              EventBridge Scheduler — cron at 00:05 UTC daily. 5-minute buffer ensures all of
+              yesterday's events are committed.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Failure alert</strong></td>
+            <td>
+              CloudWatch alarm on Lambda error rate > 0, or missing <code>anchor_log</code> row for
+              today's date. If anchoring fails, we have a ~24-hour window to retry before the day's
+              data is no longer "yesterday."
+            </td>
+          </tr>
+          <tr>
+            <td><strong>anchor_log table</strong></td>
+            <td>
+              Records: <code>(date, merkle_root, tx_hash, block_number, anchored_at)</code>. This
+              table itself is part of the audit hash chain — the anchoring action is itself an
+              auditable event.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Wallet management</strong></td>
+            <td>
+              The Arbitrum wallet private key lives in AWS Secrets Manager. The Lambda's execution
+              role has <code>secretsmanager:GetSecretValue</code> scoped to that specific secret. No
+              .env files, no hardcoded keys.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Gas strategy</strong></td>
+            <td>
+              No priority fees. The transaction can be included in any block within the 24-hour
+              window. If gas exceeds a threshold, the Lambda retries with exponential backoff.
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-    <div class="see-also">
-      <div class="heading">See also</div>
-      <a href="../adr/0008-arbitrum-hash-anchoring.html">adr/0008-arbitrum-hash-anchoring</a>
-      <a href="audit-hash-chain.html">concepts/audit-hash-chain</a>
-      <a href="idempotency.html">concepts/idempotency</a>
-    </div>
-  </main>
-</body>
+      <div class="see-also">
+        <div class="heading">See also</div>
+        <a href="../adr/0008-arbitrum-hash-anchoring.html">adr/0008-arbitrum-hash-anchoring</a>
+        <a href="audit-hash-chain.html">concepts/audit-hash-chain</a>
+        <a href="idempotency.html">concepts/idempotency</a>
+      </div>
+    </main>
+  </body>
 </html>

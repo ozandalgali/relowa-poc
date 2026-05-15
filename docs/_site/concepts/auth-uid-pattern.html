@@ -1,83 +1,140 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>auth.uid() Pattern</title>
-  <link rel="stylesheet" href="../style.css">
-</head>
-<body>
-  <aside class="sidebar">
-    <div class="sidebar-header"><h1 onclick="location.href='../index.html'">🏭 Relowa POC</h1></div>
-    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> ADRs</div>
-    <div class="sidebar-nav">
-      <a href="../adr/0001-postgres-as-system-of-record.html"><span class="page-icon">📄</span>0001 — Postgres as SoR</a>
-      <a href="../adr/0002-supabase-realtime-standalone.html"><span class="page-icon">📄</span>0002 — Realtime</a>
-      <a href="../adr/0003-rls-with-jwt-guc-pattern.html"><span class="page-icon">📄</span>0003 — RLS JWT-via-GUC</a>
-      <a href="../adr/0004-multi-agent-orchestration.html"><span class="page-icon">📄</span>0004 — Multi-Agent</a>
-      <a href="../adr/0008-arbitrum-hash-anchoring.html"><span class="page-icon">📄</span>0008 — Arbitrum Anchoring</a>
-      <a href="../adr/0009-local-bidding-architecture.html"><span class="page-icon">📄</span>0009 — Bidding Architecture</a>
-    </div>
-    <div class="sidebar-section" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')"><span class="toggle">▾</span> Concepts</div>
-    <div class="sidebar-nav">
-      <a href="auth-uid-pattern.html" class="active"><span class="page-icon">💡</span>auth.uid() Pattern</a>
-      <a href="audit-hash-chain.html"><span class="page-icon">💡</span>Audit Hash Chain</a>
-      <a href="hash-anchoring.html"><span class="page-icon">💡</span>Hash Anchoring</a>
-      <a href="idempotency.html"><span class="page-icon">💡</span>Idempotency</a>
-      <a href="multi-tenancy.html"><span class="page-icon">💡</span>Multi-tenancy</a>
-      <a href="server-authoritative-state.html"><span class="page-icon">💡</span>Server-Auth State</a>
-    </div>
-    <div class="sidebar-nav" style="margin-top:8px"><a href="../milestones.html"><span class="page-icon">🗓️</span>Phase 1 Milestones</a></div>
-    <div class="sidebar-section" style="margin-top:12px">Design System</div>
-    <div class="sidebar-nav">
-      <a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
-    </div>
-    <div class="sidebar-footer">Relowa POC · v0.1</div>
-  </aside>
-  <main class="main">
-    <div class="page-cover concept"></div>
-    <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="../index.html">Concepts</a> <span class="sep">/</span> auth.uid() Pattern</div>
-    <h2 style="border:none;font-size:1.8rem;margin-top:8px">auth.uid() Pattern</h2>
-    <div class="properties">
-      <div class="prop-row"><span class="prop-label">Type</span><span class="prop-value"><span class="badge badge-concept">Concept</span></span></div>
-    </div>
-    <hr class="divider">
-
-    <div class="callout callout-info">
-      <div class="callout-icon">💡</div>
-      <div class="callout-content">
-        <p>How we replicate Supabase's <code>auth.uid()</code> developer experience without Supabase, in 30 lines of SQL plus 5 lines of middleware.</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>auth.uid() Pattern</title>
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 onclick="location.href = '../index.html'">🏭 Relowa POC</h1>
       </div>
-    </div>
+      <div
+        class="sidebar-section"
+        onclick="
+          this.classList.toggle('collapsed');
+          this.nextElementSibling.classList.toggle('collapsed');
+        "
+      >
+        <span class="toggle">▾</span> ADRs
+      </div>
+      <div class="sidebar-nav">
+        <a href="../adr/0001-postgres-as-system-of-record.html"
+          ><span class="page-icon">📄</span>0001 — Postgres as SoR</a
+        >
+        <a href="../adr/0002-supabase-realtime-standalone.html"
+          ><span class="page-icon">📄</span>0002 — Realtime</a
+        >
+        <a href="../adr/0003-rls-with-jwt-guc-pattern.html"
+          ><span class="page-icon">📄</span>0003 — RLS JWT-via-GUC</a
+        >
+        <a href="../adr/0004-multi-agent-orchestration.html"
+          ><span class="page-icon">📄</span>0004 — Multi-Agent</a
+        >
+        <a href="../adr/0008-arbitrum-hash-anchoring.html"
+          ><span class="page-icon">📄</span>0008 — Arbitrum Anchoring</a
+        >
+        <a href="../adr/0009-local-bidding-architecture.html"
+          ><span class="page-icon">📄</span>0009 — Bidding Architecture</a
+        >
+      </div>
+      <div
+        class="sidebar-section"
+        onclick="
+          this.classList.toggle('collapsed');
+          this.nextElementSibling.classList.toggle('collapsed');
+        "
+      >
+        <span class="toggle">▾</span> Concepts
+      </div>
+      <div class="sidebar-nav">
+        <a href="auth-uid-pattern.html" class="active"
+          ><span class="page-icon">💡</span>auth.uid() Pattern</a
+        >
+        <a href="audit-hash-chain.html"><span class="page-icon">💡</span>Audit Hash Chain</a>
+        <a href="hash-anchoring.html"><span class="page-icon">💡</span>Hash Anchoring</a>
+        <a href="idempotency.html"><span class="page-icon">💡</span>Idempotency</a>
+        <a href="multi-tenancy.html"><span class="page-icon">💡</span>Multi-tenancy</a>
+        <a href="server-authoritative-state.html"
+          ><span class="page-icon">💡</span>Server-Auth State</a
+        >
+      </div>
+      <div class="sidebar-nav" style="margin-top: 8px">
+        <a href="../milestones.html"><span class="page-icon">🗓️</span>Phase 1 Milestones</a>
+      </div>
+      <div class="sidebar-section" style="margin-top: 12px">Design System</div>
+      <div class="sidebar-nav">
+        <a href="../relowa-ds/index.html"><span class="page-icon">🎨</span>Design System</a>
+      </div>
+      <div class="sidebar-footer">Relowa POC · v0.1</div>
+    </aside>
+    <main class="main">
+      <div class="page-cover concept"></div>
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a> <span class="sep">/</span>
+        <a href="../index.html">Concepts</a> <span class="sep">/</span> auth.uid() Pattern
+      </div>
+      <h2 style="border: none; font-size: 1.8rem; margin-top: 8px">auth.uid() Pattern</h2>
+      <div class="properties">
+        <div class="prop-row">
+          <span class="prop-label">Type</span
+          ><span class="prop-value"><span class="badge badge-concept">Concept</span></span>
+        </div>
+      </div>
+      <hr class="divider" />
 
-    <h3>Why this concept matters</h3>
+      <div class="callout callout-info">
+        <div class="callout-icon">💡</div>
+        <div class="callout-content">
+          <p>
+            How we replicate Supabase's <code>auth.uid()</code> developer experience without
+            Supabase, in 30 lines of SQL plus 5 lines of middleware.
+          </p>
+        </div>
+      </div>
 
-    <p>The seamless flow every Supabase developer knows:</p>
+      <h3>Why this concept matters</h3>
 
-    <ol>
-      <li>User logs in → a JWT token is issued.</li>
-      <li>App calls <code>db.from('tenders').select()</code> — no WHERE clause.</li>
-      <li>Only their org's data comes back.</li>
-    </ol>
+      <p>The seamless flow every Supabase developer knows:</p>
 
-    <p>No application-side filtering. No middleware that checks org ownership. The "magic" that makes this work is <strong>vanilla Postgres</strong>, wired up once in the schema and never touched again.</p>
+      <ol>
+        <li>User logs in → a JWT token is issued.</li>
+        <li>App calls <code>db.from('tenders').select()</code> — no WHERE clause.</li>
+        <li>Only their org's data comes back.</li>
+      </ol>
 
-    <h3>The mechanism (3 pieces)</h3>
+      <p>
+        No application-side filtering. No middleware that checks org ownership. The "magic" that
+        makes this work is <strong>vanilla Postgres</strong>, wired up once in the schema and never
+        touched again.
+      </p>
 
-    <h4>1. The GUC</h4>
+      <h3>The mechanism (3 pieces)</h3>
 
-    <p>Before every query, the middleware injects the JWT claims into a Postgres session variable:</p>
+      <h4>1. The GUC</h4>
 
-    <pre><code><span class="syn-cm">-- Called by middleware at the start of every transaction</span>
+      <p>
+        Before every query, the middleware injects the JWT claims into a Postgres session variable:
+      </p>
+
+      <pre><code><span class="syn-cm">-- Called by middleware at the start of every transaction</span>
 <span class="syn-kw">SELECT</span> <span class="syn-fn">set_config</span>(<span class="syn-str">'request.jwt.claims'</span>, <span class="syn-str">'{"sub":"550e8400-...","email":"ahmet@acme.example","active_org_id":"7c9e6679-..."}'</span>, <span class="syn-kw">true</span>);</code></pre>
 
-    <p>The third argument <code>true</code> means <em>local to this transaction</em>. No other connection sees it. When the transaction commits or rolls back, the setting evaporates.</p>
+      <p>
+        The third argument <code>true</code> means <em>local to this transaction</em>. No other
+        connection sees it. When the transaction commits or rolls back, the setting evaporates.
+      </p>
 
-    <h4>2. Helper functions</h4>
+      <h4>2. Helper functions</h4>
 
-    <p>With the GUC set, SQL functions can read the claims and extract whatever the RLS policy needs:</p>
+      <p>
+        With the GUC set, SQL functions can read the claims and extract whatever the RLS policy
+        needs:
+      </p>
 
-    <pre><code><span class="syn-cm">-- Extract the authenticated user's UUID from the JWT</span>
+      <pre><code><span class="syn-cm">-- Extract the authenticated user's UUID from the JWT</span>
 <span class="syn-kw">CREATE FUNCTION</span> auth.uid()
 <span class="syn-kw">RETURNS</span> uuid
 <span class="syn-kw">LANGUAGE</span> sql
@@ -105,13 +162,19 @@ $$;
   )::uuid;
 $$;</code></pre>
 
-    <p>Now RLS policies can say things like <code>USING (org_id = auth.org_id())</code> — the function is a single word, and its name communicates intent perfectly.</p>
+      <p>
+        Now RLS policies can say things like <code>USING (org_id = auth.org_id())</code> — the
+        function is a single word, and its name communicates intent perfectly.
+      </p>
 
-    <h4>3. The middleware</h4>
+      <h4>3. The middleware</h4>
 
-    <p>The Hono middleware that extracts the JWT, verifies it, and calls <code>set_config</code> before every request handler runs:</p>
+      <p>
+        The Hono middleware that extracts the JWT, verifies it, and calls
+        <code>set_config</code> before every request handler runs:
+      </p>
 
-    <pre><code><span class="syn-kw">import</span> { createMiddleware } <span class="syn-kw">from</span> <span class="syn-str">'hono/factory'</span>;
+      <pre><code><span class="syn-kw">import</span> { createMiddleware } <span class="syn-kw">from</span> <span class="syn-str">'hono/factory'</span>;
 <span class="syn-kw">import</span> { verify } <span class="syn-kw">from</span> <span class="syn-str">'@relowa/auth'</span>;
 
 <span class="syn-kw">export const</span> <span class="syn-fn">jwtGuc</span> = <span class="syn-fn">createMiddleware</span>(<span class="syn-kw">async</span> (c, next) => {
@@ -130,15 +193,31 @@ $$;</code></pre>
   <span class="syn-kw">await</span> <span class="syn-fn">next</span>();
 });</code></pre>
 
-    <p>That's it. Every downstream handler and every Postgres query now implicitly knows who the caller is and which org they represent — without a single WHERE clause in application code.</p>
+      <p>
+        That's it. Every downstream handler and every Postgres query now implicitly knows who the
+        caller is and which org they represent — without a single WHERE clause in application code.
+      </p>
 
-    <div class="callout callout-warning">
-      <div class="callout-icon">⚠️</div>
-      <div class="callout-content">
-        <strong>Why SECURITY DEFINER matters</strong>
-        <p style="margin-top:8px">When <code>auth.has_role('admin')</code> queries the <code>org_members</code> table, it can trigger the RLS policy <em>on</em> <code>org_members</code> — which calls <code>auth.has_role()</code> again — which queries <code>org_members</code> — infinite recursion. The database hangs or errors.</p>
-        <p style="margin-top:8px">The fix: mark every <code>auth.*</code> helper as <code>SECURITY DEFINER</code>. This makes the function run with the privileges of its owner (typically the <code>postgres</code> superuser or a bootstrap role), bypassing RLS on the tables it reads. The explicit <code>SET search_path = public, pg_temp</code> prevents search-path injection attacks.</p>
-        <pre style="background:rgba(0,0,0,0.06);margin-top:10px;font-size:12px"><code><span class="syn-cm">-- The pattern every auth helper must follow</span>
+      <div class="callout callout-warning">
+        <div class="callout-icon">⚠️</div>
+        <div class="callout-content">
+          <strong>Why SECURITY DEFINER matters</strong>
+          <p style="margin-top: 8px">
+            When <code>auth.has_role('admin')</code> queries the <code>org_members</code> table, it
+            can trigger the RLS policy <em>on</em> <code>org_members</code> — which calls
+            <code>auth.has_role()</code> again — which queries <code>org_members</code> — infinite
+            recursion. The database hangs or errors.
+          </p>
+          <p style="margin-top: 8px">
+            The fix: mark every <code>auth.*</code> helper as <code>SECURITY DEFINER</code>. This
+            makes the function run with the privileges of its owner (typically the
+            <code>postgres</code> superuser or a bootstrap role), bypassing RLS on the tables it
+            reads. The explicit <code>SET search_path = public, pg_temp</code> prevents search-path
+            injection attacks.
+          </p>
+          <pre
+            style="background: rgba(0, 0, 0, 0.06); margin-top: 10px; font-size: 12px"
+          ><code><span class="syn-cm">-- The pattern every auth helper must follow</span>
 <span class="syn-kw">CREATE FUNCTION</span> auth.has_role(role_name text)
 <span class="syn-kw">RETURNS</span> boolean
 <span class="syn-kw">LANGUAGE</span> sql
@@ -153,28 +232,44 @@ $$;</code></pre>
     <span class="syn-kw">AND</span> role = role_name
   );
 $$;</code></pre>
+        </div>
       </div>
-    </div>
 
-    <h3>Anti-patterns</h3>
+      <h3>Anti-patterns</h3>
 
-    <div class="callout callout-danger">
-      <div class="callout-icon">🚫</div>
-      <div class="callout-content">
-        <ul style="margin:0;padding-left:18px">
-          <li style="margin:6px 0"><strong>Using <code>auth.uid()</code> in application code.</strong> The function only works inside Postgres. Calling it from TypeScript returns nothing useful. Use <code>c.get('claims').sub</code> instead.</li>
-          <li style="margin:6px 0"><strong>Using <code>auth.uid()</code> as a column default.</strong> Column defaults execute <em>before</em> the middleware sets the GUC. The value will always be the zero UUID.</li>
-          <li style="margin:6px 0"><strong>Setting <code>request.jwt.claims</code> outside the middleware.</strong> If any other code path touches this GUC, the guarantee that "this transaction is authorized" vanishes. One call site. One.</li>
-          <li style="margin:6px 0"><strong>Granting the application role superuser.</strong> If the app role can bypass RLS with <code>SET bypassrls = on</code>, the entire security model collapses. The app role should have zero superuser attributes.</li>
-        </ul>
+      <div class="callout callout-danger">
+        <div class="callout-icon">🚫</div>
+        <div class="callout-content">
+          <ul style="margin: 0; padding-left: 18px">
+            <li style="margin: 6px 0">
+              <strong>Using <code>auth.uid()</code> in application code.</strong> The function only
+              works inside Postgres. Calling it from TypeScript returns nothing useful. Use
+              <code>c.get('claims').sub</code> instead.
+            </li>
+            <li style="margin: 6px 0">
+              <strong>Using <code>auth.uid()</code> as a column default.</strong> Column defaults
+              execute <em>before</em> the middleware sets the GUC. The value will always be the zero
+              UUID.
+            </li>
+            <li style="margin: 6px 0">
+              <strong>Setting <code>request.jwt.claims</code> outside the middleware.</strong> If
+              any other code path touches this GUC, the guarantee that "this transaction is
+              authorized" vanishes. One call site. One.
+            </li>
+            <li style="margin: 6px 0">
+              <strong>Granting the application role superuser.</strong> If the app role can bypass
+              RLS with <code>SET bypassrls = on</code>, the entire security model collapses. The app
+              role should have zero superuser attributes.
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
 
-    <div class="see-also">
-      <div class="heading">See also</div>
-      <a href="multi-tenancy.html">concepts/multi-tenancy</a>
-      <a href="../adr/0003-rls-with-jwt-guc-pattern.html">adr/0003-rls-with-jwt-guc-pattern</a>
-    </div>
-  </main>
-</body>
+      <div class="see-also">
+        <div class="heading">See also</div>
+        <a href="multi-tenancy.html">concepts/multi-tenancy</a>
+        <a href="../adr/0003-rls-with-jwt-guc-pattern.html">adr/0003-rls-with-jwt-guc-pattern</a>
+      </div>
+    </main>
+  </body>
 </html>

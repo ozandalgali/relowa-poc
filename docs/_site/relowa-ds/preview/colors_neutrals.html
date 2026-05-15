@@ -1,121 +1,129 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Neutrals — Relowa DS</title>
-  <link rel="stylesheet" href="../colors_and_type.css">
-  <style>
-    body {
-      padding: 24px;
-      background: var(--surface);
-      font-family: var(--font-sans);
-      color: var(--foreground);
-    }
-    h2 {
-      font-size: var(--text-h3);
-      font-weight: var(--weight-semibold);
-      margin: 0 0 8px;
-    }
-    .eyebrow {
-      font-family: var(--font-mono);
-      font-size: var(--text-caption);
-      font-weight: var(--weight-medium);
-      color: var(--foreground-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 24px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-    }
-    .swatch {
-      border-radius: var(--radius-lg);
-      padding: 20px 16px 16px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      min-height: 130px;
-      transition: transform var(--transition-base);
-      border: 1px solid var(--border);
-    }
-    .swatch:hover { transform: translateY(-2px); }
-    .swatch-name {
-      font-family: var(--font-mono);
-      font-size: var(--text-body-sm);
-      font-weight: var(--weight-medium);
-      opacity: 0.75;
-      margin-bottom: 4px;
-    }
-    .swatch-hex {
-      font-family: var(--font-mono);
-      font-size: var(--text-body);
-      font-weight: var(--weight-semibold);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .star { color: var(--green-500); opacity: 1; font-size: var(--text-body); }
-    .light { color: var(--neutral-900); }
-    .dark  { color: var(--neutral-0); }
-  </style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neutrals — Relowa DS</title>
+    <link rel="stylesheet" href="../colors_and_type.css" />
+    <style>
+      body {
+        padding: 24px;
+        background: var(--surface);
+        font-family: var(--font-sans);
+        color: var(--foreground);
+      }
+      h2 {
+        font-size: var(--text-h3);
+        font-weight: var(--weight-semibold);
+        margin: 0 0 8px;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: var(--text-caption);
+        font-weight: var(--weight-medium);
+        color: var(--foreground-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 24px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+      .swatch {
+        border-radius: var(--radius-lg);
+        padding: 20px 16px 16px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        min-height: 130px;
+        transition: transform var(--transition-base);
+        border: 1px solid var(--border);
+      }
+      .swatch:hover {
+        transform: translateY(-2px);
+      }
+      .swatch-name {
+        font-family: var(--font-mono);
+        font-size: var(--text-body-sm);
+        font-weight: var(--weight-medium);
+        opacity: 0.75;
+        margin-bottom: 4px;
+      }
+      .swatch-hex {
+        font-family: var(--font-mono);
+        font-size: var(--text-body);
+        font-weight: var(--weight-semibold);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .star {
+        color: var(--green-500);
+        opacity: 1;
+        font-size: var(--text-body);
+      }
+      .light {
+        color: var(--neutral-900);
+      }
+      .dark {
+        color: var(--neutral-0);
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Neutrals</h2>
+    <p class="eyebrow">Grayscale &middot; 8 swatches &middot; Page bg: neutral-50</p>
 
-<h2>Neutrals</h2>
-<p class="eyebrow">Grayscale &middot; 8 swatches &middot; Page bg: neutral-50</p>
+    <div class="grid">
+      <!-- neutral-0 -->
+      <div class="swatch light" style="background: var(--neutral-0)">
+        <span class="swatch-name">neutral-0</span>
+        <span class="swatch-hex">#FFFFFF</span>
+      </div>
 
-<div class="grid">
-  <!-- neutral-0 -->
-  <div class="swatch light" style="background: var(--neutral-0)">
-    <span class="swatch-name">neutral-0</span>
-    <span class="swatch-hex">#FFFFFF</span>
-  </div>
+      <!-- neutral-50 ★ page bg -->
+      <div class="swatch light" style="background: var(--neutral-50)">
+        <span class="swatch-name"><span class="star">★</span> neutral-50</span>
+        <span class="swatch-hex">#F9FAFB</span>
+      </div>
 
-  <!-- neutral-50 ★ page bg -->
-  <div class="swatch light" style="background: var(--neutral-50)">
-    <span class="swatch-name"><span class="star">★</span> neutral-50</span>
-    <span class="swatch-hex">#F9FAFB</span>
-  </div>
+      <!-- neutral-100 -->
+      <div class="swatch light" style="background: var(--neutral-100)">
+        <span class="swatch-name">neutral-100</span>
+        <span class="swatch-hex">#F4F7F6</span>
+      </div>
 
-  <!-- neutral-100 -->
-  <div class="swatch light" style="background: var(--neutral-100)">
-    <span class="swatch-name">neutral-100</span>
-    <span class="swatch-hex">#F4F7F6</span>
-  </div>
+      <!-- neutral-200 -->
+      <div class="swatch light" style="background: var(--neutral-200)">
+        <span class="swatch-name">neutral-200</span>
+        <span class="swatch-hex">#E5E7EB</span>
+      </div>
 
-  <!-- neutral-200 -->
-  <div class="swatch light" style="background: var(--neutral-200)">
-    <span class="swatch-name">neutral-200</span>
-    <span class="swatch-hex">#E5E7EB</span>
-  </div>
+      <!-- neutral-300 -->
+      <div class="swatch light" style="background: var(--neutral-300)">
+        <span class="swatch-name">neutral-300</span>
+        <span class="swatch-hex">#D1D5DB</span>
+      </div>
 
-  <!-- neutral-300 -->
-  <div class="swatch light" style="background: var(--neutral-300)">
-    <span class="swatch-name">neutral-300</span>
-    <span class="swatch-hex">#D1D5DB</span>
-  </div>
+      <!-- neutral-500 -->
+      <div class="swatch dark" style="background: var(--neutral-500)">
+        <span class="swatch-name">neutral-500</span>
+        <span class="swatch-hex">#6B7280</span>
+      </div>
 
-  <!-- neutral-500 -->
-  <div class="swatch dark" style="background: var(--neutral-500)">
-    <span class="swatch-name">neutral-500</span>
-    <span class="swatch-hex">#6B7280</span>
-  </div>
+      <!-- neutral-700 -->
+      <div class="swatch dark" style="background: var(--neutral-700)">
+        <span class="swatch-name">neutral-700</span>
+        <span class="swatch-hex">#374151</span>
+      </div>
 
-  <!-- neutral-700 -->
-  <div class="swatch dark" style="background: var(--neutral-700)">
-    <span class="swatch-name">neutral-700</span>
-    <span class="swatch-hex">#374151</span>
-  </div>
-
-  <!-- neutral-900 -->
-  <div class="swatch dark" style="background: var(--neutral-900)">
-    <span class="swatch-name">neutral-900</span>
-    <span class="swatch-hex">#111827</span>
-  </div>
-</div>
-
-</body>
+      <!-- neutral-900 -->
+      <div class="swatch dark" style="background: var(--neutral-900)">
+        <span class="swatch-name">neutral-900</span>
+        <span class="swatch-hex">#111827</span>
+      </div>
+    </div>
+  </body>
 </html>

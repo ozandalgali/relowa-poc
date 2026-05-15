@@ -1,0 +1,15 @@
+name: security
+
+on:
+  schedule:
+    - cron: "0 4 * * 0" # 04:00 UTC Sunday
+  workflow_dispatch:
+
+jobs:
+  security:
+    # Inert P2 — activate when ZAP + dep audit graduate
+    if: false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Security scans — not yet active"

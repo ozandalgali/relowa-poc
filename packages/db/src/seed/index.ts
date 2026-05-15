@@ -27,15 +27,13 @@ loadEnv();
 import postgres from "postgres";
 
 const connectionString =
-  process.env.DATABASE_URL ??
-  "postgres://relowa:dev_password_change_me@localhost:5433/relowa";
+  process.env.DATABASE_URL ?? "postgres://relowa:dev_password_change_me@localhost:5433/relowa";
 
 const sql = postgres(connectionString, { max: 1 });
 
 // Cheap deterministic password hash for the POC
 // (real auth lib will replace this; same bcrypt format)
-const FAKE_HASH =
-  "$2b$10$ZZZZZZZZZZZZZZZZZZZZZ.ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+const FAKE_HASH = "$2b$10$ZZZZZZZZZZZZZZZZZZZZZ.ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
 
 async function main() {
   console.log("→ seeding database...");
@@ -52,8 +50,7 @@ async function main() {
 
   // ============= 2. Users =============
   console.log("  · creating users");
-  const [acmeAhmet, acmeSelin, ekometalMehmet, ekometalAyse, hizliKadir] =
-    await sql`
+  const [acmeAhmet, acmeSelin, ekometalMehmet, ekometalAyse, hizliKadir] = await sql`
       INSERT INTO users (email, password_hash, full_name) VALUES
         ('ahmet@acme.example',     ${FAKE_HASH}, 'Ahmet Akman'),
         ('selin@acme.example',     ${FAKE_HASH}, 'Selin Bayrak'),

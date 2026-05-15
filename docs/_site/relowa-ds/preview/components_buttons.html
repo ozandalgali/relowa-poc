@@ -1,170 +1,219 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Buttons — Relowa DS</title>
-  <link rel="stylesheet" href="../colors_and_type.css">
-  <style>
-    body {
-      padding: 40px;
-      background: var(--background);
-      font-family: var(--font-sans);
-      color: var(--foreground);
-    }
-    h2 {
-      font-size: var(--text-h2);
-      font-weight: var(--weight-bold);
-      margin: 0 0 4px;
-    }
-    .eyebrow {
-      font-family: var(--font-mono);
-      font-size: 10.5px;
-      font-weight: var(--weight-medium);
-      color: var(--foreground-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 20px;
-    }
-    .section {
-      margin-bottom: 40px;
-    }
-    .section-label {
-      font-family: var(--font-mono);
-      font-size: 10.5px;
-      font-weight: var(--weight-semibold);
-      color: var(--foreground-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 12px;
-    }
-    .row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-family: var(--font-sans);
-      font-size: 14px;
-      font-weight: 500;
-      border-radius: var(--radius-md);
-      padding: 9px 16px;
-      cursor: pointer;
-      transition: all var(--transition-fast);
-      border: none;
-      text-decoration: none;
-      line-height: 1;
-      white-space: nowrap;
-    }
-    .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Buttons — Relowa DS</title>
+    <link rel="stylesheet" href="../colors_and_type.css" />
+    <style>
+      body {
+        padding: 40px;
+        background: var(--background);
+        font-family: var(--font-sans);
+        color: var(--foreground);
+      }
+      h2 {
+        font-size: var(--text-h2);
+        font-weight: var(--weight-bold);
+        margin: 0 0 4px;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        font-weight: var(--weight-medium);
+        color: var(--foreground-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 20px;
+      }
+      .section {
+        margin-bottom: 40px;
+      }
+      .section-label {
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        font-weight: var(--weight-semibold);
+        color: var(--foreground-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 12px;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-family: var(--font-sans);
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: var(--radius-md);
+        padding: 9px 16px;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        border: none;
+        text-decoration: none;
+        line-height: 1;
+        white-space: nowrap;
+      }
+      .btn svg {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+      }
 
-    .btn-primary {
-      background: var(--accent);
-      color: var(--accent-foreground);
-    }
-    .btn-primary:hover { background: var(--accent-hover); }
+      .btn-primary {
+        background: var(--accent);
+        color: var(--accent-foreground);
+      }
+      .btn-primary:hover {
+        background: var(--accent-hover);
+      }
 
-    .btn-secondary {
-      background: var(--surface);
-      color: var(--foreground);
-      border: 1px solid var(--border);
-    }
-    .btn-secondary:hover { background: var(--surface-muted); }
+      .btn-secondary {
+        background: var(--surface);
+        color: var(--foreground);
+        border: 1px solid var(--border);
+      }
+      .btn-secondary:hover {
+        background: var(--surface-muted);
+      }
 
-    .btn-ghost {
-      background: transparent;
-      color: var(--foreground);
-    }
-    .btn-ghost:hover { background: var(--surface-muted); }
+      .btn-ghost {
+        background: transparent;
+        color: var(--foreground);
+      }
+      .btn-ghost:hover {
+        background: var(--surface-muted);
+      }
 
-    .btn-danger {
-      background: var(--danger);
-      color: #FFFFFF;
-    }
-    .btn-danger:hover { background: #DC2626; }
+      .btn-danger {
+        background: var(--danger);
+        color: #ffffff;
+      }
+      .btn-danger:hover {
+        background: #dc2626;
+      }
 
-    .btn-disabled {
-      opacity: 0.4;
-      pointer-events: none;
-    }
+      .btn-disabled {
+        opacity: 0.4;
+        pointer-events: none;
+      }
 
-    .btn-sm {
-      font-size: 13px;
-      border-radius: var(--radius-sm);
-      padding: 6px 12px;
-    }
-    .btn-sm svg { width: 14px; height: 14px; }
+      .btn-sm {
+        font-size: 13px;
+        border-radius: var(--radius-sm);
+        padding: 6px 12px;
+      }
+      .btn-sm svg {
+        width: 14px;
+        height: 14px;
+      }
 
-    .btn-lg {
-      font-size: 15px;
-      padding: 12px 20px;
-    }
-    .btn-lg svg { width: 18px; height: 18px; }
+      .btn-lg {
+        font-size: 15px;
+        padding: 12px 20px;
+      }
+      .btn-lg svg {
+        width: 18px;
+        height: 18px;
+      }
 
-    .btn-full {
-      width: 100%;
-    }
-    .full-row {
-      max-width: 400px;
-    }
-  </style>
-</head>
-<body>
+      .btn-full {
+        width: 100%;
+      }
+      .full-row {
+        max-width: 400px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Button System</h2>
+    <p class="eyebrow">
+      Primary &middot; Secondary &middot; Outline &middot; Ghost &middot; Danger &middot; Sizes
+      &middot; Icons &middot; Full Width
+    </p>
 
-<h2>Button System</h2>
-<p class="eyebrow">Primary &middot; Secondary &middot; Outline &middot; Ghost &middot; Danger &middot; Sizes &middot; Icons &middot; Full Width</p>
+    <!-- Row 1: Variants -->
+    <div class="section">
+      <div class="section-label">
+        Primary &middot; Secondary &middot; Outline &middot; Ghost &middot; Danger &middot; Disabled
+      </div>
+      <div class="row">
+        <button class="btn btn-primary">Teklif Ver</button>
+        <button class="btn btn-secondary">Taslak Kaydet</button>
+        <button class="btn btn-ghost">İptal</button>
+        <button class="btn btn-danger">İhale İptal</button>
+        <button class="btn btn-primary btn-disabled">İletildi</button>
+      </div>
+    </div>
 
-<!-- Row 1: Variants -->
-<div class="section">
-  <div class="section-label">Primary &middot; Secondary &middot; Outline &middot; Ghost &middot; Danger &middot; Disabled</div>
-  <div class="row">
-    <button class="btn btn-primary">Teklif Ver</button>
-    <button class="btn btn-secondary">Taslak Kaydet</button>
-    <button class="btn btn-ghost">İptal</button>
-    <button class="btn btn-danger">İhale İptal</button>
-    <button class="btn btn-primary btn-disabled">İletildi</button>
-  </div>
-</div>
+    <!-- Row 2: Sizes -->
+    <div class="section">
+      <div class="section-label">Sizes: Small &middot; Default &middot; Large</div>
+      <div class="row">
+        <button class="btn btn-primary btn-sm">Teklif Ver</button>
+        <button class="btn btn-primary">Teklif Ver</button>
+        <button class="btn btn-primary btn-lg">Teklif Ver</button>
+      </div>
+    </div>
 
-<!-- Row 2: Sizes -->
-<div class="section">
-  <div class="section-label">Sizes: Small &middot; Default &middot; Large</div>
-  <div class="row">
-    <button class="btn btn-primary btn-sm">Teklif Ver</button>
-    <button class="btn btn-primary">Teklif Ver</button>
-    <button class="btn btn-primary btn-lg">Teklif Ver</button>
-  </div>
-</div>
+    <!-- Row 3: With icons -->
+    <div class="section">
+      <div class="section-label">With Icons</div>
+      <div class="row">
+        <button class="btn btn-primary">
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <line x1="8" y1="3" x2="8" y2="13" />
+            <line x1="3" y1="8" x2="13" y2="8" />
+          </svg>
+          Yeni İhale
+        </button>
+        <button class="btn btn-secondary">
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <circle cx="7" cy="7" r="4.5" />
+            <line x1="11" y1="11" x2="14" y2="14" />
+          </svg>
+          Ara
+        </button>
+        <button class="btn btn-ghost" style="color: var(--danger)">
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <polyline points="3,5 6,3 13,3 13,10 11,13 3,13" />
+            <line x1="6" y1="3" x2="6" y2="13" />
+            <line x1="3" y1="8" x2="7" y2="8" />
+          </svg>
+          Sil
+        </button>
+      </div>
+    </div>
 
-<!-- Row 3: With icons -->
-<div class="section">
-  <div class="section-label">With Icons</div>
-  <div class="row">
-    <button class="btn btn-primary">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
-      Yeni İhale
-    </button>
-    <button class="btn btn-secondary">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><line x1="11" y1="11" x2="14" y2="14"/></svg>
-      Ara
-    </button>
-    <button class="btn btn-ghost" style="color: var(--danger)">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3,5 6,3 13,3 13,10 11,13 3,13"/><line x1="6" y1="3" x2="6" y2="13"/><line x1="3" y1="8" x2="7" y2="8"/></svg>
-      Sil
-    </button>
-  </div>
-</div>
-
-<!-- Row 4: Full width -->
-<div class="section full-row">
-  <div class="section-label">Full Width</div>
-  <button class="btn btn-primary btn-full btn-lg">İhaleyi Yayınla</button>
-</div>
-
-</body>
+    <!-- Row 4: Full width -->
+    <div class="section full-row">
+      <div class="section-label">Full Width</div>
+      <button class="btn btn-primary btn-full btn-lg">İhaleyi Yayınla</button>
+    </div>
+  </body>
 </html>

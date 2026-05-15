@@ -10,7 +10,7 @@
    Mono: JetBrains Mono for codes, IDs, numerics, contract amounts.
    Both load from Google Fonts.
    ------------------------------------------------------------------------ */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
 
 :root {
   /* =========================================================================
@@ -18,170 +18,175 @@
      ======================================================================= */
 
   /* Brand — Green (neon action, deep trust) */
-  --green-50:  #E8FBF0;
-  --green-100: #D1FAE5;
-  --green-200: #A7F5CE;
-  --green-300: #6EE0A8;
-  --green-400: #3CC97D;
-  --green-500: #00E676;   /* Primary accent — buttons, active states */
-  --green-600: #00C561;
-  --green-700: #009B46;
-  --green-800: #0A2E1C;   /* Sidebar top */
-  --green-900: #051C14;   /* Sidebar bottom / darkest surfaces */
+  --green-50: #e8fbf0;
+  --green-100: #d1fae5;
+  --green-200: #a7f5ce;
+  --green-300: #6ee0a8;
+  --green-400: #3cc97d;
+  --green-500: #00e676; /* Primary accent — buttons, active states */
+  --green-600: #00c561;
+  --green-700: #009b46;
+  --green-800: #0a2e1c; /* Sidebar top */
+  --green-900: #051c14; /* Sidebar bottom / darkest surfaces */
 
   /* Neutrals — slightly warm grayscale */
-  --neutral-0:   #FFFFFF;
-  --neutral-50:  #F9FAFB;
-  --neutral-100: #F4F7F6;
-  --neutral-150: #EDF0EF;
-  --neutral-200: #E5E7EB;
-  --neutral-300: #D1D5DB;
-  --neutral-400: #9CA3AF;
-  --neutral-500: #6B7280;
-  --neutral-600: #4B5563;
+  --neutral-0: #ffffff;
+  --neutral-50: #f9fafb;
+  --neutral-100: #f4f7f6;
+  --neutral-150: #edf0ef;
+  --neutral-200: #e5e7eb;
+  --neutral-300: #d1d5db;
+  --neutral-400: #9ca3af;
+  --neutral-500: #6b7280;
+  --neutral-600: #4b5563;
   --neutral-700: #374151;
-  --neutral-800: #1F2937;
+  --neutral-800: #1f2937;
   --neutral-900: #111827;
-  --neutral-950: #0A0D0C;
+  --neutral-950: #0a0d0c;
 
   /* Semantic */
-  --success-50:  #ECFDF5;
-  --success-100: #D1FAE5;
-  --success-500: #10B981;
+  --success-50: #ecfdf5;
+  --success-100: #d1fae5;
+  --success-500: #10b981;
   --success-700: #047857;
 
-  --warning-50:  #FFFBEB;
-  --warning-100: #FEF3C7;
-  --warning-500: #F59E0B;
-  --warning-700: #B45309;
+  --warning-50: #fffbeb;
+  --warning-100: #fef3c7;
+  --warning-500: #f59e0b;
+  --warning-700: #b45309;
 
-  --danger-50:   #FEF2F2;
-  --danger-100:  #FEE2E2;
-  --danger-500:  #EF4444;
-  --danger-700:  #B91C1C;
+  --danger-50: #fef2f2;
+  --danger-100: #fee2e2;
+  --danger-500: #ef4444;
+  --danger-700: #b91c1c;
 
-  --info-50:     #EFF6FF;
-  --info-100:    #DBEAFE;
-  --info-500:    #3B82F6;
-  --info-700:    #1D4ED8;
+  --info-50: #eff6ff;
+  --info-100: #dbeafe;
+  --info-500: #3b82f6;
+  --info-700: #1d4ed8;
 }
 
-[data-theme="light"], :root {
+[data-theme="light"],
+:root {
   /* =========================================================================
      Light theme — Semantic tokens
      ======================================================================= */
 
   /* Surfaces */
-  --background:        var(--neutral-100);       /* #F4F7F6 page bg */
-  --surface:           var(--neutral-0);         /* #FFFFFF cards */
-  --surface-muted:     var(--neutral-50);        /* #F9FAFB subtle fills */
-  --surface-elevated:  var(--neutral-0);
+  --background: var(--neutral-100); /* #F4F7F6 page bg */
+  --surface: var(--neutral-0); /* #FFFFFF cards */
+  --surface-muted: var(--neutral-50); /* #F9FAFB subtle fills */
+  --surface-elevated: var(--neutral-0);
 
   /* Foreground */
-  --foreground:        var(--neutral-900);       /* #111827 primary text */
-  --foreground-muted:  var(--neutral-500);       /* #6B7280 secondary */
-  --foreground-subtle: var(--neutral-400);       /* #9CA3AF tertiary */
+  --foreground: var(--neutral-900); /* #111827 primary text */
+  --foreground-muted: var(--neutral-500); /* #6B7280 secondary */
+  --foreground-subtle: var(--neutral-400); /* #9CA3AF tertiary */
 
   /* Brand application */
-  --primary:           var(--green-800);         /* Deep green — sidebar, dark cards */
-  --primary-hover:     var(--green-700);
-  --primary-foreground: var(--neutral-0);        /* White text on dark green */
-  --primary-subtle:    var(--green-50);          /* #E8FBF0 — nav active bg */
+  --primary: var(--green-800); /* Deep green — sidebar, dark cards */
+  --primary-hover: var(--green-700);
+  --primary-foreground: var(--neutral-0); /* White text on dark green */
+  --primary-subtle: var(--green-50); /* #E8FBF0 — nav active bg */
   --primary-subtle-foreground: var(--green-800);
 
-  --accent:            var(--green-500);         /* #00E676 — buttons, links */
-  --accent-hover:      var(--green-600);         /* #00C561 — button hover */
-  --accent-foreground:  var(--green-900);        /* #022117 — text on green btn */
+  --accent: var(--green-500); /* #00E676 — buttons, links */
+  --accent-hover: var(--green-600); /* #00C561 — button hover */
+  --accent-foreground: var(--green-900); /* #022117 — text on green btn */
 
   /* Sidebar */
-  --sidebar-bg:        var(--green-800);         /* #0A2E1C */
-  --sidebar-text:      #8CA699;
-  --sidebar-text-hover: #C5D4CC;
-  --sidebar-active-bg: linear-gradient(90deg, rgba(0, 230, 118, 0) 0%, rgba(0, 230, 118, 0.15) 100%);
+  --sidebar-bg: var(--green-800); /* #0A2E1C */
+  --sidebar-text: #8ca699;
+  --sidebar-text-hover: #c5d4cc;
+  --sidebar-active-bg: linear-gradient(
+    90deg,
+    rgba(0, 230, 118, 0) 0%,
+    rgba(0, 230, 118, 0.15) 100%
+  );
   --sidebar-active-text: var(--green-500);
 
   /* Borders */
-  --border:            var(--neutral-200);       /* #E5E7EB */
-  --border-strong:     var(--neutral-300);       /* #D1D5DB */
-  --border-subtle:     var(--neutral-150);
+  --border: var(--neutral-200); /* #E5E7EB */
+  --border-strong: var(--neutral-300); /* #D1D5DB */
+  --border-subtle: var(--neutral-150);
 
   /* Inputs */
-  --input-bg:          var(--neutral-100);       /* #F4F7F6 */
-  --input-border:      var(--neutral-200);
-  --input-focus:       var(--green-500);         /* #00E676 focus ring */
-  --input-focus-ring:  rgba(0, 230, 118, 0.18);
+  --input-bg: var(--neutral-100); /* #F4F7F6 */
+  --input-border: var(--neutral-200);
+  --input-focus: var(--green-500); /* #00E676 focus ring */
+  --input-focus-ring: rgba(0, 230, 118, 0.18);
 
   /* Semantic application */
-  --success:           var(--success-500);
-  --success-bg:        var(--success-50);
-  --warning:           var(--warning-500);
-  --warning-bg:        var(--warning-50);
-  --danger:            var(--danger-500);
-  --danger-bg:         var(--danger-50);
-  --info:              var(--info-500);
-  --info-bg:           var(--info-50);
+  --success: var(--success-500);
+  --success-bg: var(--success-50);
+  --warning: var(--warning-500);
+  --warning-bg: var(--warning-50);
+  --danger: var(--danger-500);
+  --danger-bg: var(--danger-50);
+  --info: var(--info-500);
+  --info-bg: var(--info-50);
 
   /* Overlay */
-  --overlay:           rgba(0, 0, 0, 0.4);
+  --overlay: rgba(0, 0, 0, 0.4);
 
   /* =======================================================================
      TYPOGRAPHY — Semantic type scale (Inter)
      ======================================================================= */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", monospace;
 
-  --text-display:      2.5rem;     /* 40px — hero/marketing */
-  --text-h1:           1.75rem;    /* 28px — page titles */
-  --text-h2:           1.375rem;   /* 22px — section headers */
-  --text-h3:           1.125rem;   /* 18px — card titles */
-  --text-h4:           1rem;       /* 16px — subsection */
-  --text-body-lg:      1rem;       /* 16px — large body, KPIs */
-  --text-body:         0.875rem;   /* 14px — default body */
-  --text-body-sm:      0.75rem;    /* 12px — metadata */
-  --text-caption:      0.6875rem;  /* 11px — labels, badges */
-  --text-overline:     0.6875rem;  /* 11px — uppercase labels */
+  --text-display: 2.5rem; /* 40px — hero/marketing */
+  --text-h1: 1.75rem; /* 28px — page titles */
+  --text-h2: 1.375rem; /* 22px — section headers */
+  --text-h3: 1.125rem; /* 18px — card titles */
+  --text-h4: 1rem; /* 16px — subsection */
+  --text-body-lg: 1rem; /* 16px — large body, KPIs */
+  --text-body: 0.875rem; /* 14px — default body */
+  --text-body-sm: 0.75rem; /* 12px — metadata */
+  --text-caption: 0.6875rem; /* 11px — labels, badges */
+  --text-overline: 0.6875rem; /* 11px — uppercase labels */
 
-  --leading-relaxed:   1.6;
-  --leading-normal:    1.5;
-  --leading-tight:     1.25;
+  --leading-relaxed: 1.6;
+  --leading-normal: 1.5;
+  --leading-tight: 1.25;
 
-  --weight-black:      800;
-  --weight-bold:       700;
-  --weight-semibold:   600;
-  --weight-medium:     500;
-  --weight-regular:    400;
-  --weight-light:      300;
+  --weight-black: 800;
+  --weight-bold: 700;
+  --weight-semibold: 600;
+  --weight-medium: 500;
+  --weight-regular: 400;
+  --weight-light: 300;
 
   /* =======================================================================
      SPACING — 4px base grid
      ======================================================================= */
-  --space-1:  4px;
-  --space-2:  8px;
-  --space-3:  12px;
-  --space-4:  16px;
-  --space-5:  20px;
-  --space-6:  24px;
-  --space-8:  32px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
   --space-10: 40px;
   --space-12: 48px;
   --space-16: 64px;
   --space-20: 80px;
 
-  --content-max:    1440px;
+  --content-max: 1440px;
   --content-reading: 720px;
-  --sidebar-width:   260px;
-  --topbar-height:   64px;
+  --sidebar-width: 260px;
+  --topbar-height: 64px;
 
   /* =======================================================================
      CORNER RADII
      ======================================================================= */
-  --radius-xs:   4px;    /* Tags, inline chips */
-  --radius-sm:   6px;    /* Small buttons, checkboxes */
-  --radius-md:   8px;    /* Default controls: inputs, buttons */
-  --radius-lg:   12px;   /* Cards, panels, tables */
-  --radius-xl:   16px;   /* Large surfaces, modals, role cards */
-  --radius-2xl:  24px;   /* Hero / marketing cards */
-  --radius-full: 999px;  /* Pills: status chips, avatars, toggles */
+  --radius-xs: 4px; /* Tags, inline chips */
+  --radius-sm: 6px; /* Small buttons, checkboxes */
+  --radius-md: 8px; /* Default controls: inputs, buttons */
+  --radius-lg: 12px; /* Cards, panels, tables */
+  --radius-xl: 16px; /* Large surfaces, modals, role cards */
+  --radius-2xl: 24px; /* Hero / marketing cards */
+  --radius-full: 999px; /* Pills: status chips, avatars, toggles */
 
   /* =======================================================================
      SHADOWS
@@ -206,11 +211,11 @@
   /* =======================================================================
      Z-INDEX
      ======================================================================= */
-  --z-sidebar:  100;
-  --z-topbar:   200;
-  --z-modal:    500;
-  --z-tooltip:  600;
-  --z-toast:    700;
+  --z-sidebar: 100;
+  --z-topbar: 200;
+  --z-modal: 500;
+  --z-tooltip: 600;
+  --z-toast: 700;
 
   /* ---- Defaults -------------------------------------------------------- */
   font-family: var(--font-sans);
@@ -221,5 +226,12 @@
 }
 
 /* ---- Reset ------------------------------------------------------------- */
-*, *::before, *::after { box-sizing: border-box; }
-body { margin: 0; background: var(--background); }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--background);
+}

@@ -31,8 +31,7 @@ import { migrate } from "drizzle-orm/postgres-js/migrator";
 import postgres from "postgres";
 
 const connectionString =
-  process.env.DATABASE_URL ??
-  "postgres://relowa:dev_password_change_me@localhost:5432/relowa";
+  process.env.DATABASE_URL ?? "postgres://relowa:dev_password_change_me@localhost:5432/relowa";
 
 // Files that Drizzle Kit DOES NOT manage — we run them ourselves.
 // Convention: anything other than the auto-generated `XXXX_<random>.sql`

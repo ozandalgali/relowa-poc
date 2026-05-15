@@ -1,272 +1,294 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr" data-theme="light">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kontrol Paneli — Relowa</title>
-  <link rel="stylesheet" href="../../colors_and_type.css">
-  <link rel="stylesheet" href="styles.css">
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <style>
-    .sidebar-icon { width: 20px; height: 20px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-    .id-link { color: var(--foreground); text-decoration: none; font-weight: 500; }
-    .id-link:hover { color: var(--accent); }
-  </style>
-</head>
-<body>
-  <div class="app">
-
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <div class="sidebar-logo">
-        <span>relowa<span style="color:var(--accent)">.</span></span>
-      </div>
-
-      <nav class="sidebar-nav">
-        <div class="sidebar-section-title">Ana Menü</div>
-        <a class="sidebar-item active">
-          <span class="sidebar-icon"><i data-lucide="layout-dashboard"></i></span>
-          Kontrol Paneli
-        </a>
-        <a class="sidebar-item">
-          <span class="sidebar-icon"><i data-lucide="store"></i></span>
-          Pazar Yeri
-        </a>
-        <a class="sidebar-item">
-          <span class="sidebar-icon"><i data-lucide="plus-circle"></i></span>
-          İhale Oluştur
-        </a>
-        <a class="sidebar-item">
-          <span class="sidebar-icon"><i data-lucide="activity"></i></span>
-          Canlı İhale Takip
-        </a>
-
-        <div class="sidebar-section-title">Raporlar</div>
-        <a class="sidebar-item">
-          <span class="sidebar-icon"><i data-lucide="dollar-sign"></i></span>
-          Finansal Veriler
-        </a>
-        <a class="sidebar-item">
-          <span class="sidebar-icon"><i data-lucide="history"></i></span>
-          Geçmiş İhaleler
-        </a>
-        <a class="sidebar-item">
-          <span class="sidebar-icon"><i data-lucide="leaf"></i></span>
-          ESG Raporu
-        </a>
-
-        <div class="sidebar-section-title">Operasyonel</div>
-        <a class="sidebar-item">
-          <span class="sidebar-icon"><i data-lucide="truck"></i></span>
-          Taşıyıcı İlanı Aç
-        </a>
-        <a class="sidebar-item">
-          <span class="sidebar-icon"><i data-lucide="activity"></i></span>
-          Operasyon Takip
-        </a>
-
-        <div class="sidebar-section-title">Hesap</div>
-        <a class="sidebar-item">
-          <span class="sidebar-icon"><i data-lucide="file-text"></i></span>
-          Faturalar
-        </a>
-        <a class="sidebar-item">
-          <span class="sidebar-icon"><i data-lucide="settings"></i></span>
-          Ayarlar
-        </a>
-        <a class="sidebar-item">
-          <span class="sidebar-icon"><i data-lucide="help-circle"></i></span>
-          Yardım
-        </a>
-      </nav>
-
-      <div class="sidebar-bottom">
-        <div class="sidebar-avatar">EG</div>
-        <div class="sidebar-user-info">
-          <span class="sidebar-user-name">Esko Geri Dönüşüm</span>
-          <span class="sidebar-user-role">Admin</span>
-        </div>
-      </div>
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <main class="main">
-
-      <!-- TOPBAR -->
-      <header class="topbar">
-        <div class="topbar-breadcrumb">
-          Ana Sayfa / <span>Kontrol Paneli</span>
-        </div>
-        <div class="topbar-spacer"></div>
-        <input type="search" class="topbar-search" placeholder="İhale, operasyon veya fatura ara...">
-        <div class="topbar-actions">
-          <button class="topbar-icon" aria-label="Bildirimler">
-            <i data-lucide="bell"></i>
-            <span class="dot"></span>
-          </button>
-          <span class="topbar-lang">TR</span>
-          <div class="topbar-avatar">EG</div>
-        </div>
-      </header>
-
-      <!-- PAGE CONTENT -->
-      <div class="content">
-
-        <!-- Page Header -->
-        <div class="page-header">
-          <h1 class="page-title">Kontrol Paneli</h1>
-          <p class="page-subtitle">Hoş geldin, Esko Geri Dönüşüm</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kontrol Paneli — Relowa</title>
+    <link rel="stylesheet" href="../../colors_and_type.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+      .sidebar-icon {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+      }
+      .id-link {
+        color: var(--foreground);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .id-link:hover {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-logo">
+          <span>relowa<span style="color: var(--accent)">.</span></span>
         </div>
 
-        <!-- KPI Row -->
-        <div class="kpi-grid">
-          <div class="kpi-card">
-            <div class="kpi-label">Açık İhaleler</div>
-            <div class="kpi-value">12</div>
-            <div class="kpi-trend up">↑ %8 <span style="color:var(--foreground-muted);font-weight:400;">geçen aya göre</span></div>
+        <nav class="sidebar-nav">
+          <div class="sidebar-section-title">Ana Menü</div>
+          <a class="sidebar-item active">
+            <span class="sidebar-icon"><i data-lucide="layout-dashboard"></i></span>
+            Kontrol Paneli
+          </a>
+          <a class="sidebar-item">
+            <span class="sidebar-icon"><i data-lucide="store"></i></span>
+            Pazar Yeri
+          </a>
+          <a class="sidebar-item">
+            <span class="sidebar-icon"><i data-lucide="plus-circle"></i></span>
+            İhale Oluştur
+          </a>
+          <a class="sidebar-item">
+            <span class="sidebar-icon"><i data-lucide="activity"></i></span>
+            Canlı İhale Takip
+          </a>
+
+          <div class="sidebar-section-title">Raporlar</div>
+          <a class="sidebar-item">
+            <span class="sidebar-icon"><i data-lucide="dollar-sign"></i></span>
+            Finansal Veriler
+          </a>
+          <a class="sidebar-item">
+            <span class="sidebar-icon"><i data-lucide="history"></i></span>
+            Geçmiş İhaleler
+          </a>
+          <a class="sidebar-item">
+            <span class="sidebar-icon"><i data-lucide="leaf"></i></span>
+            ESG Raporu
+          </a>
+
+          <div class="sidebar-section-title">Operasyonel</div>
+          <a class="sidebar-item">
+            <span class="sidebar-icon"><i data-lucide="truck"></i></span>
+            Taşıyıcı İlanı Aç
+          </a>
+          <a class="sidebar-item">
+            <span class="sidebar-icon"><i data-lucide="activity"></i></span>
+            Operasyon Takip
+          </a>
+
+          <div class="sidebar-section-title">Hesap</div>
+          <a class="sidebar-item">
+            <span class="sidebar-icon"><i data-lucide="file-text"></i></span>
+            Faturalar
+          </a>
+          <a class="sidebar-item">
+            <span class="sidebar-icon"><i data-lucide="settings"></i></span>
+            Ayarlar
+          </a>
+          <a class="sidebar-item">
+            <span class="sidebar-icon"><i data-lucide="help-circle"></i></span>
+            Yardım
+          </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <div class="sidebar-avatar">EG</div>
+          <div class="sidebar-user-info">
+            <span class="sidebar-user-name">Esko Geri Dönüşüm</span>
+            <span class="sidebar-user-role">Admin</span>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Aktif Operasyonlar</div>
-            <div class="kpi-value">5</div>
-            <div class="kpi-trend" style="color:var(--foreground-muted);">
-              <span class="kpi-dot green"></span> Tümü aktif
+        </div>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="main">
+        <!-- TOPBAR -->
+        <header class="topbar">
+          <div class="topbar-breadcrumb">Ana Sayfa / <span>Kontrol Paneli</span></div>
+          <div class="topbar-spacer"></div>
+          <input
+            type="search"
+            class="topbar-search"
+            placeholder="İhale, operasyon veya fatura ara..."
+          />
+          <div class="topbar-actions">
+            <button class="topbar-icon" aria-label="Bildirimler">
+              <i data-lucide="bell"></i>
+              <span class="dot"></span>
+            </button>
+            <span class="topbar-lang">TR</span>
+            <div class="topbar-avatar">EG</div>
+          </div>
+        </header>
+
+        <!-- PAGE CONTENT -->
+        <div class="content">
+          <!-- Page Header -->
+          <div class="page-header">
+            <h1 class="page-title">Kontrol Paneli</h1>
+            <p class="page-subtitle">Hoş geldin, Esko Geri Dönüşüm</p>
+          </div>
+
+          <!-- KPI Row -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-label">Açık İhaleler</div>
+              <div class="kpi-value">12</div>
+              <div class="kpi-trend up">
+                ↑ %8
+                <span style="color: var(--foreground-muted); font-weight: 400">geçen aya göre</span>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Aktif Operasyonlar</div>
+              <div class="kpi-value">5</div>
+              <div class="kpi-trend" style="color: var(--foreground-muted)">
+                <span class="kpi-dot green"></span> Tümü aktif
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Toplam İşlem Hacmi</div>
+              <div class="kpi-value">₺1.245.800</div>
+              <div class="kpi-trend up">
+                ↑ %12.4 <span style="color: var(--foreground-muted); font-weight: 400">bu ay</span>
+              </div>
+            </div>
+            <div class="kpi-card kpi-card-dark">
+              <div class="kpi-label">Karbon Tasarrufu</div>
+              <div class="kpi-value">124.5 tCO₂e</div>
+              <div class="kpi-trend up">
+                ↑ %22
+                <span style="color: rgba(255, 255, 255, 0.4); font-weight: 400">2025'e göre</span>
+              </div>
             </div>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Toplam İşlem Hacmi</div>
-            <div class="kpi-value">₺1.245.800</div>
-            <div class="kpi-trend up">↑ %12.4 <span style="color:var(--foreground-muted);font-weight:400;">bu ay</span></div>
+
+          <!-- Active Tenders Section -->
+          <div class="section-header">
+            <h2 class="section-title">Aktif İhaleler</h2>
+            <a class="section-action">Tümünü Gör →</a>
           </div>
-          <div class="kpi-card kpi-card-dark">
-            <div class="kpi-label">Karbon Tasarrufu</div>
-            <div class="kpi-value">124.5 tCO₂e</div>
-            <div class="kpi-trend up">↑ %22 <span style="color:rgba(255,255,255,0.4);font-weight:400;">2025'e göre</span></div>
+
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>İhale ID</th>
+                  <th>Atık Türü</th>
+                  <th>Miktar</th>
+                  <th>En Yüksek Teklif</th>
+                  <th>Durum</th>
+                  <th>Kalan Süre</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a class="id-link col-mono">İHL-2026-0042</a></td>
+                  <td>Plastik (PET)</td>
+                  <td class="col-mono">500 t</td>
+                  <td class="col-mono">₺142.500</td>
+                  <td><span class="badge badge-success">AKTİF</span></td>
+                  <td class="col-date">02:34:12</td>
+                </tr>
+                <tr>
+                  <td><a class="id-link col-mono">İHL-2026-0041</a></td>
+                  <td>Karışık Ambalaj</td>
+                  <td class="col-mono">320 t</td>
+                  <td class="col-mono">₺89.200</td>
+                  <td><span class="badge badge-success">AKTİF</span></td>
+                  <td class="col-date">05:12:45</td>
+                </tr>
+                <tr>
+                  <td><a class="id-link col-mono">İHL-2026-0040</a></td>
+                  <td>Metal (Alüminyum)</td>
+                  <td class="col-mono">150 t</td>
+                  <td class="col-mono">₺210.000</td>
+                  <td><span class="badge badge-warning">BEKLEMEDE</span></td>
+                  <td class="col-na">—</td>
+                </tr>
+                <tr>
+                  <td><a class="id-link col-mono">İHL-2026-0039</a></td>
+                  <td>Kağıt</td>
+                  <td class="col-mono">200 t</td>
+                  <td class="col-mono">₺67.800</td>
+                  <td><span class="badge badge-success-dark">TAMAMLANDI</span></td>
+                  <td class="col-na">—</td>
+                </tr>
+                <tr>
+                  <td><a class="id-link col-mono">İHL-2026-0038</a></td>
+                  <td>Cam</td>
+                  <td class="col-mono">75 t</td>
+                  <td class="col-mono">₺34.500</td>
+                  <td><span class="badge badge-danger">İPTAL</span></td>
+                  <td class="col-na">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Recent Operations Section -->
+          <div class="section-header">
+            <h2 class="section-title">Son Operasyonlar</h2>
+            <a class="section-action">Tümünü Gör →</a>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Operasyon ID</th>
+                  <th>Atık Türü</th>
+                  <th>Rota</th>
+                  <th>Durum</th>
+                  <th>ETA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a class="id-link col-mono">OP-2026-0182</a></td>
+                  <td>Plastik (PET)</td>
+                  <td>İstanbul → Ankara</td>
+                  <td><span class="badge badge-success">Yolda</span></td>
+                  <td class="col-date">14 Mayıs</td>
+                </tr>
+                <tr>
+                  <td><a class="id-link col-mono">OP-2026-0181</a></td>
+                  <td>Metal</td>
+                  <td>Bursa → İzmir</td>
+                  <td><span class="badge badge-info">Sırada</span></td>
+                  <td class="col-date">16 Mayıs</td>
+                </tr>
+                <tr>
+                  <td><a class="id-link col-mono">OP-2026-0179</a></td>
+                  <td>Kağıt</td>
+                  <td>Kocaeli → Eskişehir</td>
+                  <td><span class="badge badge-danger">Gecikme</span></td>
+                  <td class="col-date delayed">—</td>
+                </tr>
+                <tr>
+                  <td><a class="id-link col-mono">OP-2026-0178</a></td>
+                  <td>Karışık Ambalaj</td>
+                  <td>Ankara → Konya</td>
+                  <td><span class="badge badge-success-dark">Tamamlandı</span></td>
+                  <td class="col-na">10 Mayıs</td>
+                </tr>
+                <tr>
+                  <td><a class="id-link col-mono">OP-2026-0175</a></td>
+                  <td>Organik Atık</td>
+                  <td>İzmir → Manisa</td>
+                  <td><span class="badge badge-success-dark">Tamamlandı</span></td>
+                  <td class="col-na">8 Mayıs</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-
-        <!-- Active Tenders Section -->
-        <div class="section-header">
-          <h2 class="section-title">Aktif İhaleler</h2>
-          <a class="section-action">Tümünü Gör →</a>
-        </div>
-
-        <div class="table-wrapper">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>İhale ID</th>
-                <th>Atık Türü</th>
-                <th>Miktar</th>
-                <th>En Yüksek Teklif</th>
-                <th>Durum</th>
-                <th>Kalan Süre</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><a class="id-link col-mono">İHL-2026-0042</a></td>
-                <td>Plastik (PET)</td>
-                <td class="col-mono">500 t</td>
-                <td class="col-mono">₺142.500</td>
-                <td><span class="badge badge-success">AKTİF</span></td>
-                <td class="col-date">02:34:12</td>
-              </tr>
-              <tr>
-                <td><a class="id-link col-mono">İHL-2026-0041</a></td>
-                <td>Karışık Ambalaj</td>
-                <td class="col-mono">320 t</td>
-                <td class="col-mono">₺89.200</td>
-                <td><span class="badge badge-success">AKTİF</span></td>
-                <td class="col-date">05:12:45</td>
-              </tr>
-              <tr>
-                <td><a class="id-link col-mono">İHL-2026-0040</a></td>
-                <td>Metal (Alüminyum)</td>
-                <td class="col-mono">150 t</td>
-                <td class="col-mono">₺210.000</td>
-                <td><span class="badge badge-warning">BEKLEMEDE</span></td>
-                <td class="col-na">—</td>
-              </tr>
-              <tr>
-                <td><a class="id-link col-mono">İHL-2026-0039</a></td>
-                <td>Kağıt</td>
-                <td class="col-mono">200 t</td>
-                <td class="col-mono">₺67.800</td>
-                <td><span class="badge badge-success-dark">TAMAMLANDI</span></td>
-                <td class="col-na">—</td>
-              </tr>
-              <tr>
-                <td><a class="id-link col-mono">İHL-2026-0038</a></td>
-                <td>Cam</td>
-                <td class="col-mono">75 t</td>
-                <td class="col-mono">₺34.500</td>
-                <td><span class="badge badge-danger">İPTAL</span></td>
-                <td class="col-na">—</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Recent Operations Section -->
-        <div class="section-header">
-          <h2 class="section-title">Son Operasyonlar</h2>
-          <a class="section-action">Tümünü Gör →</a>
-        </div>
-
-        <div class="table-wrapper">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Operasyon ID</th>
-                <th>Atık Türü</th>
-                <th>Rota</th>
-                <th>Durum</th>
-                <th>ETA</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><a class="id-link col-mono">OP-2026-0182</a></td>
-                <td>Plastik (PET)</td>
-                <td>İstanbul → Ankara</td>
-                <td><span class="badge badge-success">Yolda</span></td>
-                <td class="col-date">14 Mayıs</td>
-              </tr>
-              <tr>
-                <td><a class="id-link col-mono">OP-2026-0181</a></td>
-                <td>Metal</td>
-                <td>Bursa → İzmir</td>
-                <td><span class="badge badge-info">Sırada</span></td>
-                <td class="col-date">16 Mayıs</td>
-              </tr>
-              <tr>
-                <td><a class="id-link col-mono">OP-2026-0179</a></td>
-                <td>Kağıt</td>
-                <td>Kocaeli → Eskişehir</td>
-                <td><span class="badge badge-danger">Gecikme</span></td>
-                <td class="col-date delayed">—</td>
-              </tr>
-              <tr>
-                <td><a class="id-link col-mono">OP-2026-0178</a></td>
-                <td>Karışık Ambalaj</td>
-                <td>Ankara → Konya</td>
-                <td><span class="badge badge-success-dark">Tamamlandı</span></td>
-                <td class="col-na">10 Mayıs</td>
-              </tr>
-              <tr>
-                <td><a class="id-link col-mono">OP-2026-0175</a></td>
-                <td>Organik Atık</td>
-                <td>İzmir → Manisa</td>
-                <td><span class="badge badge-success-dark">Tamamlandı</span></td>
-                <td class="col-na">8 Mayıs</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-      </div>
-    </main>
-  </div>
-  <script>lucide.createIcons();</script>
-</body>
+      </main>
+    </div>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
 </html>
