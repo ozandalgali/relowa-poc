@@ -9,7 +9,7 @@
     "format:check": "prettier --check .",
     "format": "prettier --write .",
     "lint": "echo \"lint: no linter configured yet (M0)\"",
-    "test": "echo \"test: no tests configured yet (M0)\"",
+    "test": "pnpm --filter @relowa/api test",
     "agents:check": "tsx scripts/sync-agents.ts --check",
     "agents:sync": "tsx scripts/sync-agents.ts --sync",
     "db:generate": "pnpm --filter @relowa/db generate",

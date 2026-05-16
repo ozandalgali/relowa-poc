@@ -27,6 +27,13 @@ app.use("/tenders/:id/bids", idempotencyMiddleware("POST"));
 app.route("/tenders", tenderRoutes);
 app.route("/tenders", bidRoutes);
 
+export { app };
+
 const port = Number(process.env.PORT) || 3000;
-console.log(`Relowa API listening on http://localhost:${port}`);
-serve({ fetch: app.fetch, port });
+
+// Only start server when not being imported (e.g., by tests)
+const isTestEnv = process.env.VITEST || process.env.NODE_ENV === "test";
+if (!isTestEnv) {
+  console.log(`Relowa API listening on http://localhost:${port}`);
+  serve({ fetch: app.fetch, port });
+}

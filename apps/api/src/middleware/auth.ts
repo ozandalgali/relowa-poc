@@ -24,12 +24,19 @@ interface JwtClaims {
 }
 
 function base64UrlDecode(str: string): string {
-  const base64 = str.replace(/-/g, "+").replace(/_/g, "/");
-  return Buffer.from(base64, "base64").toString("utf-8");
+  return Buffer.from(str.replace(/-/g, "+").replace(/_/g, "/"), "base64").toString("utf-8");
 }
 
 function base64UrlEncode(str: string): string {
   return Buffer.from(str)
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
+}
+
+function base64UrlEncodeBytes(bytes: Uint8Array): string {
+  return Buffer.from(bytes)
     .toString("base64")
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
@@ -48,7 +55,7 @@ async function signJwt(payload: JwtClaims): Promise<string> {
     ["sign"],
   );
   const signature = await crypto.subtle.sign("HMAC", key, data);
-  const sig = base64UrlEncode(String.fromCharCode(...new Uint8Array(signature)));
+  const sig = base64UrlEncodeBytes(new Uint8Array(signature));
   return `${header}.${body}.${sig}`;
 }
 
@@ -67,18 +74,31 @@ async function verifyJwt(token: string): Promise<JwtClaims> {
     ["verify"],
   );
 
-  const sig = Uint8Array.from(atob(sigB64.replace(/-/g, "+").replace(/_/g, "/")), (c) =>
-    c.charCodeAt(0),
-  );
+  const sigBytes = Buffer.from(sigB64.replace(/-/g, "+").replace(/_/g, "/"), "base64");
 
-  const valid = await crypto.subtle.verify("HMAC", key, sig, data);
+  const valid = await crypto.subtle.verify("HMAC", key, sigBytes, data);
   if (!valid) throw new HTTPException(401, { message: "Invalid JWT signature" });
 
-  return JSON.parse(base64UrlDecode(bodyB64)) as JwtClaims;
+  const claims = JSON.parse(base64UrlDecode(bodyB64)) as JwtClaims;
+
+  // Check expiry
+  if (claims.exp && claims.exp < Math.floor(Date.now() / 1000)) {
+    throw new HTTPException(401, { message: "JWT expired" });
+  }
+
+  return claims;
 }
 
-// Export for route handlers to set GUC
-export { JWT_SECRET, signJwt, verifyJwt };
+/**
+ * SET LOCAL GUC for RLS — must run inside a transaction.
+ * Postgres SET LOCAL only works in transaction blocks.
+ * Returns the GUC JSON string for use in transactions.
+ */
+function gucClaims(claims: JwtClaims): string {
+  return JSON.stringify(claims);
+}
+
+export { JWT_SECRET, signJwt, verifyJwt, gucClaims };
 export type { JwtClaims };
 
 export const jwtMiddleware = createMiddleware(async (c, next) => {

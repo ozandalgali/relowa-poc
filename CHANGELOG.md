@@ -62,6 +62,49 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - **Zod validation** on all request bodies
 - **Docker Compose api service** — depends on postgres, port 3000
 
+### Added (API Tests)
+- **20 integration tests** across 3 files: JWT auth (8), tender CRUD + idempotency (7), bid flow (5)
+- **RLS validation**: cross-tenant isolation verified via API (Acme sees own, EkoMetal sees published only, Hizli sees 0)
+- **Idempotency tests**: replay returns cached response, missing key rejected
+- **Vitest config** + 
+> relowa-poc@0.1.0 test /Users/ozan/Desktop/Projects/relowa-poc
+> pnpm --filter @relowa/api test
+
+
+> @relowa/api@0.1.0 test /Users/ozan/Desktop/Projects/relowa-poc/apps/api
+> vitest run
+
+
+ RUN  v4.1.6 /Users/ozan/Desktop/Projects/relowa-poc/apps/api
+
+stdout | src/__tests__/bids.test.ts > Bid flow
+<-- GET /tenders
+
+stdout | src/__tests__/bids.test.ts > Bid flow
+--> GET /tenders [32m200[0m 29ms
+
+stdout | src/__tests__/bids.test.ts > Bid flow
+<-- POST /tenders
+
+stdout | src/__tests__/bids.test.ts > Bid flow
+--> POST /tenders [32m201[0m 14ms
+
+ ❯ src/__tests__/bids.test.ts (5 tests | 4 failed) 112ms
+     × places a bid on published tender (201) 4ms
+     × rejects bid without Idempotency-Key (400) 1ms
+     × returns cached bid on idempotent replay 1ms
+     × lists bids for tender (200) 0ms
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  4 failed | 16 passed (20)
+   Start at  04:00:12
+   Duration  612ms (transform 209ms, setup 92ms, import 1.04s, tests 340ms, environment 0ms)
+
+/Users/ozan/Desktop/Projects/relowa-poc/apps/api:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @relowa/api@0.1.0 test: `vitest run`
+Exit status 1
+ ELIFECYCLE  Test failed. See above for more details. script in 
+
 ### Planned
 - Hono API scaffold with tender/bid endpoints, JWT-via-GUC middleware, idempotency middleware
 - LocalStack EventBridge bus + rules: `tender.published`, `bid.placed`, `tender.won`, `tender.closing`
