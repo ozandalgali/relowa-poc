@@ -8,15 +8,15 @@
 
 | Step | Status |
 |------|--------|
-| 1. Hono API scaffold (apps/api/) | 🔨 In progress |
-| 2. JWT-via-GUC middleware | ⬜ Pending |
-| 3. Idempotency middleware | ⬜ Pending |
-| 4. Tender routes (POST/GET/PATCH) | ⬜ Pending |
-| 5. Bid routes (POST /tenders/:id/bids) | ⬜ Pending |
-| 6. Zod validation + OpenAPI spec | ⬜ Pending |
-| 7. Docker Compose API service | ⬜ Pending |
-| 8. Integration tests | ⬜ Pending |
-| 9. Docs | ⬜ Pending |
+| 1. Hono API scaffold (apps/api/) | 🔨 Done |
+| 2. JWT-via-GUC middleware | ⬜ Done |
+| 3. Idempotency middleware | ⬜ Done |
+| 4. Tender routes (POST/GET/PATCH) | ⬜ Done |
+| 5. Bid routes (POST /tenders/:id/bids) | ⬜ Done |
+| 6. Zod validation + OpenAPI spec | ⬜ Done |
+| 7. Docker Compose API service | ⬜ Done |
+| 8. Integration tests | ⬜ Done |
+| 9. Docs | ⬜ Done |
 
 ## Dependency graph
 

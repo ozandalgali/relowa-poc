@@ -53,6 +53,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - `app_user` role creation now in migration side-car (was only in test scripts)
 - `docs/plans/M1-PLAN.md` created with manual steps section
 
+### Added (M2 — Core API & Business Logic)
+- **Hono API scaffold** under `apps/api/` — port 3000, Docker service
+- **JWT-via-GUC middleware** — HMAC-signed JWT verifies claims, sets `request.jwt.claims` and `SET LOCAL ROLE app_user` for transparent RLS
+- **Idempotency middleware** — `Idempotency-Key` header on all mutation endpoints, cached response replay
+- **Tender routes**: POST /tenders (create), GET /tenders (RLS-scoped list), GET /tenders/:id, PATCH /tenders/:id/publish
+- **Bid routes**: POST /tenders/:id/bids (place bid), GET /tenders/:id/bids
+- **Zod validation** on all request bodies
+- **Docker Compose api service** — depends on postgres, port 3000
+
 ### Planned
 - Hono API scaffold with tender/bid endpoints, JWT-via-GUC middleware, idempotency middleware
 - LocalStack EventBridge bus + rules: `tender.published`, `bid.placed`, `tender.won`, `tender.closing`
