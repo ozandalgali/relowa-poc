@@ -21,6 +21,52 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  apps/api:
+    dependencies:
+      '@hono/node-server':
+        specifier: ^2.0.2
+        version: 2.0.2(hono@4.12.18)
+      '@hono/zod-openapi':
+        specifier: ^0.18.3
+        version: 0.18.4(hono@4.12.18)(zod@3.25.76)
+      '@hono/zod-validator':
+        specifier: ^0.8.0
+        version: 0.8.0(hono@4.12.18)(zod@3.25.76)
+      '@relowa/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@scalar/hono-api-reference':
+        specifier: ^0.5.166
+        version: 0.5.184(hono@4.12.18)
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.6.1
+      drizzle-orm:
+        specifier: ^0.36.4
+        version: 0.36.4(postgres@3.4.9)
+      hono:
+        specifier: ^4.6.14
+        version: 4.12.18
+      hono-rate-limiter:
+        specifier: ^0.4.1
+        version: 0.4.2(hono@4.12.18)
+      postgres:
+        specifier: ^3.4.5
+        version: 3.4.9
+      zod:
+        specifier: ^3.24.1
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.0
+        version: 22.19.18
+      tsx:
+        specifier: ^4.19.2
+        version: 4.21.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
   packages/db:
     dependencies:
       drizzle-orm:
@@ -47,6 +93,11 @@ importers:
         version: 5.9.3
 
 packages:
+
+  '@asteasolutions/zod-to-openapi@7.3.4':
+    resolution: {integrity: sha512-/2rThQ5zPi9OzVwes6U7lK1+Yvug0iXu25olp7S0XsYmOqnyMfxH7gdSQjn/+DSOHRg7wnotwGJSyL+fBKdnEA==}
+    peerDependencies:
+      zod: ^3.20.2
 
   '@drizzle-team/brocli@0.10.2':
     resolution: {integrity: sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w==}
@@ -485,11 +536,57 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@hono/node-server@2.0.2':
+    resolution: {integrity: sha512-tXlTi1h/4V7sDe7i97IVP+9re9ZU7wXZZggnR5ucCRclf1+AX6YhGStrR5w8bLj+3Mlyl0pKfBh9gqTqqnGKfQ==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      hono: ^4
+
+  '@hono/zod-openapi@0.18.4':
+    resolution: {integrity: sha512-6NHMHU96Hh32B1yDhb94Z4Z5/POsmEu2AXpWLWcBq9arskRnOMt2752yEoXoADV8WUAc7H1IkNaQHGj1ytXbYw==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      hono: '>=4.3.6'
+      zod: 3.*
+
+  '@hono/zod-validator@0.4.3':
+    resolution: {integrity: sha512-xIgMYXDyJ4Hj6ekm9T9Y27s080Nl9NXHcJkOvkXPhubOLj8hZkOL8pDnnXfvCf5xEE8Q4oMFenQUZZREUY2gqQ==}
+    peerDependencies:
+      hono: '>=3.9.0'
+      zod: ^3.19.1
+
+  '@hono/zod-validator@0.8.0':
+    resolution: {integrity: sha512-5uS4S1/LKtZQYvD4BtpPUFkOv8d1wNxHHrChm26buMiEYc1FrHWvDUaKVBwkiVtvSExHSpLGDvcnpI2Copyj9w==}
+    peerDependencies:
+      hono: '>=4.10.0'
+      zod: ^3.25.0 || ^4.0.0
+
   '@petamoriken/float16@3.9.3':
     resolution: {integrity: sha512-8awtpHXCx/bNpFt4mt2xdkgtgVvKqty8VbjHI/WWWQuEw+KLzFot3f4+LkQY9YmOtq7A5GdOnqoIC8Pdygjk2g==}
 
+  '@scalar/core@0.1.1':
+    resolution: {integrity: sha512-7qnZp8ykrXoKScFIZcwt638CuFFyj7G3SsgVfD5liNgb533K8/lhWqdmp1vK2u4BKKJ9GBAPKMlWZE/+yA8WTw==}
+    engines: {node: '>=18'}
+
+  '@scalar/hono-api-reference@0.5.184':
+    resolution: {integrity: sha512-vRSRwJkN1Xo5dW9KYQJlGpKZ+Nh9qH+x1sn0qf6/Lx8QLPyyEpNm1EEddKaIN6qd5wrtVjDN6adQhfAfcYGHzw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      hono: ^4.0.0
+
+  '@scalar/openapi-types@0.1.9':
+    resolution: {integrity: sha512-HQQudOSQBU7ewzfnBW9LhDmBE2XOJgSfwrh5PlUB7zJup/kaRkBGNgV2wMjNz9Af/uztiU/xNrO179FysmUT+g==}
+    engines: {node: '>=18'}
+
+  '@scalar/types@0.0.40':
+    resolution: {integrity: sha512-0J6o+yZzgZEvl3KhvLTAGiXXyrCeEPKvs9gUWQDf1Rb5NfFxF0lA10ougCQCwVJIguWNEzZfOUiSoAFzGy2EqQ==}
+    engines: {node: '>=18'}
+
   '@types/node@22.19.18':
     resolution: {integrity: sha512-9v00a+dn2yWVsYDEunWC4g/TcRKVq3r8N5FuZp7u0SGrPvdN9c2yXI9bBuf5Fl0hNCb+QTIePTn5pJs2pwBOQQ==}
+
+  '@unhead/schema@1.11.20':
+    resolution: {integrity: sha512-0zWykKAaJdm+/Y7yi/Yds20PrUK7XabLe9c3IRcjnwYmSWY6z0Cr19VIs3ozCj8P+GhR+/TI2mwtGlueCEYouA==}
 
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
@@ -640,12 +737,27 @@ packages:
   get-tsconfig@4.14.0:
     resolution: {integrity: sha512-yTb+8DXzDREzgvYmh6s9vHsSVCHeC0G3PI5bEXNBHtmshPnO+S5O7qgLEOn0I5QvMy6kpZN8K1NKGyilLb93wA==}
 
+  hono-rate-limiter@0.4.2:
+    resolution: {integrity: sha512-AAtFqgADyrmbDijcRTT/HJfwqfvhalya2Zo+MgfdrMPas3zSMD8SU03cv+ZsYwRU1swv7zgVt0shwN059yzhjw==}
+    peerDependencies:
+      hono: ^4.1.1
+
+  hono@4.12.18:
+    resolution: {integrity: sha512-RWzP96k/yv0PQfyXnWjs6zot20TqfpfsNXhOnev8d1InAxubW93L11/oNUc3tQqn2G0bSdAOBpX+2uDFHV7kdQ==}
+    engines: {node: '>=16.9.0'}
+
+  hookable@5.5.3:
+    resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
+
   isexe@3.1.5:
     resolution: {integrity: sha512-6B3tLtFqtQS4ekarvLVMZ+X+VlvQekbe4taUkf/rhVO3d/h0M2rfARm/pXLcPEsjjMsFgrFgSrhQIxcSVrBz8w==}
     engines: {node: '>=18'}
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
+
+  openapi3-ts@4.5.0:
+    resolution: {integrity: sha512-jaL+HgTq2Gj5jRcfdutgRGLosCy/hT8sQf6VOy+P+g36cZOjI1iukdPnijC+4CmeRzg/jEllJUboEic2FhxhtQ==}
 
   postgres@3.4.9:
     resolution: {integrity: sha512-GD3qdB0x1z9xgFI6cdRD6xu2Sp2WCOEoe3mtnyB5Ee0XrrL5Pe+e4CCnJrRMnL1zYtRDZmQQVbvOttLnKDLnaw==}
@@ -693,7 +805,23 @@ packages:
     engines: {node: ^16.13.0 || >=18.0.0}
     hasBin: true
 
+  yaml@2.9.0:
+    resolution: {integrity: sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==}
+    engines: {node: '>= 14.6'}
+    hasBin: true
+
+  zhead@2.2.4:
+    resolution: {integrity: sha512-8F0OI5dpWIA5IGG5NHUg9staDwz/ZPxZtvGVf01j7vHqSyZ0raHY+78atOVxRqb73AotX22uV1pXt3gYSstGag==}
+
+  zod@3.25.76:
+    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+
 snapshots:
+
+  '@asteasolutions/zod-to-openapi@7.3.4(zod@3.25.76)':
+    dependencies:
+      openapi3-ts: 4.5.0
+      zod: 3.25.76
 
   '@drizzle-team/brocli@0.10.2': {}
 
@@ -920,11 +1048,54 @@ snapshots:
   '@esbuild/win32-x64@0.27.7':
     optional: true
 
+  '@hono/node-server@2.0.2(hono@4.12.18)':
+    dependencies:
+      hono: 4.12.18
+
+  '@hono/zod-openapi@0.18.4(hono@4.12.18)(zod@3.25.76)':
+    dependencies:
+      '@asteasolutions/zod-to-openapi': 7.3.4(zod@3.25.76)
+      '@hono/zod-validator': 0.4.3(hono@4.12.18)(zod@3.25.76)
+      hono: 4.12.18
+      zod: 3.25.76
+
+  '@hono/zod-validator@0.4.3(hono@4.12.18)(zod@3.25.76)':
+    dependencies:
+      hono: 4.12.18
+      zod: 3.25.76
+
+  '@hono/zod-validator@0.8.0(hono@4.12.18)(zod@3.25.76)':
+    dependencies:
+      hono: 4.12.18
+      zod: 3.25.76
+
   '@petamoriken/float16@3.9.3': {}
+
+  '@scalar/core@0.1.1':
+    dependencies:
+      '@scalar/types': 0.0.40
+
+  '@scalar/hono-api-reference@0.5.184(hono@4.12.18)':
+    dependencies:
+      '@scalar/core': 0.1.1
+      hono: 4.12.18
+
+  '@scalar/openapi-types@0.1.9': {}
+
+  '@scalar/types@0.0.40':
+    dependencies:
+      '@scalar/openapi-types': 0.1.9
+      '@unhead/schema': 1.11.20
+      zod: 3.25.76
 
   '@types/node@22.19.18':
     dependencies:
       undici-types: 6.21.0
+
+  '@unhead/schema@1.11.20':
+    dependencies:
+      hookable: 5.5.3
+      zhead: 2.2.4
 
   buffer-from@1.1.2: {}
 
@@ -1055,9 +1226,21 @@ snapshots:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
+  hono-rate-limiter@0.4.2(hono@4.12.18):
+    dependencies:
+      hono: 4.12.18
+
+  hono@4.12.18: {}
+
+  hookable@5.5.3: {}
+
   isexe@3.1.5: {}
 
   ms@2.1.3: {}
+
+  openapi3-ts@4.5.0:
+    dependencies:
+      yaml: 2.9.0
 
   postgres@3.4.9: {}
 
@@ -1090,3 +1273,9 @@ snapshots:
   which@4.0.0:
     dependencies:
       isexe: 3.1.5
+
+  yaml@2.9.0: {}
+
+  zhead@2.2.4: {}
+
+  zod@3.25.76: {}

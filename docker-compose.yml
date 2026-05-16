@@ -108,6 +108,21 @@ services:
       ADMINER_DEFAULT_SERVER: postgres
       ADMINER_DESIGN: dracula
 
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: relowa-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://relowa:dev_password_change_me@postgres:5432/relowa
+      JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
+
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: relowa-pgadmin
