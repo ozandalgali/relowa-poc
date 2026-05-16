@@ -7,6 +7,7 @@ import { sql } from "drizzle-orm";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
 import { cacheIdempotentResponse } from "../middleware/idempotency";
+import { publishEvent } from "../events";
 import type { JwtClaims } from "../middleware/auth";
 import { gucClaims } from "../middleware/auth";
 
@@ -82,6 +83,13 @@ tenderRoutes.post("/", zValidator("json", createTenderSchema), async (c) => {
   });
 
   await cacheIdempotentResponse(idempotencyKey, claims.active_org_id, 201, tender);
+
+  // Fire-and-forget EventBridge publish
+  publishEvent({
+    detailType: "tender.created",
+    detail: { id: tender.id, orgId: tender.orgId },
+  });
+
   return c.json(tender, 201);
 });
 
@@ -146,5 +154,12 @@ tenderRoutes.patch("/:id/publish", zValidator("json", publishTenderSchema), asyn
   });
 
   await cacheIdempotentResponse(idempotencyKey, claims.active_org_id, 200, tender);
+
+  // Fire-and-forget EventBridge publish
+  publishEvent({
+    detailType: "tender.published",
+    detail: { id: tender.id, orgId: tender.orgId },
+  });
+
   return c.json(tender);
 });

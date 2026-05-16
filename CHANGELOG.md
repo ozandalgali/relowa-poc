@@ -18,6 +18,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - `docs/plans/M0-PLAN.md`: progress tracker for infrastructure milestone
 - `infra/.gitignore`: Terraform state exclusion
 
+### Added (M3 — EventBridge wiring)
+- **EventBridge PutEvents** from all mutation route handlers — `tender.created`, `tender.published`, `bid.placed` published to `relowa-events` bus (LocalStack dev, fire-and-forget)
+- **AWS SDK client** (`apps/api/src/events.ts`) — configures EventBridge client for LocalStack (localhost:4566) with fallback to real AWS
+- **Auction close Lambda verified** — end-to-end test: create tender → place bid → wait for close → Lambda picks winner (450.75/ton), soft-close extends on late bids
+- **pnpm-workspace** updated to include `apps/lambdas/*` for Lambda packages
+
 ### Fixed
 - **gitleaks CI failure.** Added `.gitleaks.toml` with global allowlist for known POC dev credentials (not production secrets). Removed invalid `config-path` input from gitleaks-action.
 - **Migration CI failure.** Fixed `DATABASE_URL` default port from 5432 → 5433 in `drizzle.config.ts`. Added explicit `DATABASE_URL` env var to `test.yml`.
@@ -40,6 +46,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - **pgAdmin** container in `docker-compose.yml` — Supabase-like dashboard at `localhost:5050`
 - **SSH key auto-generated** by Terraform, stored in Secrets Manager (`/relowa/dev/bastion/ssh-private-key`)
 - **RDS security group** updated with bastion-host ingress rule (5432 from bastion SG)
+
+### Added (M3 — EventBridge wiring)
+- **EventBridge PutEvents** from all mutation route handlers — `tender.created`, `tender.published`, `bid.placed` published to `relowa-events` bus (LocalStack dev, fire-and-forget)
+- **AWS SDK client** (`apps/api/src/events.ts`) — configures EventBridge client for LocalStack (localhost:4566) with fallback to real AWS
+- **Auction close Lambda verified** — end-to-end test: create tender → place bid → wait for close → Lambda picks winner (450.75/ton), soft-close extends on late bids
+- **pnpm-workspace** updated to include `apps/lambdas/*` for Lambda packages
 
 ### Fixed (RDS connectivity)
 - **RDS password not applying.** Added `apply_immediately = true` to Terraform RDS config. Previously deferred password changes to Sunday maintenance window.
@@ -112,6 +124,12 @@ Exit status 1
 - **Bidding flow integration test** — end-to-end: create → publish → bid → verify outbox events
 - **Outbox INSERT RLS policy** — added to `0002_rls_m1_tables.sql` (was missing, blocked outbox writes from route handlers)
 
+### Added (M3 — EventBridge wiring)
+- **EventBridge PutEvents** from all mutation route handlers — `tender.created`, `tender.published`, `bid.placed` published to `relowa-events` bus (LocalStack dev, fire-and-forget)
+- **AWS SDK client** (`apps/api/src/events.ts`) — configures EventBridge client for LocalStack (localhost:4566) with fallback to real AWS
+- **Auction close Lambda verified** — end-to-end test: create tender → place bid → wait for close → Lambda picks winner (450.75/ton), soft-close extends on late bids
+- **pnpm-workspace** updated to include `apps/lambdas/*` for Lambda packages
+
 ### Fixed
 - Outbox table had no INSERT policy for `app_user` — route handlers running under `SET LOCAL ROLE app_user` couldn't write outbox events. Added `outbox_insert_app_user` policy.
 
@@ -156,6 +174,12 @@ Exit status 1
 - Cross-tenant SELECT isolation: producer admin sees own 3 tenders, recycler sees only 2 published, carrier sees 0, anonymous sees 0.
 - Cross-tenant INSERT rejection: producer attempting to write to another org's tenders returns `new row violates row-level security policy`.
 - Reset cycle: full teardown + rebuild + reseed under 30 seconds, deterministic.
+
+### Added (M3 — EventBridge wiring)
+- **EventBridge PutEvents** from all mutation route handlers — `tender.created`, `tender.published`, `bid.placed` published to `relowa-events` bus (LocalStack dev, fire-and-forget)
+- **AWS SDK client** (`apps/api/src/events.ts`) — configures EventBridge client for LocalStack (localhost:4566) with fallback to real AWS
+- **Auction close Lambda verified** — end-to-end test: create tender → place bid → wait for close → Lambda picks winner (450.75/ton), soft-close extends on late bids
+- **pnpm-workspace** updated to include `apps/lambdas/*` for Lambda packages
 
 ### Fixed
 - **Postgres 18 volume mount.** Switched mount from `/var/lib/postgresql/data` to `/var/lib/postgresql` per the Postgres 18 directory-layout convention. See `docs/memory/learned/postgres-18-volume-mount.md`.

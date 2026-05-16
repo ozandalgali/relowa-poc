@@ -6,6 +6,7 @@ import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
 import { cacheIdempotentResponse } from "../middleware/idempotency";
+import { publishEvent } from "../events";
 import type { JwtClaims } from "../middleware/auth";
 import { gucClaims } from "../middleware/auth";
 
@@ -78,6 +79,13 @@ bidRoutes.post("/:id/bids", zValidator("json", createBidSchema), async (c) => {
   });
 
   await cacheIdempotentResponse(idempotencyKey, claims.active_org_id, 201, bid);
+
+  // Fire-and-forget EventBridge publish
+  publishEvent({
+    detailType: "bid.placed",
+    detail: { id: bid.id, tenderId: bid.tenderId, bidderOrgId: bid.bidderOrgId },
+  });
+
   return c.json(bid, 201);
 });
 

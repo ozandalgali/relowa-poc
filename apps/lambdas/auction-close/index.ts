@@ -15,10 +15,8 @@
  */
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
-import { eq, lt, desc, sql } from "drizzle-orm";
-
-// Load schema dynamically from the db package
-const schema = await import("@relowa/db/schema");
+import { eq, desc, sql } from "drizzle-orm";
+import * as schema from "@relowa/db/schema";
 
 const DATABASE_URL =
   process.env.DATABASE_URL ??
@@ -28,7 +26,7 @@ const SOFT_CLOSE_SECONDS = 60;
 
 async function main() {
   const pg = postgres(DATABASE_URL, { max: 1 });
-  const db = drizzle(pg, { schema: schema });
+  const db = drizzle(pg, { schema });
 
   console.log("Auction close Lambda — checking for tenders to close...");
 
@@ -50,7 +48,9 @@ async function main() {
 
   for (const tender of closingTenders) {
     // Check for soft-close: any bid in last 60 seconds before closes_at?
-    const softCloseWindow = new Date(tender.closesAt!.getTime() - SOFT_CLOSE_SECONDS * 1000);
+    const softCloseWindow = new Date(
+      tender.closesAt!.getTime() - SOFT_CLOSE_SECONDS * 1000,
+    ).toISOString();
 
     const [lateBid] = await db
       .select({ id: schema.bids.id })
