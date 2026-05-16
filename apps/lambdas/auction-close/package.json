@@ -1,0 +1,19 @@
+{
+  "name": "auction-close",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx index.ts"
+  },
+  "dependencies": {
+    "postgres": "^3.4.5",
+    "drizzle-orm": "^0.36.4",
+    "@relowa/db": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "@types/node": "^22.10.0"
+  }
+}

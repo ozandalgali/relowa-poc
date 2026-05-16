@@ -8,12 +8,12 @@
 
 | Step | Status |
 |------|--------|
-| 1. Outbox publishing from route handlers | ⬜ Pending |
-| 2. Auction close Lambda (t4g.nano, EventBridge scheduler every 30s) | ⬜ Pending |
-| 3. EventBridge rules + Scheduler wiring | ⬜ Pending |
-| 4. AppSync GraphQL schema (subscriptions) | ⬜ Pending |
-| 5. Integration tests (bidding flow end-to-end) | ⬜ Pending |
-| 6. Docs | ⬜ Pending |
+| 1. Outbox publishing from route handlers | ✅ Done |
+| 2. Auction close Lambda (t4g.nano, EventBridge scheduler every 30s) | ✅ Done |
+| 3. EventBridge rules + Scheduler wiring | ✅ Done |
+| 4. AppSync GraphQL schema (subscriptions) | ✅ Done |
+| 5. Integration tests (bidding flow end-to-end) | ✅ Done |
+| 6. Docs | ✅ Done |
 
 ## Dependency graph
 

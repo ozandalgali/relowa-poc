@@ -238,6 +238,15 @@ CREATE POLICY escrow_transactions_select_involved ON escrow_transactions
 
 -- ─── outbox — system-internal, no app_user SELECT ──────────────────
 
+-- Outbox INSERT: any authenticated user can insert (written inside mutation tx)
+DROP POLICY IF EXISTS outbox_insert_app_user ON outbox;
+CREATE POLICY outbox_insert_app_user ON outbox
+  FOR INSERT
+  TO app_user
+  WITH CHECK (true);
+
+-- Outbox SELECT: no app_user access (outbox is a relay table, not user-facing)
+
 -- ─── anchor_log — system-internal, no app_user access ──────────────
 
 -- ─── admin_audit_log hash chain trigger ────────────────────────────

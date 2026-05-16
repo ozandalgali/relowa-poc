@@ -64,6 +64,16 @@ bidRoutes.post("/:id/bids", zValidator("json", createBidSchema), async (c) => {
       .returning();
 
     if (!result) throw new HTTPException(500, { message: "Failed to place bid" });
+
+    // Outbox: publish bid.placed event
+    await tx.insert(schema.outbox).values({
+      aggregateType: "bid",
+      aggregateId: result.id,
+      eventType: "bid.placed",
+      orgId: claims.active_org_id,
+      payload: result as unknown as Record<string, unknown>,
+    });
+
     return result;
   });
 

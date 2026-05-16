@@ -68,6 +68,16 @@ tenderRoutes.post("/", zValidator("json", createTenderSchema), async (c) => {
       .returning();
 
     if (!result) throw new HTTPException(500, { message: "Failed to create tender" });
+
+    // Outbox: publish event inside same transaction
+    await tx.insert(schema.outbox).values({
+      aggregateType: "tender",
+      aggregateId: result.id,
+      eventType: "tender.created",
+      orgId: claims.active_org_id,
+      payload: result as unknown as Record<string, unknown>,
+    });
+
     return result;
   });
 
@@ -122,6 +132,16 @@ tenderRoutes.patch("/:id/publish", zValidator("json", publishTenderSchema), asyn
       .returning();
 
     if (!result) throw new HTTPException(404, { message: "Tender not found" });
+
+    // Outbox: publish tender.published event
+    await tx.insert(schema.outbox).values({
+      aggregateType: "tender",
+      aggregateId: result.id,
+      eventType: "tender.published",
+      orgId: claims.active_org_id,
+      payload: result as unknown as Record<string, unknown>,
+    });
+
     return result;
   });
 

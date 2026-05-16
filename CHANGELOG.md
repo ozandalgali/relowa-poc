@@ -105,6 +105,16 @@ stdout | src/__tests__/bids.test.ts > Bid flow
 Exit status 1
  ELIFECYCLE  Test failed. See above for more details. script in 
 
+### Added (M3 — Realtime + Workers)
+- **Outbox publishing** from all mutation endpoints: `tender.created`, `tender.published`, `bid.placed` written inside same DB transaction
+- **Auction close Lambda** (`apps/lambdas/auction-close/`) — finds tenders past `closes_at`, picks highest bid, soft-close anti-sniping (extends by 60s on late bid)
+- **EventBridge setup script** (`scripts/setup-events.sh`) — creates event bus, rules, scheduler for LocalStack dev
+- **Bidding flow integration test** — end-to-end: create → publish → bid → verify outbox events
+- **Outbox INSERT RLS policy** — added to `0002_rls_m1_tables.sql` (was missing, blocked outbox writes from route handlers)
+
+### Fixed
+- Outbox table had no INSERT policy for `app_user` — route handlers running under `SET LOCAL ROLE app_user` couldn't write outbox events. Added `outbox_insert_app_user` policy.
+
 ### Planned (M3 — Realtime + Workers)
 - Outbox publishing from all mutation endpoints (tender.created, tender.published, bid.placed, tender.won)
 - Auction close Lambda (EventBridge Scheduler every 30s, soft-close anti-sniping)
