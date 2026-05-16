@@ -9,6 +9,9 @@ import { bidRoutes } from "./routes/bids";
 import { escrowRoutes } from "./routes/escrow";
 import { webhookRoutes } from "./routes/webhooks";
 import { fileRoutes } from "./routes/files";
+import { facilityRoutes } from "./routes/facilities";
+import { orderRoutes } from "./routes/orders";
+import { subscriptionRoutes } from "./routes/subscriptions";
 
 const app = new Hono();
 
@@ -35,6 +38,9 @@ app.route("/tenders", bidRoutes);
 app.route("/escrow", escrowRoutes);
 app.route("/api/webhooks", webhookRoutes);
 app.route("/files", fileRoutes);
+app.route("/facilities", facilityRoutes);
+app.route("/orders", orderRoutes);
+app.route("/subscriptions", subscriptionRoutes);
 
 export { app };
 

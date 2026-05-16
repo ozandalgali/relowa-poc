@@ -15,6 +15,13 @@
       "when": 1778870531828,
       "tag": "0001_sad_wendell_rand",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1778966428303,
+      "tag": "0002_bizarre_union_jack",
+      "breakpoints": true
     }
   ]
 }

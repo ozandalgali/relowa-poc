@@ -160,6 +160,15 @@ Exit status 1
 - **Outbox relay worker** (`apps/lambdas/outbox-relay/`) — polls outbox table every 1s, Shopify-style SKIP LOCKED multi-worker safe, publishes to AppSync/Supabase Realtime based on REALTIME_BACKEND env var
 - **Backend now complete** — 11 Lambdas, 7 API routes, 3 middleware, 2 SFN state machines, 5 S3 buckets, 46 tests green
 
+### Added (M5 — Substrate seats for Phase 2/3/4)
+- **27 new tables** — pricing engine (4: fee_schedules, fee_schedule_tiers, fee_schedule_overrides, fee_applications), subscriptions (4: subscription_tiers, org_subscriptions, subscription_invoices, org_usage_counters), facilities (1: facilities), orders (7: orders, order_parties, order_status_transitions, quality_inspections, delivery_proofs), VRP (5: vehicles, driver_profiles, route_optimizations, route_legs, shipment_stops), IoT (4: devices, device_telemetry, telemetry_aggregations, device_alerts), Edge AI (5: ai_inference_units, ml_models, inference_jobs, inference_results, ai_unit_commands)
+- **11 new enums** — subscription_status, facility_type, order_status, inspection_outcome, vehicle_type, vehicle_status, device_type, device_status, connectivity_protocol, inference_unit_type, inference_unit_status
+- **3 new API route groups** — GET/POST /facilities, GET/POST /orders, GET /subscriptions/tiers
+- **19 new RLS policies** — facilities, orders, order_parties, inspections, delivery_proofs, subscription tiers, fee schedules
+- **PostGIS extension** added to Docker init.sql — ready for Phase 2 geo queries
+- **Schema grows from 21 to 49 tables** (25 domain + drizzle tracking)
+- **49 tables, 56 RLS policies, 46 tests all green**
+
 ### Diverted from original PRD-0003 plan
 - **ClamAV virus scanner** → M6 (API content-type validation catches 99% of abuse for POC scale; full AV on S3 events when real users upload)
 - **Real Iyzico/PayTR adapters** → M4+ (needs sandbox API keys from providers; ManualProvider is fully functional for POC/dev)

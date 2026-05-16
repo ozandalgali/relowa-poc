@@ -5,6 +5,7 @@
 -- Realtime için gerekli extension'lar
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS postgis;
 
 -- Realtime kullanıcısı (sadece replication için)
 DO $$

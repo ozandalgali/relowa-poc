@@ -172,6 +172,16 @@
         <a href="../prd/0009-onboarding-and-verification.md"
           ><span class="page-icon">📘</span>0009 — Onboarding & verification</a
         >
+        <a href="../prd/0010-phase-roadmap-vision.md"
+          ><span class="page-icon">📘</span>0010 — Phase 2/3/4 vision</a
+        >
+      </div>
+
+      <div class="sidebar-section">Executive overview</div>
+      <div class="sidebar-nav">
+        <a href="../HANDOFF-EXECUTIVE-SUMMARY.md"
+          ><span class="page-icon">🎯</span>CTO-level summary</a
+        >
       </div>
 
       <div class="sidebar-section">ADRs — Foundation</div>
@@ -255,6 +265,28 @@
         >
         <a href="../adr/0023-secrets-management.md"
           ><span class="page-icon">📄</span>0023 — Secrets management</a
+        >
+      </div>
+
+      <div class="sidebar-section">ADRs — Substrate seats (P2/P3 ready)</div>
+      <div class="sidebar-nav">
+        <a href="../adr/0024-subscription-tiers-and-billing.md"
+          ><span class="page-icon">📄</span>0024 — Subscription tiers</a
+        >
+        <a href="../adr/0025-facilities-and-multi-site.md"
+          ><span class="page-icon">📄</span>0025 — Facilities & multi-site</a
+        >
+        <a href="../adr/0026-orders-separate-from-tenders.md"
+          ><span class="page-icon">📄</span>0026 — Orders ≠ tenders</a
+        >
+        <a href="../adr/0027-route-engine-abstraction.md"
+          ><span class="page-icon">📄</span>0027 — Route engine (VRP seat)</a
+        >
+        <a href="../adr/0028-iot-ingestion-architecture.md"
+          ><span class="page-icon">📄</span>0028 — IoT ingestion seat</a
+        >
+        <a href="../adr/0029-edge-ai-architecture.md"
+          ><span class="page-icon">📄</span>0029 — Edge AI seat</a
         >
       </div>
 
@@ -362,8 +394,8 @@
         <div class="plan-card">
           <div class="pc-title">Documentation system ✅</div>
           <div class="pc-desc">
-            23 ADRs, 9 PRDs, 6 concept notes, 4 learned notes, 16 skill files (×2 runtimes), 16 test
-            category docs, 1 master plan (this page).
+            29 ADRs, 10 PRDs, 6 concept notes, 4 learned notes, 16 skill files (×2 runtimes), 16
+            test category docs, executive summary, master plan (this page).
           </div>
         </div>
         <div class="plan-card">
@@ -633,6 +665,30 @@
           <div class="pc-desc">
             3-stage pipeline: registration → verification (24h SLA) → activation + first-tender
             wizard. Çevre Lisansı + K1 docs first-class.
+          </div>
+        </a>
+        <a href="../prd/0010-phase-roadmap-vision.md" class="plan-card">
+          <div class="pc-title">
+            PRD-0010 — Phase 2/3/4 vision
+            <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            The 4-phase roadmap. Rubicon × Sensoneo × Greyparrot three-pillar fusion. HaaS,
+            VRP, edge AI, carbon credits, ERP integrations, smart city. Revenue lines per phase.
+          </div>
+        </a>
+      </div>
+
+      <h3>Executive Overview</h3>
+      <div class="plan-grid">
+        <a href="../HANDOFF-EXECUTIVE-SUMMARY.md" class="plan-card">
+          <div class="pc-title">
+            CTO-level summary 🎯
+            <span class="status-pill status-done">current</span>
+          </div>
+          <div class="pc-desc">
+            Single document with: strategic vision, 5-layer architecture, hybrid revenue model,
+            25-table DB inventory, all flows, substrate-vs-implementation map, 14 sections.
           </div>
         </a>
       </div>
@@ -922,17 +978,91 @@
           letter-spacing: 0.04em;
         "
       >
+        Substrate seats (Phase 2/3 ready)
+      </h4>
+      <div class="plan-grid">
+        <a href="../adr/0024-subscription-tiers-and-billing.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0024 — Subscription tiers & SaaS billing
+            <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            CEO matrix as schema: 3 segments × 3 tiers (Free/Pro/Enterprise). Free auto-applied.
+            Tier-driven commission resolution. Iyzico recurring; Manual in dev.
+          </div>
+        </a>
+        <a href="../adr/0025-facilities-and-multi-site.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0025 — Facilities & multi-site
+            <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            Separate `facilities` table for multi-site orgs (Enterprise tier promise). PostGIS for
+            geo queries. Per-facility compliance docs + staff scoping.
+          </div>
+        </a>
+        <a href="../adr/0026-orders-separate-from-tenders.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0026 — Orders ≠ tenders
+            <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            Tender = auction event. Order = persistent fulfillment. Enables multi-winner tenders,
+            quality_inspection, delivery_proof, dispute resolution lifecycle.
+          </div>
+        </a>
+        <a href="../adr/0027-route-engine-abstraction.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0027 — Route engine (VRP substrate)
+            <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            vehicles + drivers + route_optimizations in P1. ManualRouteEngine ships immediately;
+            Google OR-Tools lands in Phase 2. Per-route co2 calculations.
+          </div>
+        </a>
+        <a href="../adr/0028-iot-ingestion-architecture.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0028 — IoT ingestion (Sensoneo pillar)
+            <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            AWS IoT Core + MQTT + LPWAN. devices + telemetry + aggregations schema in P1.
+            MockDeviceProvider in dev. HaaS subscription line goes live Phase 2.
+          </div>
+        </a>
+        <a href="../adr/0029-edge-ai-architecture.md" class="plan-card">
+          <div class="pc-title">
+            ADR-0029 — Edge AI (Greyparrot pillar)
+            <span class="status-pill status-draft">drafted</span>
+          </div>
+          <div class="pc-desc">
+            On-premise GPU inference at conveyor belts. ai_inference_units + inference_jobs schema
+            in P1. MockEdgeAI in dev. Greyparrot real adapter Phase 2-3.
+          </div>
+        </a>
+      </div>
+
+      <h4
+        style="
+          margin-top: 18px;
+          font-size: 14px;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        "
+      >
         Reserved / future
       </h4>
       <div class="plan-grid">
         <div class="plan-card disabled">
           <div class="pc-title">
-            ADR-0024+ — TBD <span class="status-pill status-planned">reserved</span>
+            ADR-0030+ — TBD <span class="status-pill status-planned">reserved</span>
           </div>
           <div class="pc-desc">
-            Greyparrot adapter spec (ADR-0029), Iyzico adapter (ADR-0027), Nilvera adapter
-            (ADR-0028), Phase 2 IoT ingestion, mobile carrier driver app, RBAC time-bounded grants,
-            and other future plans surfaced by ADR future-plans sections.
+            Driver mobile app (P2), Iyzico real adapter, Nilvera real adapter, PayTR fallback,
+            Greyparrot real adapter, carbon credit minting (P4), ERP integrations (P4), Smart City
+            module (P4), and other future plans surfaced by ADR future-plans sections.
           </div>
         </div>
       </div>

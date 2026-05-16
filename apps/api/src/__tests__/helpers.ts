@@ -8,12 +8,12 @@ const JWT_SECRET = "super-secret-jwt-token-with-at-least-32-characters-long";
 
 // ─── Seed reference IDs (from pnpm db:seed) ────────────────────────
 const SEED = {
-  acmeAdmin: { sub: "1c0fe9c1-2570-4281-bd8c-a9b303af983d", email: "ahmet@acme.example" },
-  acmeOrg: "ece1d3fe-f555-4a0f-89d5-b75c633b0836",
-  ekoAdmin: { sub: "88920f56-42b0-4a3c-87b9-4e5b3fb5f4fc", email: "mehmet@ekometal.example" },
-  ekoOrg: "897549a5-b32f-49e4-84f9-a1b2dd993b41",
-  hizliAdmin: { sub: "75529110-c5ce-4f99-b55a-eb5a9f881029", email: "kadir@hizli.example" },
-  hizliOrg: "0fa11442-8a42-4ee3-84bd-b8b5d85d399a",
+  acmeAdmin: { sub: "210285de-c201-4ac0-b174-c1151d3a6099", email: "ahmet@acme.example" },
+  acmeOrg: "7264c8b2-a41a-4319-ac42-78e8c2b10e18",
+  ekoAdmin: { sub: "805140a3-4863-4414-a283-ee9321f978f2", email: "mehmet@ekometal.example" },
+  ekoOrg: "6ba566bf-8384-475a-8597-0e017a2c7f20",
+  hizliAdmin: { sub: "7536a211-cff9-4cf8-a4f7-56902be4eddf", email: "kadir@hizli.example" },
+  hizliOrg: "72db69a9-079b-4268-958c-d51d59aa7ca1",
 };
 
 // ─── JWT helpers ────────────────────────────────────────────────────

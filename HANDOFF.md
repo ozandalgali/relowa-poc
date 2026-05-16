@@ -1,11 +1,12 @@
 # Relowa POC — Handoff
 
 > **Read this first** if you're picking up the project from any session boundary — agent, human, fresh laptop, new contributor.
-> Last updated: 2026-05-13.
+> Last updated: 2026-05-16.
 
-> **NEW (2026-05-13)** — the full module + UI plan has landed as 6 new ADRs and 2 new PRDs.
+> **NEW (2026-05-16)** — third planning round complete. **5-layer architecture** + **substrate seats for IoT/AI/VRP** + **subscription tiers** + **orders separate from tenders** + **facilities** + **Phase 2/3/4 vision** locked. Six new ADRs (0024-0029), one new PRD (0010), two amendments (PRD-0008 with hybrid revenue, PRD-0004 with layer view), executive summary rewritten.
 > The single master-plan dashboard lives at [`docs/_site/index.html`](docs/_site/index.html).
-> See the "Architectural plan — 2026-05-13" section below for the new docs.
+> The CTO-level overview lives at [`docs/HANDOFF-EXECUTIVE-SUMMARY.md`](docs/HANDOFF-EXECUTIVE-SUMMARY.md).
+> See the "Three-pillar fusion + substrate seats — 2026-05-16" section below.
 
 This document is the single source of truth for **where the project is right now** and **what the next session should do**. Everything else (README, ADRs, memory notes) is context; this file is the entry point.
 
@@ -229,6 +230,24 @@ Per stakeholder direction "go full AWS":
 - The RLS substrate (Postgres + `auth.*` helpers + 21 policies) is **unchanged** across all three phases. JWT claims come from Cognito instead of bcrypt seed, but the GUC pattern is identical.
 
 ---
+
+## Three-pillar fusion + substrate seats — 2026-05-16 (third planning round)
+
+The CEO context (competitive matrix, pricing matrix, 4-phase roadmap, prior ERD) drove substantial planning. Key decisions:
+
+- **Strategic positioning** — Relowa is the only platform unifying Rubicon (operations) × Sensoneo (IoT) × Greyparrot (AI). Captured in the **5-layer architecture** in PRD-0004 (amended) and detailed in PRD-0010 (new).
+- **Hybrid revenue model** — SaaS subscriptions + tier-driven commission. Replaces "transaction fees only." 3 segments × 3 tiers from CEO pricing matrix. PRD-0008 amended; ADR-0024 (new) specifies subscription billing.
+- **`facilities` separate from `organizations`** — Enterprise tier promises multi-facility management; substrate enables it. PostGIS for geo queries. ADR-0025 (new).
+- **`orders` separate from `tenders`** — Tender is the auction event; order is the persistent fulfillment record. Enables partial-win tenders (P2) and gives quality_inspection / delivery_proof a home. ADR-0026 (new).
+- **VRP substrate seat** — `vehicles`, `driver_profiles`, `route_optimizations` schema in P1. `RouteEngine` adapter with `ManualRouteEngine` for P1; Google OR-Tools for P2. ADR-0027 (new).
+- **IoT substrate seat** — `devices`, `device_telemetry`, `telemetry_aggregations` schema in P1. AWS IoT Core + MQTT + LPWAN. `DeviceProvider` adapter with `MockDeviceProvider`; Sensoneo/custom for P2. ADR-0028 (new).
+- **Edge AI substrate seat** — `ai_inference_units`, `inference_jobs`, `inference_results` schema in P1. Edge GPU at conveyor belts. `EdgeAIProvider` adapter with `MockEdgeAI`; Greyparrot/self-hosted for P2-P3. ADR-0029 (new).
+- **PRD-0010** — Phase 2/3/4 vision and roadmap with revenue lines, scale targets, anticipated future ADRs.
+- **PRD-0004 amended** — 9 icon buckets organized into 5 architectural layers. IoT and AI promoted from "deferred" to "substrate-seat-reserved in P1."
+- **PRD-0008 amended** — Pricing engine resolves schedule via subscription tier. Default schedules match CEO matrix (Producer 7→5→3%, Recycler 3→2→2%, Carrier 10→7→5%).
+- **HANDOFF-EXECUTIVE-SUMMARY.md** rewritten — added strategic vision section, 5-layer architecture, hybrid revenue model, substrate-seats table, expanded DB inventory (25 tables), substrate-vs-implementation map.
+
+**The discipline:** ~20 extra tables ship in Phase 1 substrate. Zero migration cliffs when Phases 2-4 light up. Schema commits before implementation lands.
 
 ## Operational layer — 2026-05-14 (second planning round)
 
@@ -526,20 +545,23 @@ If you're picking this up cold, the minimum reading list is:
 
 1. This file (HANDOFF.md)
 2. AGENTS.md
-3. **`docs/_site/index.html`** — the master plan dashboard, links every ADR/PRD/skill/test category with status
-4. PRD-0004 (module map — the 9-bucket taxonomy)
-5. PRD-0008 (pricing engine — how money flows + fee model)
-6. ADR-0016 (agent team — how work flows through the 16 agents)
-7. ADR-0017 (test strategy — what tests exist, who owns what)
-8. ADR-0009 (tender auction direction)
-9. ADR-0011 + ADR-0012 (UI kit + frontend architecture)
-10. ADR-0014 + ADR-0015 (staff RBAC + admin isolation)
-11. ADR-0018 (notifications — what users hear from us)
-12. ADR-0020 (observability — what we see when things go wrong)
-13. `docs/memory/concepts/auth-uid-pattern.md` (the load-bearing pattern)
-14. `docs/agents/team-handbook.md` (worked feature flows — concrete examples of how a session goes)
-15. `.opencode/skills/lead-orchestrator.md` (start every multi-step session here)
+3. **`docs/HANDOFF-EXECUTIVE-SUMMARY.md`** — CTO-level overview with strategic vision + DB inventory + flows
+4. **`docs/_site/index.html`** — master plan dashboard, links every ADR/PRD/skill/test category with status
+5. PRD-0010 (Phase 2/3/4 vision — the 4-phase roadmap)
+6. PRD-0004 amended (module map — 5-layer architecture)
+7. PRD-0008 amended (pricing engine — hybrid SaaS + commission)
+8. ADR-0024 (subscription tiers)
+9. ADR-0025 + ADR-0026 (facilities + orders — the model changes)
+10. ADR-0027 + ADR-0028 + ADR-0029 (substrate seats: VRP + IoT + Edge AI)
+11. ADR-0016 (agent team — how work flows through the 16 agents)
+12. ADR-0017 (test strategy)
+13. ADR-0009 (tender auction)
+14. ADR-0011 + ADR-0012 (UI kit + frontend architecture)
+15. ADR-0014 + ADR-0015 (staff RBAC + admin isolation)
+16. `docs/memory/concepts/auth-uid-pattern.md` (the load-bearing pattern)
+17. `docs/agents/team-handbook.md` (worked feature flows)
+18. `.opencode/skills/lead-orchestrator.md` (start every multi-step session here)
 
-Total time: ~60 minutes. After that you have full context.
+Total time: ~75 minutes. After that you have full context.
 
 Good luck. Don't break the RLS tests.

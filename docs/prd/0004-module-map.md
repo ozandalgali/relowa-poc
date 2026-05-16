@@ -1,11 +1,13 @@
 # PRD-0004 — Module Map
 
-> The canonical taxonomy. Nine buckets that map icon group → frontend module → backend service → DB tables → Figma screens → ADRs.
+> The canonical taxonomy. Nine icon-poster buckets, organized as five architectural layers, mapping to frontend modules → backend services → DB tables → Figma screens → ADRs.
 > One source of truth for module scope across the whole project.
 
 **Status:** Accepted
-**Date:** 2026-05-13
+**Date:** 2026-05-13 (amended 2026-05-16)
 **Decision-makers:** Ozan (lead)
+
+> **Amended 2026-05-16:** After reviewing the CEO competitive matrix (Evreka / Rubicon / Greyparrot / Sensoneo / RELOWA), the 9 icon buckets are reorganized into **5 architectural layers** that mirror the strategic-pillar fusion (Rubicon-style operations × Sensoneo-style IoT × Greyparrot-style AI). IoT & Field and AI & Recognition are **promoted from "deferred"** to "Phase 2 first-class with substrate seats reserved in Phase 1." This means: schema, adapter interfaces, and integration points must exist in P1 even though the production deployment of hardware/AI units lands later. See §1a below.
 
 ## Why this document exists
 
@@ -19,6 +21,50 @@ These didn't reconcile. A new contributor reading the icon poster would not be a
 
 The icon system poster is the most user-legible taxonomy, so we adopt its 9 buckets as canonical. Everything else maps into them.
 
+## 1a. The five architectural layers (added 2026-05-16)
+
+The 9 icon-poster buckets reflect a UX surface taxonomy. For engineering and product strategy, they roll up into **5 architectural layers** that map directly to the competitive matrix:
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│  LAYER 5 — Compliance & Certification                                 │
+│  ESG reports, carbon certificates, Arbitrum anchoring, audit chain    │
+│  Icon buckets: ESG & Sustainability                                   │
+│  ADRs: 0001, 0008, 0014                                               │
+├──────────────────────────────────────────────────────────────────────┤
+│  LAYER 4 — Marketplace & Finance                                      │
+│  Tenders, bids, orders, escrow, e-fatura, pricing engine, subs       │
+│  Icon buckets: Marketplace, Finance & Compliance                      │
+│  ADRs: 0007, 0009, 0010, 0024, PRD-0008                              │
+├──────────────────────────────────────────────────────────────────────┤
+│  LAYER 3 — Operations & Logistics  (Rubicon-style)                    │
+│  Carrier ads, routing (VRP), shipments, fleet, driver app             │
+│  Icon buckets: Logistics & Operations                                 │
+│  ADRs: 0010, 0013, 0027 (route engine)                                │
+├──────────────────────────────────────────────────────────────────────┤
+│  LAYER 2 — Analytics & Intelligence  (Greyparrot-style)               │
+│  AI scan, edge inference, quality scoring, anomaly detection         │
+│  Icon buckets: AI & Recognition                                       │
+│  ADRs: 0029 (edge AI), PRD-0006 (AI Scan adapter)                     │
+├──────────────────────────────────────────────────────────────────────┤
+│  LAYER 1 — Field & Data  (Sensoneo-style)                             │
+│  IoT sensors, MQTT ingestion, telemetry, device fleet, HaaS billing   │
+│  Icon buckets: IoT & Field                                            │
+│  ADRs: 0028 (IoT ingestion), ADR-0024 (HaaS subscription)             │
+└──────────────────────────────────────────────────────────────────────┘
+
+System & Navigation, Core Utilities, User Roles span ALL layers.
+```
+
+**The strategic claim:** Relowa is the only platform unifying all 5 layers. Each layer is a $100M+ company in its own right (Rubicon, Sensoneo, Greyparrot). Our differentiation is the **vertical integration**.
+
+**Phase 1 ships Layers 3, 4, 5.** Layers 1 and 2 ship in Phase 2/3, but **substrate seats are reserved in Phase 1**:
+
+- **Layer 1 (IoT):** schema for `devices`, `device_telemetry`, `telemetry_aggregations`; MQTT broker interface; HaaS subscription tier (ADR-0024). No actual hardware deployed in P1, but the API can already ingest mock telemetry.
+- **Layer 2 (Edge AI):** schema for `ai_inference_units`, `inference_results`; `AIScanProvider` interface (PRD-0006); Greyparrot adapter is one implementation, future self-hosted edge AI is another. No actual edge deployment in P1.
+
+This is the difference between **deferred** ("we'll figure it out later") and **substrate-seat-reserved** ("the architecture accepts this without rewrite").
+
 ## The nine buckets
 
 | # | Icon-poster bucket | Frontend module | Backend services / tables | Phase | Status |
@@ -29,8 +75,8 @@ The icon system poster is the most user-legible taxonomy, so we adopt its 9 buck
 | 3b | **Staff Roles** (super_admin / account_manager / support_agent / compliance_officer / financial_analyst) — internal tier | `apps/admin` only, SAML SSO + VPN-gated | `internal_staff`, `staff_org_assignments`, `staff_permissions`, `staff_role_permissions`, `admin_audit_log` (ADR-0014) | P1 schema · P2 panel | 📋 Schema P1, panel deferred to M6 |
 | 4 | **Marketplace** (Exchange, Auction, Contract, Wallet, Price Trend) | tenders, bids, marketplace feed, live auction, history | `apps/api` tenders/bids (ADR-0009), `apps/lambdas/tender-close-handler`, `tenders`, `bids` | P1 | 📋 Schema done, API/UI net new |
 | 5 | **Logistics & Operations** | shipments, route map, carrier ads, operation tracking | new tables: `carrier_ads`, `carrier_bids`, `shipments`, `shipment_events` (ADR-0010) | P1+P2 | 📋 Net new |
-| 6 | **AI & Recognition** (Greyparrot module) | photo upload, AI scan UI, purity/composition panel | `apps/ai-proxy` Greyparrot adapter, `ai_analyses` table | P1 (cloud) / P2 (self-host) | 📋 Net new |
-| 7 | **IoT & Field** (Sensoneo module) | bin status widgets, sensor telemetry view | deferred — UI placeholders only in P1 | P2 | 🧊 Stubbed |
+| 6 | **AI & Recognition** (Greyparrot module — Layer 2) | photo upload, AI scan UI, purity/composition panel; substrate for future edge inference units | `apps/ai-proxy` Greyparrot adapter, `ai_analyses` table, `ai_inference_units`, `inference_results` (substrate-only in P1, ADR-0029) | P1 cloud (Greyparrot adapter) · P2 edge deployment · P3 self-hosted | 📋 P1 substrate, edge deploy P2 |
+| 7 | **IoT & Field** (Sensoneo module — Layer 1) | bin status widgets, sensor telemetry view, fleet manifest | `devices`, `device_telemetry`, `telemetry_aggregations` (substrate-only in P1, ADR-0028); MQTT broker interface; HaaS subscription billing (ADR-0024) | P1 substrate · P2 hardware deploy · P3 fleet scale | 📋 P1 substrate seat |
 | 8 | **ESG & Sustainability** | ESG dashboard, certificate viewer, carbon score, anchored proofs | `material_recovery_certificates`, `carbon_calculations`, `esg_report_runs`, `anchor_log` (ADR-0008) | P1 | 📋 Net new |
 | 9 | **Finance & Compliance** (cross-cutting; sits under Marketplace icons: Escrow / Contract / Wallet / Invoices) | escrow status, invoices, e-fatura, payouts | `escrow_orders`, `escrow_transactions`, `invoices`, `provider_webhooks` (ADR-0007), Step Functions, Iyzico/Nilvera adapters | P1 | 📋 Net new |
 

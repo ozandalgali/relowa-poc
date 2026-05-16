@@ -6,7 +6,9 @@
 
 ## Why this document exists
 
-Relowa's revenue model is **transaction fees only** — no subscriptions, no per-seat licenses, no upfront integration fees in Phase 1. Producers, recyclers, and carriers join for free; Relowa earns a commission on settled transactions.
+> **Amended 2026-05-16:** Following the CEO's pricing matrix (3 tiers × 3 segments), Relowa's revenue model is a **hybrid: SaaS subscriptions + transaction commission**, not transaction fees only. The pricing engine specified below remains structurally correct — it now resolves schedules via subscription tier (ADR-0024) rather than from a single default per transaction type. The Free tier ships at ~7%/3%/10% take-rates; Pro and Enterprise scale subscription up and commission down. See §5 for the canonical matrix.
+
+Relowa's revenue model is **hybrid**: SaaS subscriptions per segment (Producer / Recycler / Carrier) per tier (Free / Pro / Enterprise) drive both monthly recurring revenue and tier-driven transaction commission. Producers, recyclers, and carriers can join free (with caps + higher commission); paid tiers unlock features and lower take-rates.
 
 The challenge: the *exact shape* of those fees has not been validated with real customers. Different enterprise customers will likely negotiate different rates. The PRD-0001 commitment to "production-quality, no MVP-then-rewrite" means we cannot hard-code a single `platform_fee_pct` constant and rebuild later.
 
@@ -256,49 +258,105 @@ function computeFees(ctx: FeeContext):
 
 The algorithm is deterministic, idempotent, and pure given the schedule + context. The same `(orgId, transactionType, grossAmount, at)` always returns the same breakdowns.
 
-### 5. Default Phase 1 schedules
+### 5. Hybrid revenue model — SaaS subscriptions + transaction fees
 
-Seeded in M4 migration alongside the schema:
+**Amended 2026-05-16** to match the CEO's customer-facing pricing matrix (see "Image 2 — Pricing tiers" review). Relowa is a **hybrid model**: SaaS subscriptions (monthly recurring) + marketplace commission (per-transaction, scaled by subscription tier).
+
+The pricing engine remains structurally unchanged — it's still a fee schedule + per-tenant override engine. What changes is that the **subscription tier IS the per-tenant override mechanism**. An org's tier determines its fee schedule. ADR-0024 specifies the subscription billing layer separately.
+
+**The 3 × 3 matrix (canonical):**
+
+| Segment | Free | Pro | Enterprise |
+|---|---|---|---|
+| **Waste Producers** | 7% fee · 10 listings/mo · basic ESG · email support | ₺2 499/mo · 5% fee · unlimited listings · advanced ESG · waste analysis · priority support · carbon certificates | Custom · 3% fee · multi-facility · dedicated AM · API access · ISO 14001 compliance |
+| **Recycling Facilities** | 3% fee · marketplace access · 20 bids/mo · basic supply analysis · email support | ₺3 499/mo · 2% fee · unlimited bids · early access alerts · supply forecasting · quality analysis · auto-bidding | Custom · 2% fee · multi-facility · dedicated DataAPI · supplier rating · production-plan integration · guarantee assurance |
+| **Logistics & Carriers** | 10% fee · individual drivers · 10 jobs/mo · basic route suggestions · email support | ₺1 999/mo · 7% fee · unlimited job accepts · priority job alerts · AI route optimization · live ratings · fleet savings analysis · real-time tracking | Custom · 5% fee · fleet mgmt system · dedicated AM · advanced analytics · TMS integration · custom pricing models · multi-driver mgmt |
+
+**Three observations:**
+
+1. **The take-rate decreases as the subscription tier increases.** Free producers pay 7%; Enterprise producers pay 3%. The subscription replaces commission revenue at scale.
+2. **Recyclers always pay the lowest take-rate** (3% → 2% → 2%). Marketplace economics — recyclers are the buyer-side with money; they're rate-protected so they keep transacting.
+3. **Carriers pay the highest take-rate** (10% → 7% → 5%) — reflects the operational value-add of route optimization + matching.
+
+### 5a. Seeded fee schedules (M4)
+
+Nine schedules, one per `(segment, tier)`:
 
 ```sql
--- Schedule: Waste tender default
-INSERT INTO fee_schedules (name, transaction_type, is_default, effective_from)
-VALUES ('P1 default — waste tender', 'waste_tender', true, '2026-01-01');
+-- Producer tier-driven schedules
+INSERT INTO fee_schedules (name, transaction_type, is_default, effective_from) VALUES
+  ('producer-free',       'waste_tender', false, '2026-01-01'),
+  ('producer-pro',        'waste_tender', false, '2026-01-01'),
+  ('producer-enterprise', 'waste_tender', false, '2026-01-01');
 
--- Producer side: 1.5%, max ₺2500
-INSERT INTO fee_schedule_tiers (schedule_id, fee_target, tier_min_amount, tier_max_amount, percentage, max_fee, display_order)
-VALUES (
-  (SELECT id FROM fee_schedules WHERE name = 'P1 default — waste tender'),
-  'producer', 0, NULL, 0.015000, 2500.00, 1
-);
+-- Recycler tier-driven schedules
+INSERT INTO fee_schedules (name, transaction_type, is_default, effective_from) VALUES
+  ('recycler-free',       'waste_tender', false, '2026-01-01'),
+  ('recycler-pro',        'waste_tender', false, '2026-01-01'),
+  ('recycler-enterprise', 'waste_tender', false, '2026-01-01');
 
--- Recycler side: 1.5%, max ₺2500
-INSERT INTO fee_schedule_tiers (schedule_id, fee_target, tier_min_amount, tier_max_amount, percentage, max_fee, display_order)
-VALUES (
-  (SELECT id FROM fee_schedules WHERE name = 'P1 default — waste tender'),
-  'recycler', 0, NULL, 0.015000, 2500.00, 2
-);
+-- Carrier tier-driven schedules
+INSERT INTO fee_schedules (name, transaction_type, is_default, effective_from) VALUES
+  ('carrier-free',        'carrier_ad', false, '2026-01-01'),
+  ('carrier-pro',         'carrier_ad', false, '2026-01-01'),
+  ('carrier-enterprise',  'carrier_ad', false, '2026-01-01');
 
--- Schedule: Carrier ad default
-INSERT INTO fee_schedules (name, transaction_type, is_default, effective_from)
-VALUES ('P1 default — carrier ad', 'carrier_ad', true, '2026-01-01');
-
--- Recycler pays 1.5% on transport, max ₺1000
-INSERT INTO fee_schedule_tiers (schedule_id, fee_target, tier_min_amount, tier_max_amount, percentage, max_fee, display_order)
-VALUES (
-  (SELECT id FROM fee_schedules WHERE name = 'P1 default — carrier ad'),
-  'recycler', 0, NULL, 0.015000, 1000.00, 1
-);
+-- Tiers (one row per (schedule, fee_target))
+INSERT INTO fee_schedule_tiers (schedule_id, fee_target, tier_min_amount, percentage, display_order) VALUES
+  -- Producer side
+  ((SELECT id FROM fee_schedules WHERE name='producer-free'),       'producer', 0, 0.070000, 1),
+  ((SELECT id FROM fee_schedules WHERE name='producer-pro'),        'producer', 0, 0.050000, 1),
+  ((SELECT id FROM fee_schedules WHERE name='producer-enterprise'), 'producer', 0, 0.030000, 1),
+  -- Recycler side (paired with producer on every waste tender)
+  ((SELECT id FROM fee_schedules WHERE name='recycler-free'),       'recycler', 0, 0.030000, 1),
+  ((SELECT id FROM fee_schedules WHERE name='recycler-pro'),        'recycler', 0, 0.020000, 1),
+  ((SELECT id FROM fee_schedules WHERE name='recycler-enterprise'), 'recycler', 0, 0.020000, 1),
+  -- Carrier side (carrier ad)
+  ((SELECT id FROM fee_schedules WHERE name='carrier-free'),        'carrier', 0, 0.100000, 1),
+  ((SELECT id FROM fee_schedules WHERE name='carrier-pro'),         'carrier', 0, 0.070000, 1),
+  ((SELECT id FROM fee_schedules WHERE name='carrier-enterprise'),  'carrier', 0, 0.050000, 1);
 ```
 
-**Phase 1 default rates summary:**
+Note: no `is_default=true` on these — the **subscription tier resolves the schedule**, not a global default. See ADR-0024 §3 for the resolution logic.
 
-| Transaction | Producer | Recycler | Carrier | Total platform take |
-|---|---|---|---|---|
-| Waste tender (e.g. ₺100,000) | 1.5% capped ₺2500 → ₺1500 | 1.5% capped ₺2500 → ₺1500 | — | ~3% of GMV |
-| Carrier ad (e.g. ₺5,000) | — | 1.5% capped ₺1000 → ₺75 | — | ~1.5% of transport spend |
+### 5b. Resolution algorithm — amended
 
-These are starting defaults. Adjustable per-tenant by super_admin without code changes.
+```
+function resolveSchedule(orgId, transactionType, at):
+  1. Find org's active subscription:
+       SELECT subscription_tier_id FROM org_subscriptions
+       WHERE org_id = $1 AND effective_from <= at
+         AND (effective_until IS NULL OR effective_until > at)
+       ORDER BY effective_from DESC LIMIT 1;
+     If no row → tier = 'free' (default for new orgs).
+  2. Find the schedule:
+       SELECT id FROM fee_schedules WHERE name = <segment>-<tier> AND transaction_type = $1;
+     If no match → fall back to <segment>-free.
+  3. Apply tier_min_amount, percentage, caps — unchanged from §4.
+  4. Per-tenant override (fee_schedule_overrides) still takes precedence.
+```
+
+Override priority (highest first):
+1. `fee_schedule_overrides` row for this org + transaction_type
+2. Org's `subscription_tier`-derived schedule
+3. `<segment>-free` fallback
+
+This gives super_admin three knobs:
+- **Move an org to a higher tier** (most common — sales-driven)
+- **Override schedule for a specific custom rate** (enterprise contract bespoke)
+- **Override schedule with a completely custom schedule** (white-glove customers)
+
+### 5c. Phase 1 commission math (illustrative)
+
+| Scenario | Waste price | Producer pays | Recycler pays | Carrier transport | Carrier pays | Total Relowa take |
+|---|---|---|---|---|---|---|
+| Free-tier producer × Pro-tier recycler | ₺100 000 | ₺7 000 (7%) | ₺2 000 (2%) | — | — | ₺9 000 |
+| Pro-tier producer × Pro-tier recycler | ₺100 000 | ₺5 000 (5%) | ₺2 000 (2%) | — | — | ₺7 000 |
+| Enterprise × Enterprise | ₺100 000 | ₺3 000 (3%) | ₺2 000 (2%) | — | — | ₺5 000 |
+| + Free-tier carrier on transport ₺10 000 | | | | ₺10 000 | ₺1 000 (10%) | +₺1 000 |
+| + Pro-tier carrier on transport ₺10 000 | | | | ₺10 000 | ₺700 (7%) | +₺700 |
+
+At Phase 1 pilot scale (50 producers × 5 tenders/mo average), a healthy mix of Free + Pro orgs yields ~₺350 000 / mo commission revenue + ~₺200 000 / mo SaaS subscription revenue → ~₺550 000 / mo gross. Defensible.
 
 ### 6. Escrow integration
 

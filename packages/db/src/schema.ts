@@ -109,6 +109,104 @@ export const escrowStatusEnum = pgEnum("escrow_status", [
   "failed",
 ]);
 
+// ─── Subscriptions (ADR-0024) ─────────────────────────────────────
+
+export const subscriptionStatusEnum = pgEnum("subscription_status", [
+  "active",
+  "past_due",
+  "cancelled",
+  "expired",
+]);
+
+// ─── Facilities (ADR-0025) ────────────────────────────────────────
+
+export const facilityTypeEnum = pgEnum("facility_type", [
+  "factory",
+  "warehouse",
+  "transfer_station",
+  "recycling_plant",
+  "landfill",
+  "other",
+]);
+
+// ─── Orders (ADR-0026) ────────────────────────────────────────────
+
+export const orderStatusEnum = pgEnum("order_status", [
+  "pending",
+  "accepted",
+  "in_transit",
+  "delivered",
+  "disputed",
+  "completed",
+  "cancelled",
+]);
+
+export const inspectionOutcomeEnum = pgEnum("inspection_outcome", [
+  "pass",
+  "fail",
+  "conditional",
+]);
+
+// ─── VRP / Route Engine (ADR-0027) ────────────────────────────────
+
+export const vehicleTypeEnum = pgEnum("vehicle_type", [
+  "truck_3_5t",
+  "truck_7_5t",
+  "truck_24t",
+  "tanker",
+  "other",
+]);
+
+export const vehicleStatusEnum = pgEnum("vehicle_status", [
+  "idle",
+  "en_route",
+  "loading",
+  "unloading",
+  "maintenance",
+]);
+
+// ─── IoT (ADR-0028) ───────────────────────────────────────────────
+
+export const deviceTypeEnum = pgEnum("device_type", [
+  "weight_sensor",
+  "fill_level_sensor",
+  "gps_tracker",
+  "camera",
+  "environmental_sensor",
+]);
+
+export const deviceStatusEnum = pgEnum("device_status", [
+  "online",
+  "offline",
+  "maintenance",
+  "error",
+]);
+
+export const connectivityProtocolEnum = pgEnum("connectivity_protocol", [
+  "mqtt",
+  "lora",
+  "cellular",
+  "wifi",
+  "ethernet",
+]);
+
+// ─── Edge AI (ADR-0029) ───────────────────────────────────────────
+
+export const inferenceUnitTypeEnum = pgEnum("inference_unit_type", [
+  "waste_classifier",
+  "contamination_detector",
+  "volume_estimator",
+  "material_sorter",
+  "custom",
+]);
+
+export const inferenceUnitStatusEnum = pgEnum("inference_unit_status", [
+  "idle",
+  "inferring",
+  "error",
+  "offline",
+]);
+
 // ============================================================
 // Identity & tenancy
 // ============================================================
@@ -177,7 +275,10 @@ export const tenders = pgTable(
     quantityTons: numeric("quantity_tons", { precision: 12, scale: 3 }).notNull(),
     pickupRegion: text("pickup_region").notNull(),
     pickupAddress: text("pickup_address"),
+    pickupFacilityId: uuid("pickup_facility_id").references(() => facilities.id),
+    dropoffFacilityId: uuid("dropoff_facility_id").references(() => facilities.id),
     notes: text("notes"),
+    allowPartialAward: boolean("allow_partial_award").notNull().default(false),
     status: tenderStatusEnum("status").notNull().default("draft"),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     closesAt: timestamp("closes_at", { withTimezone: true }),
@@ -364,6 +465,7 @@ export const carrierAds = pgTable(
     pickupWindowStart: timestamp("pickup_window_start", { withTimezone: true }).notNull(),
     pickupWindowEnd: timestamp("pickup_window_end", { withTimezone: true }).notNull(),
     notes: text("notes"),
+    orderId: uuid("order_id").references(() => orders.id),
     status: carrierAdStatusEnum("status").notNull().default("open"),
     closesAt: timestamp("closes_at", { withTimezone: true }).notNull(),
     winnerBidId: uuid("winner_bid_id"),
@@ -434,6 +536,10 @@ export const shipments = pgTable(
     pickupAt: timestamp("pickup_at", { withTimezone: true }),
     deliveredAt: timestamp("delivered_at", { withTimezone: true }),
     irsaliyeNo: text("irsaliye_no"),
+    routeLegId: uuid("route_leg_id").references(() => routeLegs.id),
+    sequenceInLeg: integer("sequence_in_leg"),
+    pickupFacilityId: uuid("pickup_facility_id").references(() => facilities.id),
+    dropoffFacilityId: uuid("dropoff_facility_id").references(() => facilities.id),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -584,4 +690,488 @@ export const anchorLog = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("anchor_log_created_idx").on(t.createdAt.desc())],
+);
+
+// ============================================================
+// PRD-0008 — Pricing engine (hybrid SaaS + commission)
+// ============================================================
+
+export const feeSchedules = pgTable(
+  "fee_schedules",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull(),
+    segment: orgTypeEnum("segment").notNull(),
+    tier: text("tier").notNull(),
+    commissionPct: numeric("commission_pct", { precision: 5, scale: 2 }).notNull(),
+    capAmount: numeric("cap_amount", { precision: 14, scale: 2 }),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+export const feeScheduleTiers = pgTable(
+  "fee_schedule_tiers",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    scheduleId: uuid("schedule_id")
+      .notNull()
+      .references(() => feeSchedules.id, { onDelete: "cascade" }),
+    minVolume: numeric("min_volume", { precision: 14, scale: 2 }),
+    maxVolume: numeric("max_volume", { precision: 14, scale: 2 }),
+    rate: numeric("rate", { precision: 14, scale: 4 }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+export const feeScheduleOverrides = pgTable(
+  "fee_schedule_overrides",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    scheduleId: uuid("schedule_id")
+      .notNull()
+      .references(() => feeSchedules.id, { onDelete: "cascade" }),
+    reason: text("reason").notNull(),
+    createdBy: uuid("created_by").references(() => internalStaff.id),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+  },
+);
+
+export const feeApplications = pgTable(
+  "fee_applications",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    feeScheduleId: uuid("fee_schedule_id")
+      .notNull()
+      .references(() => feeSchedules.id, { onDelete: "restrict" }),
+    escrowOrderId: uuid("escrow_order_id").references(() => escrowOrders.id, { onDelete: "restrict" }),
+    computedAmount: numeric("computed_amount", { precision: 14, scale: 2 }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+// ============================================================
+// ADR-0024 — Subscription tiers + billing
+// ============================================================
+
+export const subscriptionTiers = pgTable(
+  "subscription_tiers",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull(),
+    segment: orgTypeEnum("segment").notNull(),
+    tier: text("tier").notNull(),
+    priceMonthly: numeric("price_monthly", { precision: 10, scale: 2 }).notNull(),
+    features: jsonb("features").notNull().default(sql`'{}'::jsonb`),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+export const orgSubscriptions = pgTable(
+  "org_subscriptions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    tierId: uuid("tier_id")
+      .notNull()
+      .references(() => subscriptionTiers.id, { onDelete: "restrict" }),
+    status: subscriptionStatusEnum("status").notNull().default("active"),
+    currentPeriodStart: timestamp("current_period_start", { withTimezone: true }).notNull(),
+    currentPeriodEnd: timestamp("current_period_end", { withTimezone: true }).notNull(),
+    cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+export const subscriptionInvoices = pgTable(
+  "subscription_invoices",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    subscriptionId: uuid("subscription_id")
+      .notNull()
+      .references(() => orgSubscriptions.id, { onDelete: "restrict" }),
+    amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
+    status: text("status").notNull().default("pending"),
+    dueDate: timestamp("due_date", { withTimezone: true }).notNull(),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+export const orgUsageCounters = pgTable(
+  "org_usage_counters",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    counterName: text("counter_name").notNull(),
+    currentValue: integer("current_value").notNull().default(0),
+    limitValue: integer("limit_value"),
+    periodStart: timestamp("period_start", { withTimezone: true }).notNull(),
+    periodEnd: timestamp("period_end", { withTimezone: true }).notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+// ============================================================
+// ADR-0025 — Facilities (multi-site)
+// ============================================================
+
+export const facilities = pgTable(
+  "facilities",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    name: text("name").notNull(),
+    type: facilityTypeEnum("type").notNull(),
+    address: text("address").notNull(),
+    lat: numeric("lat", { precision: 9, scale: 6 }),
+    lng: numeric("lng", { precision: 9, scale: 6 }),
+    cevreLisansiNo: text("cevre_lisansi_no"),
+    isPrimary: boolean("is_primary").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+// ============================================================
+// ADR-0026 — Orders (separate from tenders)
+// ============================================================
+
+export const orders = pgTable(
+  "orders",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenderId: uuid("tender_id")
+      .notNull()
+      .references(() => tenders.id, { onDelete: "restrict" }),
+    buyerOrgId: uuid("buyer_org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    sellerOrgId: uuid("seller_org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    winningBidId: uuid("winning_bid_id").references(() => bids.id),
+    quantityTons: numeric("quantity_tons", { precision: 12, scale: 3 }).notNull(),
+    pricePerTon: numeric("price_per_ton", { precision: 14, scale: 2 }).notNull(),
+    totalAmount: numeric("total_amount", { precision: 14, scale: 2 }).notNull(),
+    status: orderStatusEnum("status").notNull().default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("orders_tender_idx").on(t.tenderId),
+    index("orders_buyer_idx").on(t.buyerOrgId),
+    index("orders_status_idx").on(t.status),
+  ],
+);
+
+export const orderParties = pgTable(
+  "order_parties",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => orders.id, { onDelete: "cascade" }),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id),
+    role: text("role").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+export const orderStatusTransitions = pgTable(
+  "order_status_transitions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => orders.id, { onDelete: "cascade" }),
+    fromStatus: orderStatusEnum("from_status").notNull(),
+    toStatus: orderStatusEnum("to_status").notNull(),
+    actorUserId: uuid("actor_user_id").references(() => users.id),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+export const qualityInspections = pgTable(
+  "quality_inspections",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => orders.id, { onDelete: "cascade" }),
+    inspectorOrgId: uuid("inspector_org_id")
+      .notNull()
+      .references(() => organizations.id),
+    outcome: inspectionOutcomeEnum("outcome").notNull(),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+export const deliveryProofs = pgTable(
+  "delivery_proofs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => orders.id, { onDelete: "cascade" }),
+    irsaliyeNo: text("irsaliye_no"),
+    signatureUrl: text("signature_url"),
+    photoUrls: jsonb("photo_urls").notNull().default(sql`'[]'::jsonb`),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+// ============================================================
+// ADR-0027 — VRP / Route Engine (substrate seat)
+// ============================================================
+
+export const vehicles = pgTable(
+  "vehicles",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    plate: text("plate").notNull(),
+    type: vehicleTypeEnum("type").notNull().default("truck_24t"),
+    capacityKg: integer("capacity_kg").notNull(),
+    status: vehicleStatusEnum("status").notNull().default("idle"),
+    currentLat: numeric("current_lat", { precision: 9, scale: 6 }),
+    currentLng: numeric("current_lng", { precision: 9, scale: 6 }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+export const driverProfiles = pgTable(
+  "driver_profiles",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    userId: uuid("user_id").references(() => users.id),
+    fullName: text("full_name").notNull(),
+    licenseNumber: text("license_number"),
+    phone: text("phone"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+export const routeOptimizations = pgTable(
+  "route_optimizations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id),
+    status: text("status").notNull().default("pending"),
+    inputPayload: jsonb("input_payload").notNull().default(sql`'{}'::jsonb`),
+    outputPayload: jsonb("output_payload"),
+    engine: text("engine").notNull().default("manual"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+export const routeLegs = pgTable(
+  "route_legs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    optimizationId: uuid("optimization_id")
+      .notNull()
+      .references(() => routeOptimizations.id, { onDelete: "cascade" }),
+    vehicleId: uuid("vehicle_id").references(() => vehicles.id),
+    driverId: uuid("driver_id").references(() => driverProfiles.id),
+    sequence: integer("sequence").notNull().default(0),
+    startLat: numeric("start_lat", { precision: 9, scale: 6 }),
+    startLng: numeric("start_lng", { precision: 9, scale: 6 }),
+    endLat: numeric("end_lat", { precision: 9, scale: 6 }),
+    endLng: numeric("end_lng", { precision: 9, scale: 6 }),
+    estimatedDurationMin: integer("estimated_duration_min"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+export const shipmentStops = pgTable(
+  "shipment_stops",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    shipmentId: uuid("shipment_id")
+      .notNull()
+      .references(() => shipments.id, { onDelete: "cascade" }),
+    legId: uuid("leg_id").references(() => routeLegs.id),
+    sequence: integer("sequence").notNull().default(0),
+    lat: numeric("lat", { precision: 9, scale: 6 }),
+    lng: numeric("lng", { precision: 9, scale: 6 }),
+    address: text("address"),
+    arrivedAt: timestamp("arrived_at", { withTimezone: true }),
+    departedAt: timestamp("departed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+// ============================================================
+// ADR-0028 — IoT ingestion (substrate seat)
+// ============================================================
+
+export const devices = pgTable(
+  "devices",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    facilityId: uuid("facility_id").references(() => facilities.id),
+    name: text("name").notNull(),
+    type: deviceTypeEnum("type").notNull(),
+    status: deviceStatusEnum("status").notNull().default("offline"),
+    connectivity: connectivityProtocolEnum("connectivity").notNull().default("mqtt"),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }),
+    metadata: jsonb("metadata").notNull().default(sql`'{}'::jsonb`),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+export const deviceTelemetry = pgTable(
+  "device_telemetry",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    deviceId: uuid("device_id")
+      .notNull()
+      .references(() => devices.id, { onDelete: "cascade" }),
+    payload: jsonb("payload").notNull(),
+    receivedAt: timestamp("received_at", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("device_telemetry_device_idx").on(t.deviceId, t.receivedAt.desc())],
+);
+
+export const telemetryAggregations = pgTable(
+  "telemetry_aggregations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    deviceId: uuid("device_id")
+      .notNull()
+      .references(() => devices.id, { onDelete: "cascade" }),
+    aggType: text("agg_type").notNull(),
+    aggValue: numeric("agg_value", { precision: 14, scale: 4 }),
+    windowStart: timestamp("window_start", { withTimezone: true }).notNull(),
+    windowEnd: timestamp("window_end", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+export const deviceAlerts = pgTable(
+  "device_alerts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    deviceId: uuid("device_id")
+      .notNull()
+      .references(() => devices.id, { onDelete: "cascade" }),
+    alertType: text("alert_type").notNull(),
+    severity: text("severity").notNull().default("info"),
+    message: text("message").notNull(),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+// ============================================================
+// ADR-0029 — Edge AI (substrate seat)
+// ============================================================
+
+export const aiInferenceUnits = pgTable(
+  "ai_inference_units",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "restrict" }),
+    facilityId: uuid("facility_id").references(() => facilities.id),
+    name: text("name").notNull(),
+    type: inferenceUnitTypeEnum("type").notNull(),
+    status: inferenceUnitStatusEnum("status").notNull().default("idle"),
+    modelId: uuid("model_id"),
+    lastInferenceAt: timestamp("last_inference_at", { withTimezone: true }),
+    metadata: jsonb("metadata").notNull().default(sql`'{}'::jsonb`),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+export const mlModels = pgTable(
+  "ml_models",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull(),
+    version: text("version").notNull(),
+    framework: text("framework").notNull(),
+    accuracy: numeric("accuracy", { precision: 5, scale: 4 }),
+    isActive: boolean("is_active").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+export const inferenceJobs = pgTable(
+  "inference_jobs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    unitId: uuid("unit_id")
+      .notNull()
+      .references(() => aiInferenceUnits.id, { onDelete: "cascade" }),
+    modelId: uuid("model_id").references(() => mlModels.id),
+    status: text("status").notNull().default("pending"),
+    inputPayload: jsonb("input_payload"),
+    startedAt: timestamp("started_at", { withTimezone: true }),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+);
+
+export const inferenceResults = pgTable(
+  "inference_results",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jobId: uuid("job_id")
+      .notNull()
+      .references(() => inferenceJobs.id, { onDelete: "cascade" }),
+    unitId: uuid("unit_id")
+      .notNull()
+      .references(() => aiInferenceUnits.id, { onDelete: "cascade" }),
+    labels: jsonb("labels").notNull().default(sql`'[]'::jsonb`),
+    confidence: numeric("confidence", { precision: 5, scale: 4 }),
+    rawOutput: jsonb("raw_output"),
+    imageUrl: text("image_url"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("inference_results_job_idx").on(t.jobId, t.createdAt.desc())],
+);
+
+export const aiUnitCommands = pgTable(
+  "ai_unit_commands",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    unitId: uuid("unit_id")
+      .notNull()
+      .references(() => aiInferenceUnits.id, { onDelete: "cascade" }),
+    command: text("command").notNull(),
+    payload: jsonb("payload"),
+    status: text("status").notNull().default("pending"),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    acknowledgedAt: timestamp("acknowledged_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
 );

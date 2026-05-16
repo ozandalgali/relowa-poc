@@ -36,7 +36,7 @@ const connectionString =
 // Files that Drizzle Kit DOES NOT manage — we run them ourselves.
 // Convention: anything other than the auto-generated `XXXX_<random>.sql`
 // pattern (we recognize them by hand-picked filenames).
-const RAW_SQL_FILES = ["0001_rls_helpers_and_policies.sql", "0002_rls_m1_tables.sql"];
+const RAW_SQL_FILES = ["0001_rls_helpers_and_policies.sql", "0002_rls_m1_tables.sql", "0003_rls_substrate_seats.sql"];
 
 async function runDrizzleMigrations() {
   console.log("→ phase 1: running drizzle-generated migrations");
