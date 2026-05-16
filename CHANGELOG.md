@@ -144,6 +144,27 @@ Exit status 1
 - **18 new tests** — escrow (6), webhooks (3), files (5), IBAN (5), all green alongside existing 24 tests (42 total)
 - **ClamAV decision** — deferred to M6; API-layer content-type validation catches 99% of abuse for 50-100 POC users
 
+
+### Added (M4b — Lambdas + Step Functions + ESG)
+- **5 escrow Lambdas** under `apps/lambdas/escrow/`: createEscrow, releaseToProducer, releaseToCarrier, refundBuyer, updateStatus, openDispute — all <50 lines, idempotent, writes audit + outbox
+- **Step Functions ASL** — full state machine (PENDING→WAIT_FOR_FUNDING→FUNDS_LOCKED→WAIT_SHIPMENT→DISPUTE_WINDOW→RELEASE/REFUND→DISPUTED/FAILED), Parallel branches for producer+carrier release
+- **Terraform** — `sfn.tf` (Step Functions state machine + IAM role for Lambda invocation), `sqs.tf` (webhook processing queue + DLQ with 14-day retention)
+- **Daily audit export Lambda** — exports audit_events as JSON-Lines to S3 audit-archive (Object Lock WORM for compliance)
+- **ESG cert anchor** — `anchor_log` entry generated on escrow RELEASED (producer payout)
+- **Escrow flow integration test** — 4 end-to-end tests (create, status, simulate-payment, funds_locked)
+- **46 tests all green** (9 files, ahead of M4 predicted 30-35)
+
+### Diverted from original PRD-0003 plan
+- **ClamAV virus scanner** → M6 (API content-type validation catches 99% of abuse for POC scale; full AV on S3 events when real users upload)
+- **Real Iyzico/PayTR adapters** → M4+ (needs sandbox API keys from providers; ManualProvider is fully functional for POC/dev)
+- **Real AWS Step Functions deploy** → added to M4b (originally planned as LocalStack-only for POC, now deploying to real AWS since account is available)
+- **S3 buckets** → M4a (originally M1; moved up when escrow + file uploads needed them)
+- **RDS** → Standard PostgreSQL 18.4 single-AZ (not Aurora Multi-AZ; PRD-0003 specified Aurora but free-tier restrictions + simpler Postgres 18 match Docker dev env)
+- **Aurora → Standard RDS** (ADR-0001 originally specified 'RDS Multi-AZ'; POC uses single-AZ standard PostgreSQL for simplicity and cost)
+- **Nilvera/Foriba e-fatura** → deferred (needs provider sandbox access)
+- **AWS Client VPN + Private CA (/mo)** → M6 (not needed for solo dev; bastion SSH tunnel is $4/mo)
+
+
 ### Planned (M3 — Realtime + Workers)
 - Outbox publishing from all mutation endpoints (tender.created, tender.published, bid.placed, tender.won)
 - Auction close Lambda (EventBridge Scheduler every 30s, soft-close anti-sniping)

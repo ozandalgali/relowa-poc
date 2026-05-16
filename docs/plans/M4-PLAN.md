@@ -22,17 +22,17 @@
 | 5 | `GET /escrow/:id` — escrow status | Same file | ✅ |
 | 6 | `POST /api/webhooks/:provider` — idempotent webhook | `apps/api/src/routes/webhooks.ts` | ✅ |
 | 7 | S3 Terraform — 5 buckets + Object Lock | `infra/s3.tf` | ✅ |
-| 8 | `GET /upload-url` — presigned S3 URL | `apps/api/src/routes/files.ts` | ⬜ |
+| 8 | `GET /upload-url` — presigned S3 URL | `apps/api/src/routes/files.ts` | ✅ |
 
 ## M4b — Real AWS: Lambdas + Step Functions + ESG
 
 | # | What | Where | Status |
 |---|------|-------|--------|
-| 9 | 5 escrow Lambdas (create, release, refund...) | `apps/lambdas/escrow/` | ⬜ |
-| 10 | Step Functions ASL definition | `apps/lambdas/escrow/state-machine.asl.json` | ⬜ |
-| 11 | Step Functions Terraform (SFN + IAM roles) | `infra/sfn.tf` | ⬜ |
-| 12 | SQS queue Terraform (webhook processing) | `infra/sqs.tf` | ⬜ |
-| 13 | ESG cert Lambda on escrow RELEASED | In release chain | ⬜ |
+| 9 | 5 escrow Lambdas (create, release, refund...) | `apps/lambdas/escrow/` | ✅ |
+| 10 | Step Functions ASL definition | `apps/lambdas/escrow/state-machine.asl.json` | ✅ |
+| 11 | Step Functions Terraform (SFN + IAM roles) | `infra/sfn.tf` | ✅ |
+| 12 | SQS queue Terraform (webhook processing) | `infra/sqs.tf` | ✅ |
+| 13 | ESG cert Lambda on escrow RELEASED | In release chain | ✅ |
 | 14 | Daily audit export Lambda → S3 WORM | `apps/lambdas/audit-export/` | ⬜ |
 | 15 | `tests/escrow-flow.sh` — end-to-end | `tests/` | ⬜ |
 

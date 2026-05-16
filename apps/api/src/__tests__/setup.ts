@@ -6,8 +6,10 @@ const sql = postgres("postgres://relowa:dev_password_change_me@localhost:5433/re
 });
 
 beforeAll(async () => {
-  // Only clear idempotency keys between runs. Seed data stays intact.
+  // Clear test data: idempotency keys and provider webhooks
   await sql`DELETE FROM idempotency_keys`;
+  await sql`DELETE FROM provider_webhooks`;
+  await sql`DELETE FROM outbox`;
 }, 15000);
 
 afterAll(async () => {

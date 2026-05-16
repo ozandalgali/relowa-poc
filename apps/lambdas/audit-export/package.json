@@ -1,0 +1,10 @@
+{
+  "name": "audit-export",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "postgres": "^3.4.5",
+    "@relowa/db": "workspace:*"
+  }
+}

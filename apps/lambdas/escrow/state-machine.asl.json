@@ -1,0 +1,241 @@
+/**
+ * Step Functions ASL — Escrow State Machine (ADR-0007 §2)
+ *
+ * PENDING → WAIT_FOR_FUNDING → FUNDS_LOCKED → WAIT_FOR_SHIPMENT
+ *   → DISPUTE_WINDOW → RELEASE_FUNDS (parallel: producer + carrier)
+ *   → RELEASED / REFUNDED / DISPUTED / FAILED
+ *
+ * Each Task calls a Lambda via the ARN pattern:
+ *   arn:aws:lambda:${region}:${account}:function:relowa-dev-escrow-${name}
+ *
+ * Wait states use Task tokens (callback pattern) for:
+ *   - WaitForFunding: webhook resumes via SendTaskSuccess
+ *   - ManualReview: super_admin resolves via admin panel
+ */
+{
+  "Comment": "Relowa Escrow State Machine — ADR-0007",
+  "StartAt": "CreateEscrowOrder",
+  "States": {
+    "CreateEscrowOrder": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${EscrowCreateFunctionArn}",
+        "Payload.$": "$"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "WaitForFunding"
+    },
+
+    "WaitForFunding": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+      "Parameters": {
+        "FunctionName": "${EscrowWaitForCallbackArn}",
+        "Payload": {
+          "taskToken.$": "$$.Task.Token",
+          "input.$": "$"
+        }
+      },
+      "HeartbeatSeconds": 86400,
+      "TimeoutSeconds": 86400,
+      "Catch": [
+        {
+          "ErrorEquals": ["States.Timeout"],
+          "Next": "MarkFailed"
+        }
+      ],
+      "Next": "FundsLocked"
+    },
+
+    "FundsLocked": {
+      "Type": "Pass",
+      "Result": { "status": "funds_locked" },
+      "Next": "WaitForShipment"
+    },
+
+    "WaitForShipment": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+      "Parameters": {
+        "FunctionName": "${EscrowWaitForCallbackArn}",
+        "Payload": {
+          "taskToken.$": "$$.Task.Token",
+          "input.$": "$"
+        }
+      },
+      "HeartbeatSeconds": 604800,
+      "TimeoutSeconds": 604800,
+      "Catch": [
+        {
+          "ErrorEquals": ["States.Timeout"],
+          "Next": "OpenDispute"
+        }
+      ],
+      "Next": "DisputeWindow"
+    },
+
+    "DisputeWindow": {
+      "Type": "Wait",
+      "Seconds": 259200,
+      "Next": "CheckDispute"
+    },
+
+    "CheckDispute": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.dispute_raised",
+          "BooleanEquals": true,
+          "Next": "ManualReview"
+        }
+      ],
+      "Default": "ReleaseFunds"
+    },
+
+    "ReleaseFunds": {
+      "Type": "Parallel",
+      "Branches": [
+        {
+          "StartAt": "ReleaseToProducer",
+          "States": {
+            "ReleaseToProducer": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "Parameters": {
+                "FunctionName": "${EscrowReleaseToProducerArn}",
+                "Payload.$": "$"
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "ReleaseToCarrier",
+          "States": {
+            "ReleaseToCarrier": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "Parameters": {
+                "FunctionName": "${EscrowReleaseToCarrierArn}",
+                "Payload.$": "$"
+              },
+              "End": true
+            }
+          }
+        }
+      ],
+      "Next": "MarkReleased"
+    },
+
+    "MarkReleased": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${EscrowUpdateStatusArn}",
+        "Payload": {
+          "input.$": "$",
+          "status": "released"
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3
+        }
+      ],
+      "End": true
+    },
+
+    "ManualReview": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+      "Parameters": {
+        "FunctionName": "${EscrowWaitForCallbackArn}",
+        "Payload": {
+          "taskToken.$": "$$.Task.Token",
+          "input.$": "$"
+        }
+      },
+      "HeartbeatSeconds": 604800,
+      "Catch": [
+        {
+          "ErrorEquals": ["States.Timeout"],
+          "Next": "MarkFailed"
+        }
+      ],
+      "Next": "PostManualReview"
+    },
+
+    "PostManualReview": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.resolution",
+          "StringEquals": "release",
+          "Next": "ReleaseFunds"
+        },
+        {
+          "Variable": "$.resolution",
+          "StringEquals": "refund",
+          "Next": "RefundBuyer"
+        }
+      ],
+      "Default": "MarkFailed"
+    },
+
+    "RefundBuyer": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${EscrowRefundBuyerArn}",
+        "Payload.$": "$"
+      },
+      "Next": "MarkRefunded"
+    },
+
+    "MarkRefunded": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${EscrowUpdateStatusArn}",
+        "Payload": {
+          "input.$": "$",
+          "status": "refunded"
+        }
+      },
+      "End": true
+    },
+
+    "OpenDispute": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${EscrowOpenDisputeArn}",
+        "Payload.$": "$"
+      },
+      "Next": "ManualReview"
+    },
+
+    "MarkFailed": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${EscrowUpdateStatusArn}",
+        "Payload": {
+          "input.$": "$",
+          "status": "failed"
+        }
+      },
+      "End": true
+    }
+  }
+}
