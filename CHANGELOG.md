@@ -154,6 +154,12 @@ Exit status 1
 - **Escrow flow integration test** — 4 end-to-end tests (create, status, simulate-payment, funds_locked)
 - **46 tests all green** (9 files, ahead of M4 predicted 30-35)
 
+### Added (M4c — Backend gap closures)
+- **waitForCallback Lambda** — Step Functions Task Token passthrough (target for .waitForTaskToken states: WaitForFunding, WaitForShipment, ManualReview)
+- **EventBridge Scheduler Terraform** (`infra/scheduler.tf`) — auction-close every 30s, daily audit export at 03:00 UTC, IAM role for Lambda invocation
+- **Outbox relay worker** (`apps/lambdas/outbox-relay/`) — polls outbox table every 1s, Shopify-style SKIP LOCKED multi-worker safe, publishes to AppSync/Supabase Realtime based on REALTIME_BACKEND env var
+- **Backend now complete** — 11 Lambdas, 7 API routes, 3 middleware, 2 SFN state machines, 5 S3 buckets, 46 tests green
+
 ### Diverted from original PRD-0003 plan
 - **ClamAV virus scanner** → M6 (API content-type validation catches 99% of abuse for POC scale; full AV on S3 events when real users upload)
 - **Real Iyzico/PayTR adapters** → M4+ (needs sandbox API keys from providers; ManualProvider is fully functional for POC/dev)

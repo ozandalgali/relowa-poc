@@ -36,6 +36,14 @@
 | 14 | Daily audit export Lambda → S3 WORM | `apps/lambdas/audit-export/` | ⬜ |
 | 15 | `tests/escrow-flow.sh` — end-to-end | `tests/` | ⬜ |
 
+## M4c — Gap closures | ✅ Done
+
+| # | What | Where | Status |
+|---|------|-------|--------|
+| 16 | waitForCallback Lambda (SFN task token target) | apps/lambdas/escrow/waitForCallback.ts | ✅ |
+| 17 | EventBridge Scheduler Terraform (auction-close 30s + audit-export daily) | infra/scheduler.tf | ✅ |
+| 18 | Outbox relay worker (polls outbox, ships to AppSync/Supabase) | apps/lambdas/outbox-relay/ | ✅ |
+
 ## Deferred
 
 | Item | Sprint | Why |
