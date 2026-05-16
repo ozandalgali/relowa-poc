@@ -72,10 +72,11 @@ Client (dev: curl with HMAC-signed JWT)
   → SET LOCAL ROLE app_user
   → route handler runs Drizzle query (RLS applies transparently)
 ```
+## 🔴 Manual steps (human action required)
 
-## Manual steps
-
-| # | When | Action |
-|---|------|--------|
-| 1 | After app scaffold | `pnpm install` to resolve new dependencies |
-| 2 | After Dockerfile | `docker compose up -d api` to verify container starts |
+| # | When | Action | Why |
+|---|------|--------|-----|
+| 1 | After app scaffold | `pnpm install` in repo root | Resolve new `apps/api/` dependencies (hono, drizzle-orm, zod, vitest) |
+| 2 | Before local API dev | Kill SSH tunnel if active: `kill $(lsof -ti:5433)` — then start Docker stack: `docker compose up -d` | SSH tunnel intercepts port 5433, API needs Docker Postgres |
+| 3 | Before API tests | Ensure Docker Postgres is healthy + seeded: `docker compose ps postgres`, `pnpm db:reset` | Tests need seed data |
+| 4 | To test bid endpoints | Generate JWT: use `apps/api/src/__tests__/helpers.ts` signJwt, or run tests: `pnpm test` | JWT required for all /tenders endpoints |

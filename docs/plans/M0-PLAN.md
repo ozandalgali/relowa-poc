@@ -12,7 +12,7 @@
 | 2. Terraform module (VPC, RDS, ECR, IAM, secrets) | ✅ Done |
 | 3. GitHub Actions CI (lint, test, deploy-dev + stubs) | ✅ Done |
 | 4. Terraform deploy (dev) | ✅ Done |
-| 5. Documentation + push | 🔨 In progress |
+| 5. Documentation + push | ✅ Done |
 
 ## Dependency graph
 

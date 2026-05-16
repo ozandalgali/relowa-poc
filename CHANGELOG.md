@@ -105,6 +105,14 @@ stdout | src/__tests__/bids.test.ts > Bid flow
 Exit status 1
  ELIFECYCLE  Test failed. See above for more details. script in 
 
+### Planned (M3 — Realtime + Workers)
+- Outbox publishing from all mutation endpoints (tender.created, tender.published, bid.placed, tender.won)
+- Auction close Lambda (EventBridge Scheduler every 30s, soft-close anti-sniping)
+- EventBridge rules + Scheduler wiring
+- AppSync GraphQL schema (subscriptions)
+- Integration tests for full bidding flow
+- ADR-0009: Local EventBridge bidding architecture
+
 ### Planned
 - Hono API scaffold with tender/bid endpoints, JWT-via-GUC middleware, idempotency middleware
 - LocalStack EventBridge bus + rules: `tender.published`, `bid.placed`, `tender.won`, `tender.closing`
