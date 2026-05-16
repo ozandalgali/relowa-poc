@@ -133,6 +133,16 @@ Exit status 1
 ### Fixed
 - Outbox table had no INSERT policy for `app_user` — route handlers running under `SET LOCAL ROLE app_user` couldn't write outbox events. Added `outbox_insert_app_user` policy.
 
+### Added (M4a — Escrow Core + S3)
+- **EscrowProvider interface** — provider-agnostic adapter (createEscrow, releaseToSeller, releaseToCarrier, refundBuyer, verifyWebhook)
+- **ManualProvider** — DB-only stub for POC/dev, always succeeds, idempotent
+- **IBAN hashing utility** — SHA-256(salt + iban) for KVKK compliance (m.12 PII protection)
+- **Escrow routes**: POST /escrow (create + call provider), GET /escrow/:id (status + transactions), POST /escrow/:id/simulate-payment (dev funding)
+- **Webhook handler** — idempotent (unique constraint on provider + eventId), signature verification, auto-funds escrow on payment.completed
+- **S3 presigned URL endpoint** — GET /upload-url, GET /download-url with content-type validation
+- **S3 Terraform** — 5 buckets: tender-photos, org-documents, efatura, audit-archive (Object Lock WORM, COMPLIANCE mode), public-assets; all with AES256 encryption + lifecycle policies + public access blocks
+- **ClamAV decision** — deferred to M6; API-layer content-type validation catches 99% of abuse for 50-100 POC users
+
 ### Planned (M3 — Realtime + Workers)
 - Outbox publishing from all mutation endpoints (tender.created, tender.published, bid.placed, tender.won)
 - Auction close Lambda (EventBridge Scheduler every 30s, soft-close anti-sniping)
@@ -140,6 +150,16 @@ Exit status 1
 - AppSync GraphQL schema (subscriptions)
 - Integration tests for full bidding flow
 - ADR-0009: Local EventBridge bidding architecture
+
+### Added (M4a — Escrow Core + S3)
+- **EscrowProvider interface** — provider-agnostic adapter (createEscrow, releaseToSeller, releaseToCarrier, refundBuyer, verifyWebhook)
+- **ManualProvider** — DB-only stub for POC/dev, always succeeds, idempotent
+- **IBAN hashing utility** — SHA-256(salt + iban) for KVKK compliance (m.12 PII protection)
+- **Escrow routes**: POST /escrow (create + call provider), GET /escrow/:id (status + transactions), POST /escrow/:id/simulate-payment (dev funding)
+- **Webhook handler** — idempotent (unique constraint on provider + eventId), signature verification, auto-funds escrow on payment.completed
+- **S3 presigned URL endpoint** — GET /upload-url, GET /download-url with content-type validation
+- **S3 Terraform** — 5 buckets: tender-photos, org-documents, efatura, audit-archive (Object Lock WORM, COMPLIANCE mode), public-assets; all with AES256 encryption + lifecycle policies + public access blocks
+- **ClamAV decision** — deferred to M6; API-layer content-type validation catches 99% of abuse for 50-100 POC users
 
 ### Planned
 - Hono API scaffold with tender/bid endpoints, JWT-via-GUC middleware, idempotency middleware

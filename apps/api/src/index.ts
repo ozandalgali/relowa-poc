@@ -6,6 +6,9 @@ import { jwtMiddleware } from "./middleware/auth";
 import { idempotencyMiddleware } from "./middleware/idempotency";
 import { tenderRoutes } from "./routes/tenders";
 import { bidRoutes } from "./routes/bids";
+import { escrowRoutes } from "./routes/escrow";
+import { webhookRoutes } from "./routes/webhooks";
+import { fileRoutes } from "./routes/files";
 
 const app = new Hono();
 
@@ -17,15 +20,21 @@ app.get("/health", (c) => c.json({ status: "ok", timestamp: new Date().toISOStri
 
 // JWT + GUC middleware — sets request.jwt.claims and ROLE app_user
 app.use("/tenders/*", jwtMiddleware);
+app.use("/escrow/*", jwtMiddleware);
+app.use("/files/*", jwtMiddleware);
 
 // Idempotency — on all mutation endpoints
 app.use("/tenders", idempotencyMiddleware("POST"));
 app.use("/tenders/:id/publish", idempotencyMiddleware("PATCH"));
 app.use("/tenders/:id/bids", idempotencyMiddleware("POST"));
+app.use("/escrow", idempotencyMiddleware("POST"));
 
 // Routes
 app.route("/tenders", tenderRoutes);
 app.route("/tenders", bidRoutes);
+app.route("/escrow", escrowRoutes);
+app.route("/api/webhooks", webhookRoutes);
+app.route("/files", fileRoutes);
 
 export { app };
 
