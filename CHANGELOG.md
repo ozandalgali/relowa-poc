@@ -141,6 +141,7 @@ Exit status 1
 - **Webhook handler** — idempotent (unique constraint on provider + eventId), signature verification, auto-funds escrow on payment.completed
 - **S3 presigned URL endpoint** — GET /upload-url, GET /download-url with content-type validation
 - **S3 Terraform** — 5 buckets: tender-photos, org-documents, efatura, audit-archive (Object Lock WORM, COMPLIANCE mode), public-assets; all with AES256 encryption + lifecycle policies + public access blocks
+- **18 new tests** — escrow (6), webhooks (3), files (5), IBAN (5), all green alongside existing 24 tests (42 total)
 - **ClamAV decision** — deferred to M6; API-layer content-type validation catches 99% of abuse for 50-100 POC users
 
 ### Planned (M3 — Realtime + Workers)
@@ -159,6 +160,7 @@ Exit status 1
 - **Webhook handler** — idempotent (unique constraint on provider + eventId), signature verification, auto-funds escrow on payment.completed
 - **S3 presigned URL endpoint** — GET /upload-url, GET /download-url with content-type validation
 - **S3 Terraform** — 5 buckets: tender-photos, org-documents, efatura, audit-archive (Object Lock WORM, COMPLIANCE mode), public-assets; all with AES256 encryption + lifecycle policies + public access blocks
+- **18 new tests** — escrow (6), webhooks (3), files (5), IBAN (5), all green alongside existing 24 tests (42 total)
 - **ClamAV decision** — deferred to M6; API-layer content-type validation catches 99% of abuse for 50-100 POC users
 
 ### Planned

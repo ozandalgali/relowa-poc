@@ -40,17 +40,26 @@ webhookRoutes.post("/:provider", async (c) => {
     return c.json({ status: "already_processed", id: existing.id }, 200);
   }
 
-  // Insert webhook record
-  const [webhook] = await db
-    .insert(schema.providerWebhooks)
-    .values({
-      provider: providerName,
-      providerEventId: verification.eventId,
-      payload: verification.payload as Record<string, unknown>,
-      signatureValid: verification.valid,
-      relatedEscrowId: verification.orderId !== "unknown" ? verification.orderId : null,
-    })
-    .returning();
+    // Insert webhook record (relatedEscrowId is UUID, skip non-UUID strings)
+    let relatedEscrowId: string | null = null;
+    if (
+      verification.orderId &&
+      verification.orderId !== "unknown" &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(verification.orderId)
+    ) {
+      relatedEscrowId = verification.orderId;
+    }
+
+    const [webhook] = await db
+      .insert(schema.providerWebhooks)
+      .values({
+        provider: providerName,
+        providerEventId: verification.eventId,
+        payload: verification.payload as Record<string, unknown>,
+        signatureValid: verification.valid,
+        relatedEscrowId: relatedEscrowId,
+      })
+      .returning();
 
   if (!webhook) throw new HTTPException(500, { message: "Failed to store webhook" });
 
